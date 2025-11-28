@@ -1,0 +1,68 @@
+stages:
+  - test
+  - docker
+  - helm
+
+default:
+  tags:
+    - dena
+
+unit-test:
+  image: eclipse-temurin:17-jdk-alpine
+  stage: test
+  parallel:
+    matrix:
+      - DIR: controlplane-oauth2
+        IMG: connector-controlplane-oauth2
+      - DIR: controlplane-x509
+        IMG: connector-controlplane-x509
+      - DIR: controlplane-ssi
+        IMG: connector-controlplane-ssi
+      - DIR: dataplane
+        IMG: connector-dataplane
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew -p "runtimes/$DIR" test
+
+docker-build-publish:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  stage: docker
+  parallel:
+    matrix:
+      - DIR: controlplane-oauth2
+        IMG: connector-controlplane-oauth2
+      - DIR: controlplane-x509
+        IMG: connector-controlplane-x509
+      - DIR: controlplane-ssi
+        IMG: connector-controlplane-ssi
+      - DIR: dataplane
+        IMG: connector-dataplane
+  variables:
+      IMAGE_NAME: $CI_REGISTRY_IMAGE/$IMG:$CI_COMMIT_TAG
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  script:
+    - /kaniko/executor
+      --context "."
+      --dockerfile "./runtimes/$DIR/src/main/docker/Dockerfile"
+      --destination "${IMAGE_NAME}"
+  rules:
+    - if: $CI_COMMIT_TAG
+
+helm-build-publish:
+  image: hub.cc-asp.fraunhofer.de/iee-commons/helm:3.10.2-v1
+  stage: helm
+  parallel:
+    matrix:
+      - DIR: connector-oauth
+      - DIR: connector-x509
+      - DIR: connector-ssi
+  when: manual
+  script:
+    - helm registry login "${HARBOR_URL}" -u "${HARBOR_USERNAME}" -p "${HARBOR_PASSWORD}"
+    - helm dependency update ./charts/$DIR
+    - helm package ./charts/$DIR
+    - helm push ${CI_PROJECT_DIR}/*.tgz ${HARBOR_OCI}/${HARBOR_PROJECT}/charts

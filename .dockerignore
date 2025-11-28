@@ -1,0 +1,9 @@
+*
+!gradle
+!extensions
+!spi
+!runtimes
+!*.kts
+!gradle.properties
+!gradlew
+!gradlew.bat

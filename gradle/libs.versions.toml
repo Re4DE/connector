@@ -1,0 +1,83 @@
+[metadata]
+format.version = "1.1"
+
+[versions]
+edc = "0.14.0"
+buncycastle = "1.81"
+httpMockServer = "5.15.0"
+jersey = "3.1.10"
+nimbus = "10.3"
+restAssured = "5.5.5"
+rsApi = "4.0.0"
+swagger = "2.2.34"
+
+[libraries]
+# BOM mobules
+edc-bom-controlplane-base = { module = "org.eclipse.edc:controlplane-base-bom", version.ref = "edc" }
+edc-bom-controlplane-sql = { module = "org.eclipse.edc:controlplane-feature-sql-bom", version.ref = "edc" }
+edc-bom-controlplane-dcp = { module = "org.eclipse.edc:controlplane-dcp-bom", version.ref = "edc" }
+edc-bom-dataplane = { module = "org.eclipse.edc:dataplane-base-bom", version.ref = "edc" }
+edc-bom-dataplane-sql = { module = "org.eclipse.edc:dataplane-feature-sql-bom", version.ref = "edc" }
+
+# Federated catalog
+edc-bom-federatedcatalog-base = { module = "org.eclipse.edc:federatedcatalog-base-bom", version.ref = "edc" }
+edc-bom-federatedcatalog-sql = { module = "org.eclipse.edc:federatedcatalog-feature-sql-bom", version.ref = "edc" }
+edc-bom-federatedcatalog-dcp = { module = "org.eclipse.edc:federatedcatalog-dcp-bom", version.ref = "edc" }
+edc-fc-crawler-spi = { module = "org.eclipse.edc:crawler-spi", version.ref = "edc" }
+
+# Additional edc libs
+edc-http-lib = { module = "org.eclipse.edc:http-lib", version.ref = "edc" }
+edc-jws2020-lib = { module = "org.eclipse.edc:jws2020-lib", version.ref = "edc" }
+edc-token-lib = { module = "org.eclipse.edc:token-lib", version.ref = "edc" }
+edc-transform-lib = { module = "org.eclipse.edc:transform-lib", version.ref = "edc" }
+edc-util-lib = { module = "org.eclipse.edc:util-lib", version.ref = "edc" }
+edc-controlplane-core = { module = "org.eclipse.edc:control-plane-core", version.ref = "edc" }
+edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
+edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref = "edc" }
+edc-jsonld = { module = "org.eclipse.edc:json-ld", version.ref = "edc" }
+edc-policy-monitor = { module = "org.eclipse.edc:policy-monitor-core", version.ref = "edc" }
+edc-data-plane-util = { module = "org.eclipse.edc:data-plane-util", version.ref = "edc" }
+edc-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref = "edc" }
+edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
+edc-http = { module = "org.eclipse.edc:http", version.ref = "edc" }
+edc-jersey-core = { module = "org.eclipse.edc:jersey-core", version.ref = "edc" }
+
+# Additional edc spis
+edc-spi-core = { module = "org.eclipse.edc:core-spi", version.ref = "edc" }
+edc-spi-data-plane = { module = "org.eclipse.edc:data-plane-spi", version.ref = "edc" }
+edc-spi-data-plane-http = { module = "org.eclipse.edc:data-plane-http-spi", version.ref = "edc" }
+edc-spi-http = { module = "org.eclipse.edc:http-spi", version.ref = "edc" }
+edc-spi-keys = { module = "org.eclipse.edc:keys-spi", version.ref = "edc" }
+edc-spi-token = { module = "org.eclipse.edc:token-spi", version.ref = "edc" }
+edc-spi-oauth2 = { module = "org.eclipse.edc:oauth2-spi", version.ref = "edc" }
+edc-spi-jwt = { module = "org.eclipse.edc:jwt-spi", version.ref = "edc" }
+edc-spi-json-ld = { module = "org.eclipse.edc:json-ld-spi", version.ref = "edc" }
+edc-spi-policy-monitor = { module = "org.eclipse.edc:policy-monitor-spi", version.ref = "edc" }
+edc-spi-jwt-signer = { module = "org.eclipse.edc:jwt-signer-spi", version.ref = "edc" }
+edc-spi-protocol = { module = "org.eclipse.edc:protocol-spi", version.ref = "edc" }
+edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
+edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
+edc-spi-catalog = { module = "org.eclipse.edc:catalog-spi", version.ref = "edc" }
+edc-spi-web = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
+
+# Third-part dependencies
+bouncyCastle-bcpkixJdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "buncycastle" }
+bouncyCastle-bcprovJdk18on = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "buncycastle" }
+bouncyCastle-bctlsJdk18on = { module = "org.bouncycastle:bctls-jdk18on", version.ref = "buncycastle" }
+
+jakarta-rsApi = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "rsApi" }
+jersey-multipart = { module = "org.glassfish.jersey.media:jersey-media-multipart", version.ref = "jersey" }
+mockserver-client = { module = "org.mock-server:mockserver-client-java", version.ref = "httpMockServer" }
+mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "httpMockServer" }
+nimbus-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
+restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
+
+[bundles]
+fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
+fc-ssi = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
+
+[plugins]
+docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
+edc-build = { id = "org.eclipse.edc.edc-build", version = "1.1.1" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
+swagger = { id = "io.swagger.core.v3.swagger-gradle-plugin", version.ref = "swagger" }

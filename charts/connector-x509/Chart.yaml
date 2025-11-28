@@ -1,0 +1,34 @@
+#
+#  Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Contributors:
+#       Fraunhofer IEE - initial API and implementation
+#
+#
+
+apiVersion: v2
+name: connector-x509
+description: |
+  A Helm chart for the edc based connector. The connector will open the door to the data space and will
+  handle all communication with the other participants and the identity provider. This connectors uses X509
+  as Identity Service.
+
+type: application
+version: 0.8.3
+appVersion: 0.8.3
+
+dependencies:
+  - name: vault
+    version: 0.29.0
+    repository: https://helm.releases.hashicorp.com
+    condition: install.vault
+  - name: postgresql
+    version: 16.4.3
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: install.postgresql

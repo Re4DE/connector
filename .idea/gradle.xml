@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/extensions" />
+            <option value="$PROJECT_DIR$/extensions/common" />
+            <option value="$PROJECT_DIR$/extensions/common/iam" />
+            <option value="$PROJECT_DIR$/extensions/common/iam/oauth2" />
+            <option value="$PROJECT_DIR$/extensions/common/iam/oauth2/oauth2-core" />
+            <option value="$PROJECT_DIR$/extensions/common/iam/oauth2/oauth2-service" />
+            <option value="$PROJECT_DIR$/extensions/common/iam/x509" />
+            <option value="$PROJECT_DIR$/extensions/control-plane" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook/target-node-resolver-oauth2" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook/target-node-resolver-ssi" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/policy-functions" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/scope-functions" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/self-registration" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/self-registration/participant-self-registration-oauth2" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/self-registration/participant-self-registration-ssi" />
+            <option value="$PROJECT_DIR$/extensions/data-plane" />
+            <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-https-oauth2-userflow" />
+            <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-public-api-v2" />
+            <option value="$PROJECT_DIR$/runtimes" />
+            <option value="$PROJECT_DIR$/runtimes/controlplane-oauth2" />
+            <option value="$PROJECT_DIR$/runtimes/controlplane-ssi" />
+            <option value="$PROJECT_DIR$/runtimes/controlplane-x509" />
+            <option value="$PROJECT_DIR$/runtimes/dataplane" />
+            <option value="$PROJECT_DIR$/runtimes/local-dev" />
+            <option value="$PROJECT_DIR$/runtimes/local-dev/controlplane-local" />
+            <option value="$PROJECT_DIR$/runtimes/local-dev/dataplane-local" />
+            <option value="$PROJECT_DIR$/runtimes/local-dev/docker-env" />
+            <option value="$PROJECT_DIR$/spi" />
+            <option value="$PROJECT_DIR$/spi/common" />
+            <option value="$PROJECT_DIR$/spi/common/iee-oauth2-spi" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

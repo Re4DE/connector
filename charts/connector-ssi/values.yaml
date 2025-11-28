@@ -1,0 +1,337 @@
+#
+#  Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Contributors:
+#       Fraunhofer IEE - initial API and implementation
+#
+#
+
+install:
+  postgresql: true
+
+global:
+  participantId: did:web:identityhub:connector
+  connectorName: connector
+  defaultStorageClass: harvester
+  pullSecret: gitlab
+  security:
+    allowInsecureImages: true
+
+namespaceOverride: ""
+
+controlplane:
+  image:
+    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-controlplane-ssi
+    tag: 0.8.3
+  existingSecret: controlplane-secret
+  scheduling:
+    label: null
+  endpoints:
+    default:
+      path: /api
+      port: 8080
+      public: true
+    management:
+      path: /api/management
+      port: 8081
+      public: true
+    control:
+      path: /api/control
+      port: 8082
+      public: false
+    protocol:
+      path: /api/v1/dsp
+      port: 8083
+      public: true
+    version:
+      path: /api/version
+      port: 8085
+      public: true
+    catalog:
+      path: /api/catalog
+      port: 8086
+      public: true
+  service:
+    enabled: true
+  ingress:
+    enabled: true
+    host: controlplane-dena.services.iee.fraunhofer.de
+    tls:
+      enabled: false
+      issuer: cert-issuer
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 3
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 3
+    periodSeconds: 5
+  edc:
+    core:
+      retriesMax: 5
+      backoffMin: 500
+      backoffMax: 10000
+      logOnRetry: false
+      logOnRetryScheduled: false
+      logOnRetriesExceeded: false
+      logOnRetryFailedAttempt: false
+      logOnRetryAbort: false
+    iam:
+      didWebHttps: true
+      stsUrl: https://identityhub/api/sts/token
+      revocationMimetype: application/json
+      tokenUrl: https://auth-dena.services.iee.fraunhofer.de/realms/dena-testfeld/protocol/openid-connect/token
+      tokenClientSecretAlias: connector-registry-client-secret
+      tokenClientSecret: changeme
+      keyAliasOverwrite: null
+    policy:
+      reevaluateWait: 30000
+      permissionAdministrator:
+        url: https://api-nprd.traxes.io/prprd/forwatt/v2
+        tokenUrl: https://acc.signin.energy/am/oauth2/realms/root/realms/difesp/access_token
+        clientId: changeme
+        clientSecretAlias: pm-secret
+    http:
+      clientHttpsEnforce: false
+      clientTimeoutConnect: 30
+      clientTimeoutRead: 30
+      clientSendBuffer: 0
+      clientReceiveBuffer: 0
+    vault:
+      healthCheck: true
+      healthCheckStandBy: false
+      healthCheckPath: /v1/sys/health
+      tokenScheduledRenew: true
+      tokenTTL: 300
+      tokenRenewBuffer: 30
+      secretPath: /v1/secret
+    sql:
+      fetchSize: 5000
+    catalog:
+      registryEnabled: true
+      targetNodeDirectoryUrl: https://registry-dena.services.iee.fraunhofer.de/api/registry
+      numberOfCrawlers: 1
+      timeBetweenRuns: 3600
+      delayUntilStart: 60
+    selfRegistration:
+      enabled: true
+      registryUrl: https://registry-dena.services.iee.fraunhofer.de/api/registry
+      membershipIssuanceEnabled: true
+      ihIdentityUrl: https://identityhub/api/identity
+      ihCredentialUrl: https://identityhub/api/credentials
+      issuerDid: did:web:dataspaceissuer:issuer
+
+dataplane:
+  image:
+    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-dataplane
+    tag: 0.8.3
+  scheduling:
+    label: null
+  endpoints:
+    default:
+      path: /api
+      port: 8080
+      public: false
+    control:
+      path: /api/control
+      port: 8082
+      public: false
+    public:
+      path: /api/v2/public
+      port: 8084
+      public: true
+  service:
+    enabled: true
+  ingress:
+    enabled: true
+    host: dataplane-dena.services.iee.fraunhofer.de
+    tls:
+      enabled: false
+      issuer: cert-issuer
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 3
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 3
+    periodSeconds: 5
+  edc:
+    core:
+      retriesMax: 5
+      backoffMin: 500
+      backoffMax: 10000
+      logOnRetry: false
+      logOnRetryScheduled: false
+      logOnRetriesExceeded: false
+      logOnRetryFailedAttempt: false
+      logOnRetryAbort: false
+    http:
+      clientHttpsEnforce: false
+      clientTimeoutConnect: 30
+      clientTimeoutRead: 30
+      clientSendBuffer: 0
+      clientReceiveBuffer: 0
+    vault:
+      healthCheck: true
+      healthCheckStandBy: false
+      healthCheckPath: /v1/sys/health
+      tokenScheduledRenew: true
+      tokenTTL: 300
+      tokenRenewBuffer: 30
+      secretPath: /v1/secret
+    sql:
+      fetchSize: 5000
+    token:
+      signer:
+        privateKey: changeme
+        privateKeyAlias: signer-key
+      verifier:
+        publicKey: changeme
+        publicKeyAlias: verifier-key
+
+identityhub:
+  image:
+    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/identity-hub/identityhub
+    tag: 0.8.0
+    pullSecret: gitlab-ih
+  scheduling:
+    label: null
+  endpoints:
+    default:
+      path: /api
+      port: 8080
+      public: false
+    credentials:
+      path: /api/credentials
+      port: 8081
+      public: true
+    identity:
+      path: /api/identity
+      port: 8082
+      public: false
+    sts:
+      path: /api/sts
+      port: 8083
+      public: false
+    version:
+      path: /api/version
+      port: 8084
+      public: true
+    did:
+      path: /
+      port: 8085
+      public: true
+  service:
+    enabled: true
+  ingress:
+    enabled: true
+    host: identityhub-dena.service.iee.fraunhofer.de
+    tls:
+      enabled: false
+      issuer: cert-issuer
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 3
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 3
+    periodSeconds: 5
+  edc:
+    core:
+      retriesMax: 5
+      backoffMin: 500
+      backoffMax: 10000
+      logOnRetry: false
+      logOnRetryScheduled: false
+      logOnRetriesExceeded: false
+      logOnRetryFailedAttempt: false
+      logOnRetryAbort: false
+    http:
+      clientHttpsEnforce: false
+      clientTimeoutConnect: 30
+      clientTimeoutRead: 30
+      clientSendBuffer: 0
+      clientReceiveBuffer: 0
+    vault:
+      healthCheck: true
+      healthCheckStandBy: false
+      healthCheckPath: /v1/sys/health
+      tokenScheduledRenew: true
+      tokenTTL: 300
+      tokenRenewBuffer: 30
+      secretPath: /v1/secret
+    sql:
+      fetchSize: 5000
+    ih:
+      iam:
+        didWebHttps: true
+      seed:
+        superUserKey: c3VwZXItdXNlcg==.changeme
+
+ui:
+  enabled: true
+  image:
+    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector-data-dashboard-ui
+    tag: 0.3.0
+    pullSecret: gitlab-ui
+  service:
+    port: 80
+  ingress:
+    enabled: true
+    tls:
+      enabled: false
+      issuer: cert-issuer
+
+vault:
+  enabled: true
+  image:
+    repository: hashicorp/vault
+    tag: 1.18.1
+  dev:
+    devRootToken: changeme
+  persistence:
+    size: 8Gi
+    volumeName: vault-vol
+  extraEnvironmentVars:
+    SIGN_ALIAS: signer-key
+    VERI_ALIAS: verifier-key
+    REGISTRY_ALIAS: connector-registry-client-secret
+  extraSecretEnvironmentVars:
+    - envName: SIGN_KEY
+      secretName: vault-secret
+      secretKey: signer-key
+    - envName: VERI_KEY
+      secretName: vault-secret
+      secretKey: verifier-key
+    - envName: REGISTRY_KEY
+      secretName: vault-secret
+      secretKey: connector-registry-client-secret
+
+postgresql:
+  image:
+    repository: bitnamilegacy/postgresql
+  auth:
+    username: edc
+    database: edc
+    existingSecret: postgres-secret

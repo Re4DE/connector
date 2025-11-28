@@ -1,0 +1,88 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "vault.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  serviceName: vault
+  selector:
+    matchLabels: {{- include "vault.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "vault.labels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: vault-entrypoint
+          configMap:
+            name: vault
+            defaultMode: 0755
+      containers:
+        - name: vault
+          image: {{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}
+          imagePullPolicy: Always
+          command: [ "/bin/sh", "-ec"]
+          args:
+            - |
+              exec /usr/local/bin/docker-entrypoint.sh vault server -config=/vault/config
+          securityContext:
+            capabilities:
+              add: [ "IPC_LOCK" ]
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: VAULT_ADDR
+              value: "http://127.0.0.1:8200"
+            - name: VAULT_API_ADDR
+              value: "http://$(POD_IP):8200"
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: {{ .Values.vault.dev.devRootToken | quote }}
+            - name: VAULT_LOCAL_CONFIG
+              value: '{"storage": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
+            - name: VAULT_SUPPLEMENTAL_CONFIG
+              value: '{"ui": false, "listener": [{"tcp": { "address": "0.0.0.0:8200", "tls_disable": true}}]}'
+            {{- include "vault.extraEnvironmentVars" . | nindent 12 }}
+            {{- include "vault.extraSecretEnvironmentVars" . | nindent 12 }}
+          volumeMounts:
+            - name: {{ .Values.vault.persistence.volumeName }}
+              mountPath: /vault/file
+              subPath: file
+            - name: {{ .Values.vault.persistence.volumeName }}
+              mountPath: /vault/unseal
+              subPath: unseal
+            - name: vault-entrypoint
+              mountPath: /usr/local/bin/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh
+            - name: vault-entrypoint
+              mountPath: /scripts/vault-init.sh
+              subPath: vault-init.sh
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.vault.persistence.volumeName }}
+        labels: {{- include "vault.labels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        storageClassName: {{ .Values.global.defaultStorageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.vault.persistence.size | quote }}

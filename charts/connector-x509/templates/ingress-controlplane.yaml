@@ -1,0 +1,49 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+{{- if .Values.controlplane.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: controlplane
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "controlplane.labels" . | nindent 4 }}
+  {{- if .Values.controlplane.ingress.tls.enabled }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.controlplane.ingress.tls.issuer }}
+  {{- end }}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.controlplane.ingress.host }}
+      http:
+        paths:
+          {{- range $k, $v := .Values.controlplane.endpoints }}
+          {{- if $v.public }}
+          - path: {{ $v.path }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: controlplane
+                port:
+                  name: {{ $k }}
+          {{- end }}
+          {{- end }}
+  {{- if .Values.controlplane.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ .Values.controlplane.ingress.host }}
+      secretName: {{ .Values.controlplane.ingress.host }}-tls
+  {{- end }}
+{{- end }}

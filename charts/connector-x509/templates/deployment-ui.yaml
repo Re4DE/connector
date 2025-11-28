@@ -1,0 +1,41 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+{{- if .Values.ui.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "ui.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "ui.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "ui.labels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.ui.image.pullSecret }}
+      containers:
+        - name: ui
+          image: {{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}
+          imagePullPolicy: Always
+          env:
+            - name: EDC_UI_MANAGEMENT_API_URL
+              value: {{ include "ui.managementUrl" . }}
+            - name: EDC_UI_CATALOG_URLS
+              value: {{ include "ui.catalogUrl" . }}
+{{- end }}

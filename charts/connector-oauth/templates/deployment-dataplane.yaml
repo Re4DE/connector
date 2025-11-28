@@ -1,0 +1,150 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dataplane
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "dataplane.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "dataplane.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "dataplane.labels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.pullSecret }}
+      {{- if .Values.dataplane.scheduling.label }}
+      nodeSelector:
+        {{- with .Values.dataplane.scheduling.label }}
+        {{ toYaml . }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: dataplane
+          image: {{ .Values.dataplane.image.repository }}:{{ .Values.dataplane.image.tag }}
+          imagePullPolicy: Always
+          {{- if .Values.dataplane.startupProbe.enabled }}
+          startupProbe:
+            initialDelaySeconds: {{ .Values.dataplane.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataplane.startupProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.dataplane.endpoints.default.path }}/check/startup
+              port: {{ .Values.dataplane.endpoints.default.port }}
+          {{- end }}
+          {{- if .Values.dataplane.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.dataplane.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataplane.readinessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.dataplane.endpoints.default.path }}/check/readiness
+              port: {{ .Values.dataplane.endpoints.default.port }}
+          {{- end }}
+          {{- if .Values.dataplane.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.dataplane.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dataplane.livenessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.dataplane.endpoints.default.path }}/check/liveness
+              port: {{ .Values.dataplane.endpoints.default.port }}
+          {{- end }}
+          env:
+            - name: EDC_PARTICIPANT_ID
+              value: {{ .Values.global.participantId | quote }}
+            - name: EDC_COMPONENT_ID
+              value: "{{ .Values.global.participantId }}-dataplane"
+            - name: EDC_HOSTNAME
+              value: {{ .Values.dataplane.ingress.host | quote }}
+            - name: EDC_CORE_RETRY_RETRIES_MAX
+              value: {{ .Values.dataplane.edc.core.retriesMax | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MIN
+              value: {{ .Values.dataplane.edc.core.backoffMin | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MAX
+              value: {{ .Values.dataplane.edc.core.backoffMax | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY
+              value: {{ .Values.dataplane.edc.core.logOnRetry | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED
+              value: {{ .Values.dataplane.edc.core.logOnRetryScheduled | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED
+              value: {{ .Values.dataplane.edc.core.logOnRetriesExceeded | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT
+              value: {{ .Values.dataplane.edc.core.logOnRetryFailedAttempt | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_ABORT
+              value: {{ .Values.dataplane.edc.core.logOnRetryAbort | quote }}
+            - name: EDC_DPF_SELECTOR_URL
+              value: {{ include "dataplane.dfpUrl" . }}
+            - name: EDC_VAULT_HASHICORP_URL
+              value: {{ include "common.vault.url" . }}
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: {{ .Values.vault.server.dev.devRootToken | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED
+              value: {{ .Values.dataplane.edc.vault.healthCheck | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK
+              value: {{ .Values.dataplane.edc.vault.healthCheckStandBy | quote }}
+            - name: EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH
+              value: {{ .Values.dataplane.edc.vault.healthCheckPath | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED
+              value: {{ .Values.dataplane.edc.vault.tokenScheduledRenew | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_TTL
+              value: {{ .Values.dataplane.edc.vault.tokenTTL | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER
+              value: {{ .Values.dataplane.edc.vault.tokenRenewBuffer | quote }}
+            - name: EDC_VAULT_HASHICORP_API_SECRET_PATH
+              value: {{ .Values.dataplane.edc.vault.secretPath | quote }}
+            - name: EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS
+              value: {{ .Values.dataplane.edc.token.signer.privateKeyAlias | quote }}
+            - name: EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS
+              value: {{ .Values.dataplane.edc.token.verifier.publicKeyAlias | quote }}
+            - name: EDC_HTTP_CLIENT_HTTPS_ENFORCE
+              value: {{ .Values.dataplane.edc.http.clientHttpsEnforce | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_CONNECT
+              value: {{ .Values.dataplane.edc.http.clientTimeoutConnect | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_READ
+              value: {{ .Values.dataplane.edc.http.clientTimeoutRead | quote }}
+            - name: EDC_HTTP_CLIENT_SEND_BUFFER_SIZE
+              value: {{ .Values.dataplane.edc.http.clientSendBuffer | quote }}
+            - name: EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE
+              value: {{ .Values.dataplane.edc.http.clientReceiveBuffer | quote }}
+            - name: WEB_HTTP_PATH
+              value: {{ .Values.dataplane.endpoints.default.path | quote }}
+            - name: WEB_HTTP_PORT
+              value: {{ .Values.dataplane.endpoints.default.port | quote }}
+            - name: WEB_HTTP_CONTROL_PATH
+              value: {{ .Values.dataplane.endpoints.control.path | quote }}
+            - name: WEB_HTTP_CONTROL_PORT
+              value: {{ .Values.dataplane.endpoints.control.port | quote }}
+            - name: WEB_HTTP_PUBLIC_PATH
+              value: {{ .Values.dataplane.endpoints.public.path | quote }}
+            - name: WEB_HTTP_PUBLIC_PORT
+              value: {{ .Values.dataplane.endpoints.public.port | quote }}
+            - name: EDC_CONTROL_ENDPOINT
+              value: {{ include "dataplane.controlUrl" . }}
+            - name: EDC_DATAPLANE_API_PUBLIC_BASEURL
+              value: {{ include "dataplane.publicUrl" . }}
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_SQL_FETCH_SIZE
+              value: {{ .Values.dataplane.edc.sql.fetchSize | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"

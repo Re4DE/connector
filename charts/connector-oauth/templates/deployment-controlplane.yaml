@@ -1,0 +1,197 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controlplane
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "controlplane.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "controlplane.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "controlplane.labels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.pullSecret }}
+      {{- if .Values.controlplane.scheduling.label }}
+      nodeSelector:
+        {{- with .Values.controlplane.scheduling.label }}
+        {{ toYaml . }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: controlplane
+          image: {{ .Values.controlplane.image.repository }}:{{ .Values.controlplane.image.tag }}
+          imagePullPolicy: Always
+          {{- if .Values.controlplane.startupProbe.enabled }}
+          startupProbe:
+            initialDelaySeconds: {{ .Values.controlplane.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.controlplane.startupProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.controlplane.endpoints.default.path }}/check/startup
+              port: {{ .Values.controlplane.endpoints.default.port }}
+          {{- end }}
+          {{- if .Values.controlplane.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.controlplane.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.controlplane.readinessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.controlplane.endpoints.default.path }}/check/readiness
+              port: {{ .Values.controlplane.endpoints.default.port }}
+          {{- end }}
+          {{- if .Values.controlplane.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.controlplane.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.controlplane.livenessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.controlplane.endpoints.default.path }}/check/liveness
+              port: {{ .Values.controlplane.endpoints.default.port }}
+          {{- end }}
+          env:
+            - name: EDC_PARTICIPANT_ID
+              value: {{ .Values.global.participantId | quote }}
+            - name: EDC_COMPONENT_ID
+              value: "{{ .Values.global.participantId }}-controlplane"
+            - name: EDC_HOSTNAME
+              value: {{ .Values.controlplane.ingress.host | quote }}
+            - name: EDC_CORE_RETRY_RETRIES_MAX
+              value: {{ .Values.controlplane.edc.core.retriesMax | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MIN
+              value: {{ .Values.controlplane.edc.core.backoffMin | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MAX
+              value: {{ .Values.controlplane.edc.core.backoffMax | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY
+              value: {{ .Values.controlplane.edc.core.logOnRetry | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED
+              value: {{ .Values.controlplane.edc.core.logOnRetryScheduled | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED
+              value: {{ .Values.controlplane.edc.core.logOnRetriesExceeded | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT
+              value: {{ .Values.controlplane.edc.core.logOnRetryFailedAttempt | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_ABORT
+              value: {{ .Values.controlplane.edc.core.logOnRetryAbort | quote }}
+            - name: EDC_OAUTH_CLIENT_ID
+              value: {{ .Values.global.participantId | quote }}
+            - name: EDC_OAUTH_TOKEN_URL
+              value: {{ .Values.controlplane.edc.auth.oauth.tokenUrl | quote }}
+            - name: EDC_OAUTH_PROVIDER_JWKS_URL
+              value: {{ .Values.controlplane.edc.auth.oauth.jwksUrl | quote }}
+            - name: EDC_OAUTH_PROVIDER_AUDIENCE
+              value: {{ include "controlplane.auth.oauth.provider_audience" . | quote }}
+            - name: EDC_OAUTH_CERTIFICATE_ALIAS
+              value: {{ .Values.controlplane.edc.auth.oauth.certificateAlias | quote }}
+            - name: EDC_OAUTH_PRIVATE_KEY_ALIAS
+              value: {{ .Values.controlplane.edc.auth.oauth.privateKeyAlias | quote }}
+            - name: EDC_VAULT_HASHICORP_URL
+              value: {{ include "common.vault.url" . }}
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: {{ .Values.vault.server.dev.devRootToken | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED
+              value: {{ .Values.controlplane.edc.vault.healthCheck | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK
+              value: {{ .Values.controlplane.edc.vault.healthCheckStandBy | quote }}
+            - name: EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH
+              value: {{ .Values.controlplane.edc.vault.healthCheckPath | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED
+              value: {{ .Values.controlplane.edc.vault.tokenScheduledRenew | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_TTL
+              value: {{ .Values.controlplane.edc.vault.tokenTTL | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER
+              value: {{ .Values.controlplane.edc.vault.tokenRenewBuffer | quote }}
+            - name: EDC_VAULT_HASHICORP_API_SECRET_PATH
+              value: {{ .Values.controlplane.edc.vault.secretPath | quote }}
+            - name: EDC_POLICY_MONITOR_STATE-MACHINE_ITERATION-WAIT-MILLIS
+              value: {{ .Values.controlplane.edc.policy.reevaluateWait | quote }}
+            - name: EDC_HTTP_CLIENT_HTTPS_ENFORCE
+              value: {{ .Values.controlplane.edc.http.clientHttpsEnforce | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_CONNECT
+              value: {{ .Values.controlplane.edc.http.clientTimeoutConnect | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_READ
+              value: {{ .Values.controlplane.edc.http.clientTimeoutRead | quote }}
+            - name: EDC_HTTP_CLIENT_SEND_BUFFER_SIZE
+              value: {{ .Values.controlplane.edc.http.clientSendBuffer | quote }}
+            - name: EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE
+              value: {{ .Values.controlplane.edc.http.clientReceiveBuffer | quote }}
+            - name: WEB_HTTP_PATH
+              value: {{ .Values.controlplane.endpoints.default.path | quote }}
+            - name: WEB_HTTP_PORT
+              value: {{ .Values.controlplane.endpoints.default.port | quote }}
+            - name: WEB_HTTP_MANAGEMENT_PATH
+              value: {{ .Values.controlplane.endpoints.management.path | quote }}
+            - name: WEB_HTTP_MANAGEMENT_PORT
+              value: {{ .Values.controlplane.endpoints.management.port | quote }}
+            - name: WEB_HTTP_MANAGEMENT_AUTH_TYPE
+              value: "tokenbased"
+            - name: WEB_HTTP_MANAGEMENT_AUTH_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.controlplane.existingSecret }}
+                  key: management-api-key
+            - name: WEB_HTTP_CONTROL_PATH
+              value: {{ .Values.controlplane.endpoints.control.path | quote }}
+            - name: WEB_HTTP_CONTROL_PORT
+              value: {{ .Values.controlplane.endpoints.control.port | quote }}
+            - name: WEB_HTTP_PROTOCOL_PATH
+              value: {{ .Values.controlplane.endpoints.protocol.path | quote }}
+            - name: WEB_HTTP_PROTOCOL_PORT
+              value: {{ .Values.controlplane.endpoints.protocol.port | quote }}
+            - name: WEB_HTTP_VERSION_PATH
+              value: {{ .Values.controlplane.endpoints.version.path | quote }}
+            - name: WEB_HTTP_VERSION_PORT
+              value: {{ .Values.controlplane.endpoints.version.port | quote }}
+            - name: WEB_HTTP_CATALOG_PATH
+              value: {{ .Values.controlplane.endpoints.catalog.path | quote }}
+            - name: WEB_HTTP_CATALOG_PORT
+              value: {{ .Values.controlplane.endpoints.catalog.port | quote }}
+            - name: EDC_DSP_CALLBACK_ADDRESS
+              value: "https://{{ .Values.controlplane.ingress.host }}{{ .Values.controlplane.endpoints.protocol.path }}"
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_SQL_FETCH_SIZE
+              value: {{ .Values.controlplane.edc.sql.fetchSize | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"
+            - name: EDC_CATALOG_REGISTRY_ENABLED
+              value: {{ .Values.controlplane.edc.catalog.registryEnabled | quote }}
+            - name: EDC_CATALOG_REGISTRY_URL
+              value: {{ .Values.controlplane.edc.catalog.targetNodeDirectoryUrl | quote }}
+            - name: EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS
+              value: {{ .Values.controlplane.edc.catalog.timeBetweenRuns | quote }}
+            - name: EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS
+              value: {{ .Values.controlplane.edc.catalog.delayUntilStart | quote }}
+            - name: EDC_CATALOG_CACHE_PARTITION_NUM_CRAWLERS
+              value: {{ .Values.controlplane.edc.catalog.numberOfCrawlers | quote }}
+            - name: EDC_PARTICIPANT_REGISTRATION_ENABLED
+              value: {{ .Values.controlplane.edc.selfRegistration.enabled | quote }}
+            - name: EDC_PARTICIPANT_REGISTRATION_URL
+              value: {{ .Values.controlplane.edc.selfRegistration.registryUrl | quote }}
+            - name: EDC_POLICY_PM_URL
+              value: {{ .Values.controlplane.edc.policy.permissionAdministrator.url | quote }}
+            - name: EDC_POLICY_PM_TOKEN_URL
+              value: {{ .Values.controlplane.edc.policy.permissionAdministrator.tokenUrl | quote }}
+            - name: EDC_POLICY_PM_TOKEN_CLIENT_ID
+              value: {{ .Values.controlplane.edc.policy.permissionAdministrator.clientId | quote }}
+            - name: EDC_POLICY_PM_TOKEN_CLIENT_SECRET_ALIAS
+              value: {{ .Values.controlplane.edc.policy.permissionAdministrator.clientSecretAlias | quote }}

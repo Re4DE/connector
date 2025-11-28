@@ -1,0 +1,156 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identityhub
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "identityhub.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "identityhub.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "identityhub.labels" . | nindent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.identityhub.image.pullSecret }}
+      {{- if .Values.identityhub.scheduling.label }}
+      nodeSelector:
+        {{- with .Values.identityhub.scheduling.label }}
+        {{ toYaml . }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: identityhub
+          image: {{ .Values.identityhub.image.repository }}:{{ .Values.identityhub.image.tag }}
+          imagePullPolicy: Always
+          {{- if .Values.identityhub.startupProbe.enabled }}
+          startupProbe:
+            initialDelaySeconds: {{ .Values.identityhub.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.identityhub.startupProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.identityhub.endpoints.default.path }}/check/startup
+              port: {{ .Values.identityhub.endpoints.default.port }}
+                  {{- end }}
+                  {{- if .Values.identityhub.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.identityhub.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.identityhub.readinessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.identityhub.endpoints.default.path }}/check/readiness
+              port: {{ .Values.identityhub.endpoints.default.port }}
+                  {{- end }}
+                  {{- if .Values.identityhub.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.identityhub.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.identityhub.livenessProbe.periodSeconds }}
+            httpGet:
+              path: {{ .Values.identityhub.endpoints.default.path }}/check/liveness
+              port: {{ .Values.identityhub.endpoints.default.port }}
+          {{- end }}
+          env:
+            - name: EDC_PARTICIPANT_ID
+              value: {{ .Values.global.participantId | quote }}
+            - name: EDC_COMPONENT_ID
+              value: "{{ .Values.global.participantId }}-identityhub"
+            - name: EDC_HOSTNAME
+              value: {{ .Values.identityhub.ingress.host | quote }}
+            - name: EDC_IAM_DID_WEB_USE_HTTPS
+              value: {{ .Values.identityhub.edc.ih.iam.didWebHttps | quote }}
+            - name: EDC_IH_API_SUPERUSER_KEY
+              value: {{ .Values.identityhub.edc.ih.seed.superUserKey | quote }}
+            - name: EDC_CORE_RETRY_RETRIES_MAX
+              value: {{ .Values.identityhub.edc.core.retriesMax | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MIN
+              value: {{ .Values.identityhub.edc.core.backoffMin | quote }}
+            - name: EDC_CORE_RETRY_BACKOFF_MAX
+              value: {{ .Values.identityhub.edc.core.backoffMax | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY
+              value: {{ .Values.identityhub.edc.core.logOnRetry | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED
+              value: {{ .Values.identityhub.edc.core.logOnRetryScheduled | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED
+              value: {{ .Values.identityhub.edc.core.logOnRetriesExceeded | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT
+              value: {{ .Values.identityhub.edc.core.logOnRetryFailedAttempt | quote }}
+            - name: EDC_CORE_RETRY_LOG_ON_ABORT
+              value: {{ .Values.identityhub.edc.core.logOnRetryAbort | quote }}
+            - name: EDC_VAULT_HASHICORP_URL
+              value: {{ include "common.vault.url" . }}
+            - name: EDC_VAULT_HASHICORP_TOKEN
+              value: {{ .Values.vault.dev.devRootToken | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED
+              value: {{ .Values.identityhub.edc.vault.healthCheck | quote }}
+            - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK
+              value: {{ .Values.identityhub.edc.vault.healthCheckStandBy | quote }}
+            - name: EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH
+              value: {{ .Values.identityhub.edc.vault.healthCheckPath | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED
+              value: {{ .Values.identityhub.edc.vault.tokenScheduledRenew | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_TTL
+              value: {{ .Values.identityhub.edc.vault.tokenTTL | quote }}
+            - name: EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER
+              value: {{ .Values.identityhub.edc.vault.tokenRenewBuffer | quote }}
+            - name: EDC_VAULT_HASHICORP_API_SECRET_PATH
+              value: {{ .Values.identityhub.edc.vault.secretPath | quote }}
+            - name: EDC_HTTP_CLIENT_HTTPS_ENFORCE
+              value: {{ .Values.identityhub.edc.http.clientHttpsEnforce | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_CONNECT
+              value: {{ .Values.identityhub.edc.http.clientTimeoutConnect | quote }}
+            - name: EDC_HTTP_CLIENT_TIMEOUT_READ
+              value: {{ .Values.identityhub.edc.http.clientTimeoutRead | quote }}
+            - name: EDC_HTTP_CLIENT_SEND_BUFFER_SIZE
+              value: {{ .Values.identityhub.edc.http.clientSendBuffer | quote }}
+            - name: EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE
+              value: {{ .Values.identityhub.edc.http.clientReceiveBuffer | quote }}
+            - name: WEB_HTTP_PATH
+              value: {{ .Values.identityhub.endpoints.default.path | quote }}
+            - name: WEB_HTTP_PORT
+              value: {{ .Values.identityhub.endpoints.default.port | quote }}
+            - name: WEB_HTTP_CREDENTIALS_PATH
+              value: {{ .Values.identityhub.endpoints.credentials.path | quote }}
+            - name: WEB_HTTP_CREDENTIALS_PORT
+              value: {{ .Values.identityhub.endpoints.credentials.port | quote }}
+            - name: WEB_HTTP_IDENTITY_PATH
+              value: {{ .Values.identityhub.endpoints.identity.path | quote }}
+            - name: WEB_HTTP_IDENTITY_PORT
+              value: {{ .Values.identityhub.endpoints.identity.port | quote }}
+            - name: WEB_HTTP_STS_PATH
+              value: {{ .Values.identityhub.endpoints.sts.path | quote }}
+            - name: WEB_HTTP_STS_PORT
+              value: {{ .Values.identityhub.endpoints.sts.port | quote }}
+            - name: WEB_HTTP_VERSION_PATH
+              value: {{ .Values.identityhub.endpoints.version.path | quote }}
+            - name: WEB_HTTP_VERSION_PORT
+              value: {{ .Values.identityhub.endpoints.version.port | quote }}
+            - name: WEB_HTTP_DID_PATH
+              value: {{ .Values.identityhub.endpoints.did.path | quote }}
+            - name: WEB_HTTP_DID_PORT
+              value: {{ .Values.identityhub.endpoints.did.port | quote }}
+            - name: EDC_SQL_SCHEMA_AUTOCREATE
+              value: "true"
+            - name: EDC_SQL_FETCH_SIZE
+              value: {{ .Values.identityhub.edc.sql.fetchSize | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: EDC_DATASOURCE_DEFAULT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+            - name: EDC_DATASOURCE_DEFAULT_URL
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"

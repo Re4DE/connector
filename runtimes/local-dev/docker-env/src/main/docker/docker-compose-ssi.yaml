@@ -1,0 +1,388 @@
+#
+#  Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+#
+#  This program and the accompanying materials are made available under the
+#  terms of the Apache License, Version 2.0 which is available at
+#  https://www.apache.org/licenses/LICENSE-2.0
+#
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Contributors:
+#       Fraunhofer IEE - initial API and implementation
+#
+#
+
+name: dena-connector-local-dev-ssi
+
+volumes:
+  vault_data:
+  postgres_data:
+
+services:
+  vault:
+    container_name: vault
+    image: hashicorp/vault:1.18.1
+    command: [ "vault", "server", "-config=/vault/config" ]
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_API_ADDR: http://127.0.0.1:8200
+      VAULT_ADDR: http://127.0.0.1:8200
+      VAULT_DEV_ROOT_TOKEN_ID: devpass
+      VAULT_LOCAL_CONFIG: '{"storage": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
+      VAULT_SUPPLEMENTAL_CONFIG: '{"ui": false, "listener": [{"tcp": { "address": "0.0.0.0:8200", "tls_disable": true}}]}'
+      SIGNER_KEY: |
+        -----BEGIN PRIVATE KEY-----
+        MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDb1+hXTJU8LVHK
+        OkKUer6lUAE4aGwIidWAgkVn7L6WSuy8fYE/T0XAP9MnKRS/R2w4WR0rfQ3tRqXk
+        +/v0YvQcIho1Fa7A2HlXdm7E1Ky8HrksRxkfZKOnyRNQULQZaRaIf619SaBD9il3
+        V/jkS1jcPBF6MuUOr42ilK82+3wCc+ltocLGAL1gIVFoPakulW0sn5EpxWIiKDm+
+        uX47GmME73mObxKAm4hC+6k5LUuiL9lMBdtUw66mLU9jBdDRd4MVWrSZ8kR9Ng61
+        2Tt0Qigsxfjr+O7WR+qBy6BIaqjU/uTq67Uf+PYaGJHjWvsK/KeI/qsSZxhKgxlm
+        +q9bVdPhAgMBAAECggEABlcJqkrZGu0rqKtZdDK+AMJ35oqMYwqmj5gyLDcVn/v1
+        K9Jqwcqldk/g5QY4RPPoWQ+o2bI3jpo0+o+RypB3/b+2BcXkTkdv6GfP9fk0KhCw
+        wmgif1dFqPcRiYVqTDlNnw4fkLdo2czlkT2GPf82RtOspVuGY5AIg6HKE8nY37Eu
+        X2MpwSbfTrQCVYklB9mIZal7YBawd4HKJLHth0w+s9fBiMsJw/vAVquXTUa32wnt
+        YWn3sQ8al9A+7iXgcuzWe69el2P0nRddsnP1Xx8Dbl6x7dUpFoCL68xJUzB6unqI
+        EU9T9gMhrR09cOTvAHwoLu3wG0fNxWmv9qJEB3hOqQKBgQD1I6pTIJIQxkypJpso
+        x7MQ5yTZIA1PPC0jUkiGRVFVzQ62y4g4br3ylmENgQcYdjtU2nsPQkZ2Q1VSM2Rj
+        hMtAR8DpzzKvYWgVizDVtUC98S7d0O61EohxfSCYuSmy3mfWWo2DTblv/7X717k4
+        +zgVuVCSHe37QQfnU9D3pxdiowKBgQDllVboshRnCYiqNt6QhWtm8g8IAvATJIYb
+        O/DNiKTARVxgFF1uHQmymnaVGauZmshNz6Hx2+47gzzvC8M1YrZdR8vfAaq4/xeN
+        Gi35gtBOrz9LQRbVTn97rjkZgoxIL9mfyZwO9vFGrea1uPTwMXkrQ5vOkECft3jX
+        jQlkCC1bqwKBgFsM8jiKAnbEkLjLJBpTgkkm8WLMKuVhPoq+Bz4IBRvPXEW8902u
+        pFK0VDwFzrLhR0xPEiIqxa0reUdc206zhiLMA/VUBklp7pUB7BOUjQV/zZ6J+f+7
+        cH5msXLIY5qSTRMq8yDv/45/9gIisCNf/Ablm+2JvFj0YJElappxr5ftAoGBAKcq
+        ORDP8akguQDvWNk0PILFx4oW0YWut3MHDwwo7YUOO/e9fFYcEJ6ad7OS8G601BpM
+        D+fSMsHkii6oiufJS23aRCjJxuxS2WwlXspppJFWayi5aQ3BzXNZ5Tuc4dYB+Vyu
+        aNJAnmfPYch5tudZrpeA7+bVBCkHZ5bTm73ZcmVnAoGBAJuxYy49UTQ+w5yRn8wJ
+        MHCfd7MQB2C85Ir/0M1j6yMWPgxJXKdOB2K1pBbMRHgGqcSv4a6pJ2D3IDDqOOHG
+        369gyJW7qCS3eIn57LrwmO+JET/ypqi+JIWcMMmw6+E2At3nqFBkpes5AspEPtnz
+        1VUlpL3Zn5WnA/3vz5R6dWhe
+        -----END PRIVATE KEY-----
+      VERIFIER_KEY: |
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA29foV0yVPC1RyjpClHq+
+        pVABOGhsCInVgIJFZ+y+lkrsvH2BP09FwD/TJykUv0dsOFkdK30N7Ual5Pv79GL0
+        HCIaNRWuwNh5V3ZuxNSsvB65LEcZH2Sjp8kTUFC0GWkWiH+tfUmgQ/Ypd1f45EtY
+        3DwRejLlDq+NopSvNvt8AnPpbaHCxgC9YCFRaD2pLpVtLJ+RKcViIig5vrl+Oxpj
+        BO95jm8SgJuIQvupOS1Loi/ZTAXbVMOupi1PYwXQ0XeDFVq0mfJEfTYOtdk7dEIo
+        LMX46/ju1kfqgcugSGqo1P7k6uu1H/j2GhiR41r7CvyniP6rEmcYSoMZZvqvW1XT
+        4QIDAQAB
+        -----END PUBLIC KEY-----
+      CLIENT_SECRET: kkwEZ93ikOhWBgWlpVUddAbRrR1DUXXX
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - "../resources/vault-init-ssi.sh:/scripts/vault-init.sh"
+      - "../resources/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
+      - type: volume
+        source: vault_data
+        target: /vault/file
+        volume:
+          subpath: file
+      - type: volume
+        source: vault_data
+        target: /vault/unseal
+        volume:
+          subpath: unseal
+
+  postgresql:
+    image: bitnamilegacy/postgresql:17.2.0
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRESQL_DATABASE: edc
+      POSTGRESQL_USERNAME: edc
+      POSTGRESQL_PASSWORD: devpass
+    volumes:
+      - "postgres_data:/bitnami/postgresql"
+      - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
+
+  controlplane:
+    # image: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-controlplane-ssi:0.8.3
+    build:
+      context: ../../../../../..
+      dockerfile: ../../../../../controlplane-ssi/src/main/docker/Dockerfile
+    ports:
+      - "9080:9080"
+      - "9081:9081"
+      - "9082:9082"
+      - "9083:9083"
+      - "9085:9085"
+      - "9086:9086"
+    environment:
+      EDC_PARTICIPANT_ID: did:web:identityhub%3A10085:tester
+      EDC_COMPONENT_ID: tester-controlplane
+      EDC_HOSTNAME: controlplane
+
+      EDC_IAM_ISSUER_ID: did:web:identityhub%3A10085:tester
+      EDC_IAM_DID_WEB_USE_HTTPS: false
+      EDC_IAM_STS_OAUTH_TOKEN_URL: http://identityhub:10083/api/sts/token
+      EDC_IAM_STS_OAUTH_CLIENT_ID: did:web:identityhub%3A10085:tester
+      EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: did:web:identityhub%3A10085:tester-sts-client-secret
+      EDC_IAM_CREDENTIAL_REVOCATION_MIMETYPE: application/json
+
+      EDC_CORE_RETRY_RETRIES_MAX: 5
+      EDC_CORE_RETRY_BACKOFF_MIN: 500
+      EDC_CORE_RETRY_BACKOFF_MAX: 10000
+      EDC_CORE_RETRY_LOG_ON_RETRY: false
+      EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED: false
+      EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED: false
+      EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT: false
+      EDC_CORE_RETRY_LOG_ON_ABORT: false
+
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: devpass
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED: true
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK: false
+      EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH: /v1/sys/health
+      EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED: true
+      EDC_VAULT_HASHICORP_TOKEN_TTL: 300
+      EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER: 30
+      EDC_VAULT_HASHICORP_API_SECRET_PATH: /v1/secret
+
+      EDC_POLICY_MONITOR_STATE-MACHINE_ITERATION-WAIT-MILLIS: 30000
+
+      EDC_HTTP_CLIENT_HTTPS_ENFORCE: false
+      EDC_HTTP_CLIENT_TIMEOUT_CONNECT: 30
+      EDC_HTTP_CLIENT_TIMEOUT_READ: 30
+      EDC_HTTP_CLIENT_SEND_BUFFER_SIZE: 0
+      EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE: 0
+
+      WEB_HTTP_PATH: /api
+      WEB_HTTP_PORT: 9080
+      WEB_HTTP_MANAGEMENT_PATH: /api/management
+      WEB_HTTP_MANAGEMENT_PORT: 9081
+      WEB_HTTP_MANAGEMENT_AUTH_TYPE: tokenbased
+      WEB_HTTP_MANAGEMENT_AUTH_KEY: devpass
+      WEB_HTTP_CONTROL_PATH: /api/control
+      WEB_HTTP_CONTROL_PORT: 9082
+      WEB_HTTP_PROTOCOL_PATH: /api/v1/dsp
+      WEB_HTTP_PROTOCOL_PORT: 9083
+      WEB_HTTP_VERSION_PATH: /api/version
+      WEB_HTTP_VERSION_PORT: 9085
+      WEB_HTTP_CATALOG_PATH: /api/catalog
+      WEB_HTTP_CATALOG_PORT: 9086
+
+      EDC_DSP_CALLBACK_ADDRESS: http://controlplane:9083/api/v1/dsp
+
+      EDC_SQL_SCHEMA_AUTOCREATE: true
+      EDC_SQL_FETCH_SIZE: 5000
+      EDC_DATASOURCE_DEFAULT_USER: edc
+      EDC_DATASOURCE_DEFAULT_PASSWORD: devpass
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgresql:5432/edc
+
+      EDC_CATALOG_REGISTRY_URL: https://registry-ssi-dena.services.iee.fraunhofer.de/api/registry
+      EDC_CATALOG_REGISTRY_TOKEN_URL: https://auth-dena.services.iee.fraunhofer.de/realms/dena-testfeld/protocol/openid-connect/token
+      EDC_CATALOG_REGISTRY_TOKEN_CLIENT_ID: tester-ssi
+      EDC_CATALOG_REGISTRY_TOKEN_CLIENT_SECRET_ALIAS: connector-registry-client-secret
+      EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS: 30000
+      EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS: 5
+      EDC_CATALOG_CACHE_PARTITION_NUM_CRAWLERS: 5
+
+      EDC_PARTICIPANT_REGISTRATION_URL: https://registry-ssi-dena.services.iee.fraunhofer.de/api/registry
+      EDC_PARTICIPANT_REGISTRATION_TOKEN_URL: https://auth-dena.services.iee.fraunhofer.de/realms/dena-testfeld/protocol/openid-connect/token
+      EDC_PARTICIPANT_REGISTRATION_TOKEN_CLIENT_ID: tester-ssi
+      EDC_PARTICIPANT_REGISTRATION_TOKEN_CLIENT_SECRET_ALIAS: connector-registry-client-secret
+      EDC_PARTICIPANT_REGISTRATION_IH_IDENTITY_URL: http://identityhub:10082/api/identity
+      EDC_PARTICIPANT_REGISTRATION_IH_CREDENTIALS_URL: http://identityhub:10081/api/credentials
+      EDC_PARTICIPANT_REGISTRATION_ISSUER_DID: did:web:issuer%3A20085:issuer
+
+      EDC_POLICY_PM_URL: null
+      EDC_POLICY_PM_TOKEN_URL: https://acc.signin.energy/am/oauth2/realms/root/realms/difesp/access_token
+      EDC_POLICY_PM_TOKEN_CLIENT-ID: esp_FraunhoferPermissionCZ1MsY_001
+      EDC_POLICY_PM_TOKEN_CLIENT-SECRET-ALIAS: pm-secret
+
+  dataplane:
+    #image: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-dataplane:0.8.3
+    build:
+      context: ../../../../../..
+      dockerfile: ../../../../../dataplane/src/main/docker/Dockerfile
+    ports:
+      - "9090:9090"
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      EDC_PARTICIPANT_ID: did:web:identityhub%3A10085:tester
+      EDC_COMPONENT_ID: tester-dataplane
+      EDC_HOSTNAME: dataplane
+
+      EDC_CORE_RETRY_RETRIES_MAX: 5
+      EDC_CORE_RETRY_BACKOFF_MIN: 500
+      EDC_CORE_RETRY_BACKOFF_MAX: 10000
+      EDC_CORE_RETRY_LOG_ON_RETRY: false
+      EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED: false
+      EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED: false
+      EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT: false
+      EDC_CORE_RETRY_LOG_ON_ABORT: false
+
+      EDC_DPF_SELECTOR_URL: http://controlplane:9082/api/control/v1/dataplanes
+
+      EDC_DATAPLANE_API_PUBLIC_BASEURL: http://localhost:9094/api/v2/public
+
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: devpass
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED: true
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK: false
+      EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH: /v1/sys/health
+      EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED: true
+      EDC_VAULT_HASHICORP_TOKEN_TTL: 300
+      EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER: 30
+      EDC_VAULT_HASHICORP_API_SECRET_PATH: /v1/secret
+
+      EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS: signer-key
+      EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS: verifier-key
+
+      EDC_HTTP_CLIENT_HTTPS_ENFORCE: false
+      EDC_HTTP_CLIENT_TIMEOUT_CONNECT: 30
+      EDC_HTTP_CLIENT_TIMEOUT_READ: 30
+      EDC_HTTP_CLIENT_SEND_BUFFER_SIZE: 0
+      EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE: 0
+
+      WEB_HTTP_PATH: /api
+      WEB_HTTP_PORT: 9090
+      WEB_HTTP_CONTROL_PATH: /api/control
+      WEB_HTTP_CONTROL_PORT: 9092
+      WEB_HTTP_PUBLIC_PATH: /api/v2/public
+      WEB_HTTP_PUBLIC_PORT: 9094
+
+      EDC_SQL_SCHEMA_AUTOCREATE: true
+      EDC_SQL_FETCH_SIZE: 5000
+      EDC_DATASOURCE_DEFAULT_USER: edc
+      EDC_DATASOURCE_DEFAULT_PASSWORD: devpass
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgresql:5432/edc
+
+  identityhub:
+    image: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/identity-hub/identityhub:0.8.0
+    ports:
+      - "10080:10080"
+      - "10081:10081"
+      - "10082:10082"
+      - "10083:10083"
+      - "10084:10084"
+      - "10085:10085"
+    environment:
+      EDC_PARTICIPANT_ID: did:web:identityhub%3A10085:tester
+      EDC_COMPONENT_ID: tester-identityhub
+      EDC_HOSTNAME: identityhub
+
+      EDC_IAM_DID_WEB_USE_HTTPS: false
+
+      EDC_IH_API_SUPERUSER_KEY: c3VwZXItdXNlcg==.devpass
+
+      EDC_CORE_RETRY_RETRIES_MAX: 5
+      EDC_CORE_RETRY_BACKOFF_MIN: 500
+      EDC_CORE_RETRY_BACKOFF_MAX: 10000
+      EDC_CORE_RETRY_LOG_ON_RETRY: false
+      EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED: false
+      EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED: false
+      EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT: false
+      EDC_CORE_RETRY_LOG_ON_ABORT: false
+
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: devpass
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED: true
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK: false
+      EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH: /v1/sys/health
+      EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED: true
+      EDC_VAULT_HASHICORP_TOKEN_TTL: 300
+      EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER: 30
+      EDC_VAULT_HASHICORP_API_SECRET_PATH: /v1/secret
+
+      EDC_HTTP_CLIENT_HTTPS_ENFORCE: false
+      EDC_HTTP_CLIENT_TIMEOUT_CONNECT: 30
+      EDC_HTTP_CLIENT_TIMEOUT_READ: 30
+      EDC_HTTP_CLIENT_SEND_BUFFER_SIZE: 0
+      EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE: 0
+
+      WEB_HTTP_PATH: /api
+      WEB_HTTP_PORT: 10080
+      WEB_HTTP_CREDENTIALS_PATH: /api/credentials
+      WEB_HTTP_CREDENTIALS_PORT: 10081
+      WEB_HTTP_IDENTITY_PATH: /api/identity
+      WEB_HTTP_IDENTITY_PORT: 10082
+      WEB_HTTP_STS_PATH: /api/sts
+      WEB_HTTP_STS_PORT: 10083
+      WEB_HTTP_VERSION_PATH: /api/version
+      WEB_HTTP_VERSION_PORT: 10084
+      WEB_HTTP_DID_PATH: /
+      WEB_HTTP_DID_PORT: 10085
+
+      EDC_SQL_SCHEMA_AUTOCREATE: true
+      EDC_SQL_FETCH_SIZE: 5000
+      EDC_DATASOURCE_DEFAULT_USER: edc
+      EDC_DATASOURCE_DEFAULT_PASSWORD: devpass
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgresql:5432/edc
+
+  issuer:
+    image: 	container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/dataspace-issuer/issuer:0.8.0
+    ports:
+      - "20080:20080"
+      - "20082:20082"
+      - "20083:20083"
+      - "20084:20084"
+      - "20085:20085"
+      - "20086:20086"
+      - "20087:20087"
+      - "20090:20090"
+    environment:
+      EDC_PARTICIPANT_ID: did:web:issuer%3A20085:issuer
+      EDC_COMPONENT_ID: issuer
+      EDC_HOSTNAME: issuer
+
+      EDC_IAM_DID_WEB_USE_HTTPS: false
+
+      EDC_IH_API_SUPERUSER_KEY: c3VwZXItdXNlcg==.devpass
+
+      EDC_ISSUER_DID: did:web:issuer%3A20085:issuer
+      EDC_ISSUER_BASE_URL: http://issuer:20086
+      EDC_ISSUER_STATUSLIST_SIGNING_KEY_ALIAS: statuslist-signing-key
+
+      EDC_CORE_RETRY_RETRIES_MAX: 5
+      EDC_CORE_RETRY_BACKOFF_MIN: 500
+      EDC_CORE_RETRY_BACKOFF_MAX: 10000
+      EDC_CORE_RETRY_LOG_ON_RETRY: false
+      EDC_CORE_RETRY_LOG_ON_RETRY_SCHEDULED: false
+      EDC_CORE_RETRY_LOG_ON_RETRIES_EXCEEDED: false
+      EDC_CORE_RETRY_LOG_ON_FAILED_ATTEMPT: false
+      EDC_CORE_RETRY_LOG_ON_ABORT: false
+
+      EDC_VAULT_HASHICORP_URL: http://vault:8200
+      EDC_VAULT_HASHICORP_TOKEN: devpass
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED: true
+      EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK: false
+      EDC_VAULT_HASHICORP_API_HEALTH_CHECK_PATH: /v1/sys/health
+      EDC_VAULT_HASHICORP_TOKEN_SCHEDULED-RENEW-ENABLED: true
+      EDC_VAULT_HASHICORP_TOKEN_TTL: 300
+      EDC_VAULT_HASHICORP_TOKEN_RENEW-BUFFER: 30
+      EDC_VAULT_HASHICORP_API_SECRET_PATH: /v1/secret
+
+      EDC_HTTP_CLIENT_HTTPS_ENFORCE: false
+      EDC_HTTP_CLIENT_TIMEOUT_CONNECT: 30
+      EDC_HTTP_CLIENT_TIMEOUT_READ: 30
+      EDC_HTTP_CLIENT_SEND_BUFFER_SIZE: 0
+      EDC_HTTP_CLIENT_RECEIVE_BUFFER_SIZE: 0
+
+      WEB_HTTP_PATH: /api
+      WEB_HTTP_PORT: 20080
+      WEB_HTTP_IDENTITY_PATH: /api/identity
+      WEB_HTTP_IDENTITY_PORT: 20082
+      WEB_HTTP_STS_PATH: /api/sts
+      WEB_HTTP_STS_PORT: 20083
+      WEB_HTTP_VERSION_PATH: /api/version
+      WEB_HTTP_VERSION_PORT: 20084
+      WEB_HTTP_DID_PATH: /
+      WEB_HTTP_DID_PORT: 20085
+      WEB_HTTP_ISSUANCE_PATH: /api/issuance
+      WEB_HTTP_ISSUANCE_PORT: 20086
+      WEB_HTTP_ISSUARADMIN_PATH: /api/admin
+      WEB_HTTP_ISSUARADMIN_PORT: 20087
+      WEB_HTTP_STATUSLIST_PATH: /api/statuslist
+      WEB_HTTP_STATUSLIST_PORT: 20090
+
+      EDC_SQL_SCHEMA_AUTOCREATE: true
+      EDC_SQL_FETCH_SIZE: 5000
+      EDC_DATASOURCE_DEFAULT_USER: edc
+      EDC_DATASOURCE_DEFAULT_PASSWORD: devpass
+      EDC_DATASOURCE_DEFAULT_URL: jdbc:postgresql://postgresql:5432/edc

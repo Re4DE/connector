@@ -1,0 +1,49 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+{{- if .Values.identityhub.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: identityhub
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "identityhub.labels" . | nindent 4 }}
+  {{- if .Values.identityhub.ingress.tls.enabled }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.identityhub.ingress.tls.issuer }}
+  {{- end }}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.identityhub.ingress.host }}
+      http:
+        paths:
+          {{- range $k, $v := .Values.identityhub.endpoints }}
+          {{- if $v.public }}
+          - path: {{ $v.path }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: identityhub
+                port:
+                  name: {{ $k }}
+          {{- end }}
+          {{- end }}
+  {{- if .Values.identityhub.ingress.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.identityhub.ingress.host }}
+      secretName: {{ .Values.identityhub.ingress.host }}-tls
+  {{- end }}
+{{- end }}

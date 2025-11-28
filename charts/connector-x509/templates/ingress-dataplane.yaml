@@ -1,0 +1,49 @@
+{{- /*
+Copyright (c) 2025 Fraunhofer Institute for Energy Economics and Energy System Technology (IEE)
+
+This program and the accompanying materials are made available under the
+terms of the Apache License, Version 2.0 which is available at
+https://www.apache.org/licenses/LICENSE-2.0
+
+SPDX-License-Identifier: Apache-2.0
+
+Contributors:
+     Fraunhofer IEE - initial API and implementation
+
+*/}}
+
+{{- if .Values.dataplane.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dataplane
+  namespace: {{ include "common.namespace" . | quote }}
+  labels: {{- include "dataplane.labels" . | nindent 4 }}
+  {{- if .Values.dataplane.ingress.tls.enabled }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.dataplane.ingress.tls.issuer }}
+  {{- end }}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{ .Values.dataplane.ingress.host }}
+      http:
+        paths:
+          {{- range $k, $v := .Values.dataplane.endpoints }}
+          {{- if $v.public }}
+          - path: {{ $v.path }}
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dataplane
+                port:
+                  name: {{ $k }}
+          {{- end }}
+          {{- end }}
+  {{- if .Values.dataplane.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ .Values.dataplane.ingress.host }}
+      secretName: {{ .Values.dataplane.ingress.host }}-tls
+  {{- end }}
+{{- end }}
