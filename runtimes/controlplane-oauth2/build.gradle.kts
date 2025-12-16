@@ -31,7 +31,7 @@ dependencies {
 
     runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-oauth2"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
-    runtimeOnly(project(":extensions:control-plane:phonebook:target-node-resolver-oauth2"))
+    runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

@@ -43,7 +43,7 @@ dependencies {
 
     runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-ssi"))
     runtimeOnly(project(":extensions:control-plane:scope-functions"))
-    runtimeOnly(project(":extensions:control-plane:phonebook:target-node-resolver-ssi"))
+    runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

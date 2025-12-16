@@ -28,7 +28,7 @@ dependencies {
     runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-oauth2"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
     runtimeOnly(project(":extensions:common:iam:x509"))
-    runtimeOnly(project(":extensions:control-plane:phonebook:target-node-resolver-oauth2"))
+    runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 
     shadow(libs.bouncyCastle.bcpkixJdk18on)
     shadow(libs.bouncyCastle.bcprovJdk18on)

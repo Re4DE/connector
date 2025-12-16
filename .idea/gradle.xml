@@ -17,14 +17,12 @@
             <option value="$PROJECT_DIR$/extensions/common/iam/oauth2/oauth2-service" />
             <option value="$PROJECT_DIR$/extensions/common/iam/x509" />
             <option value="$PROJECT_DIR$/extensions/control-plane" />
-            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook" />
-            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook/target-node-resolver-oauth2" />
-            <option value="$PROJECT_DIR$/extensions/control-plane/phonebook/target-node-resolver-ssi" />
             <option value="$PROJECT_DIR$/extensions/control-plane/policy-functions" />
             <option value="$PROJECT_DIR$/extensions/control-plane/scope-functions" />
             <option value="$PROJECT_DIR$/extensions/control-plane/self-registration" />
             <option value="$PROJECT_DIR$/extensions/control-plane/self-registration/participant-self-registration-oauth2" />
             <option value="$PROJECT_DIR$/extensions/control-plane/self-registration/participant-self-registration-ssi" />
+            <option value="$PROJECT_DIR$/extensions/control-plane/target-node-resolver" />
             <option value="$PROJECT_DIR$/extensions/data-plane" />
             <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-https-oauth2-userflow" />
             <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-public-api-v2" />
