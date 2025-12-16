@@ -46,6 +46,18 @@ import java.util.stream.Collectors;
 
 public class X509OAuthService implements IdentityService {
 
+    private static final String TLS = "TLS";
+    private static final String BCJSSE = "BCJSSE";
+    private static final String BEGIN_PRIV = "-----BEGIN PRIVATE KEY-----";
+    private static final String END_PRIV = "-----END PRIVATE KEY-----";
+    private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+    private static final String END_CERT = "-----END CERTIFICATE-----";
+    private static final String EC = "EC";
+    private static final String BC = "BC";
+    private static final String X509 = "X.509";
+    private static final String JKS = "JKS";
+    private static final String CLIENT = "client";
+    private static final String PKIX = "PKIX";
     private static final String ACCEPT = "Accept";
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
@@ -99,31 +111,31 @@ public class X509OAuthService implements IdentityService {
 
     private void buildSSLContext(String certificateRaw, String keyRaw) {
         try {
-            var sslContext = SSLContext.getInstance("TLS", "BCJSSE");
+            var sslContext = SSLContext.getInstance(TLS, BCJSSE);
 
             // Parse Private Key
             var privateKeyString = keyRaw
-                    .replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace(BEGIN_PRIV, "")
                     .replaceAll("\\R", "")
-                    .replace("-----END PRIVATE KEY-----", "");
+                    .replace(END_PRIV, "");
             var decoded64PrivateKey = Base64.getDecoder().decode(privateKeyString);
-            var privateKey = KeyFactory.getInstance("EC", "BC").generatePrivate(new PKCS8EncodedKeySpec(decoded64PrivateKey));
+            var privateKey = KeyFactory.getInstance(EC, BC).generatePrivate(new PKCS8EncodedKeySpec(decoded64PrivateKey));
 
             // Parse Certificate
             var certificateString = certificateRaw
-                    .replace("-----BEGIN CERTIFICATE-----", "")
+                    .replace(BEGIN_CERT, "")
                     .replaceAll("\\R", "")
-                    .replace("-----END CERTIFICATE-----", "");
+                    .replace(END_CERT, "");
             var decoded64Certificate = Base64.getDecoder().decode(certificateString);
-            var certFactory = CertificateFactory.getInstance("X.509");
+            var certFactory = CertificateFactory.getInstance(X509);
             var chain = certFactory.generateCertificates(new ByteArrayInputStream(decoded64Certificate));
 
             char[] pass = {};
-            var clientKeyStore = KeyStore.getInstance("JKS");
+            var clientKeyStore = KeyStore.getInstance(JKS);
             clientKeyStore.load(null, null);
-            clientKeyStore.setKeyEntry("client", privateKey, pass, chain.toArray(new Certificate[0]));
+            clientKeyStore.setKeyEntry(CLIENT, privateKey, pass, chain.toArray(new Certificate[0]));
 
-            var keyManagerFactory = KeyManagerFactory.getInstance("PKIX");
+            var keyManagerFactory = KeyManagerFactory.getInstance(PKIX);
             keyManagerFactory.init(clientKeyStore, pass);
 
             // Load default Java trust store
@@ -136,7 +148,7 @@ public class X509OAuthService implements IdentityService {
                     .findFirst()
                     .orElseThrow(() -> new EdcException("[X509]: Could not load default X509 trust store"));*/
 
-            // TODO: ONLY FOR TEST, REMOVE!!!
+            // TODO: EXPERIMENTAL, this need to be removed for productive build
             var trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
