@@ -19,21 +19,23 @@ Example Asset definition:
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
-    "@id": "test-asset",
-    "properties": {
-        "name": "test data",
-        "description": "Retrieve test data from a test api to showcase oauth2 userflow in the data plane.",
-        "contenttype": "application/json"
-    },
-    "dataAddress": {
-        "type": "HttpData",
-        "baseUrl": "https://my.awesome.api.de",
-        "oauth2:tokenUrl": "https://secur.de/tokens",
-        "oauth2:username": "joedoe",
-        "oauth2:passwordSecretName": "secret-alias"
-    }
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@id": "test-asset",
+  "@type": "Asset",
+  "properties": {
+    "name": "test data",
+    "description": "Retrieve test data from a test api to showcase oauth2 userflow in the data plane.",
+    "contenttype": "application/json"
+  },
+  "dataAddress": {
+    "@type": "DataAddress",
+    "type": "HttpData",
+    "baseUrl": "https://my.awesome.api.de",
+    "oauth2:tokenUrl": "https://secur.de/tokens",
+    "oauth2:username": "joedoe",
+    "oauth2:passwordSecretName": "secret-alias"
+  }
 }
 ```

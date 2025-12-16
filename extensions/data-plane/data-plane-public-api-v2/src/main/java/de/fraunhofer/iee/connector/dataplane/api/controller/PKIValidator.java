@@ -27,6 +27,11 @@ import java.util.Base64;
 import java.util.Map;
 
 public class PKIValidator {
+
+    private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
+    private static final String END_CERT = "-----END CERTIFICATE-----";
+    private static final String X509 = "X.509";
+
     private static final String PKI_VALIDATE_ADDRESS_FLAG = "pki:validate";
     private static final String PKI_HEADER_NAME = "pki:headerName";
 
@@ -54,14 +59,14 @@ public class PKIValidator {
 
         // Extract raw cert data
         var certString = cert
-                .replace("-----BEGIN CERTIFICATE-----", "")
+                .replace(BEGIN_CERT, "")
                 .replaceAll("\\R", "")
-                .replace("-----END CERTIFICATE-----", "");
+                .replace(END_CERT, "");
         var decoded64Cert = Base64.getDecoder().decode(certString);
 
         // Use bouncy castle provider to load brainpool certificate and analyze it
         try {
-            var certFact = CertificateFactory.getInstance("X509", BouncyCastleProvider.PROVIDER_NAME);
+            var certFact = CertificateFactory.getInstance(X509, BouncyCastleProvider.PROVIDER_NAME);
             var chain = certFact.generateCertificates(new ByteArrayInputStream(decoded64Cert));
             if (chain.size() != 1) {
                 return Result.failure("Invalid cert in header %s".formatted(certHeaderName));
