@@ -14,6 +14,7 @@
 
 package de.fraunhofer.iee.connector.controlplane.fc;
 
+import de.fraunhofer.iee.connector.controlplane.registry.ConnectorRegistryService;
 import org.eclipse.edc.crawler.spi.TargetNode;
 import org.eclipse.edc.crawler.spi.TargetNodeDirectory;
 import org.eclipse.edc.http.spi.EdcHttpClient;
@@ -26,7 +27,7 @@ import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
 
 @Provides(TargetNodeDirectory.class)
-@Extension(value = "Connector Registry node directory for oauth2 identity provider")
+@Extension(value = "Connector Registry Node Directory")
 public class CatalogNodeDirectoryExtension implements ServiceExtension {
 
     @Setting(key = "edc.catalog.registry.enabled", description = "Switch to activate the node target node resolution through a external registry, default is true", defaultValue = "true")
@@ -49,7 +50,9 @@ public class CatalogNodeDirectoryExtension implements ServiceExtension {
         if (this.enabled) {
             this.typeManager.registerTypes(TargetNode.class);
 
-            var targetNodeDirectory = new CatalogNodeDirectory(this.httpclient, this.apiKey, context.getMonitor(), this.connectorRegistryUrl, this.typeManager.getMapper());
+            var registryClient = new ConnectorRegistryService(this.httpclient, context.getMonitor(), this.typeManager.getMapper(), this.connectorRegistryUrl, this.apiKey);
+
+            var targetNodeDirectory = new CatalogNodeDirectory(context.getMonitor(), registryClient);
             context.registerService(TargetNodeDirectory.class, targetNodeDirectory);
         } else {
             context.getMonitor().warning("Target node resolution through external registry is deactivated! Catalog of other participants will not be crawled");

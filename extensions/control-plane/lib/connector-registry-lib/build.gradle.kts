@@ -18,10 +18,8 @@ plugins {
 
 dependencies {
     api(libs.edc.spi.http)
-    api(libs.edc.spi.token)
 
     implementation(libs.edc.spi.core)
     implementation(libs.edc.fc.crawler.spi)
-
-    implementation(project(":extensions:control-plane:lib:connector-registry-lib"))
+    implementation(libs.edc.jsonld)
 }
