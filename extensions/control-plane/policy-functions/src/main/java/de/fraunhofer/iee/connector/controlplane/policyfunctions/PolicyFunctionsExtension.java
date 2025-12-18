@@ -14,6 +14,7 @@
 
 package de.fraunhofer.iee.connector.controlplane.policyfunctions;
 
+import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.IdentityFunction;
 import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.MembershipCredentialEvaluationFunction;
 import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.PermissionAdministratorFunction;
 import de.fraunhofer.iee.connector.controlplane.policyfunctions.oauth2.AccessTokenRetriever;
@@ -42,10 +43,13 @@ import static org.eclipse.edc.connector.controlplane.contract.spi.policy.Contrac
 import static org.eclipse.edc.connector.controlplane.contract.spi.policy.TransferProcessPolicyContext.TRANSFER_SCOPE;
 import static org.eclipse.edc.connector.policy.monitor.spi.PolicyMonitorContext.POLICY_MONITOR_SCOPE;
 import static org.eclipse.edc.policy.model.OdrlNamespace.ODRL_SCHEMA;
-import static org.eclipse.edc.spi.constants.CoreConstants.EDC_NAMESPACE;
 
 @Extension(value = "Policy functions for the dataspace")
 public class PolicyFunctionsExtension implements ServiceExtension {
+    private static final String PERMISSION_ADMINISTRATOR_POLICY_KEY = "permission_request_id";
+    private static final String MEMBERSHIP_KEY = "Membership.membershipType";
+    private static final String IDENTITY_IDENTITY_KEY = "identity";
+    private static final String USE = "use";
 
     @Setting(key = "edc.policy.pm.url", description = "The endpoint of the permission administrator", required = false, warnOnMissingConfig = true)
     private String pmUrl;
@@ -77,8 +81,6 @@ public class PolicyFunctionsExtension implements ServiceExtension {
     @Inject
     private Vault vault;
 
-    private static final String PERMISSION_ADMINISTRATOR_POLICY_KEY = EDC_NAMESPACE + "permission_request_id";
-
     private Monitor monitor;
 
     @Override
@@ -87,6 +89,7 @@ public class PolicyFunctionsExtension implements ServiceExtension {
 
         this.registerPMPolicy();
         this.registerMembershipTypePolicy();
+        this.registerIdentityPolicy();
     }
 
     private void registerPMPolicy() {
@@ -98,16 +101,20 @@ public class PolicyFunctionsExtension implements ServiceExtension {
     }
 
     private void registerMembershipTypePolicy() {
-        var membershipTypeKey = "Membership.membershipType";
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, MEMBERSHIP_KEY);
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, MEMBERSHIP_KEY);
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, MEMBERSHIP_KEY);
+    }
 
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, membershipTypeKey);
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, membershipTypeKey);
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, membershipTypeKey);
+    private void registerIdentityPolicy() {
+        this.bindPermissionFunction(new IdentityFunction<>(), CatalogPolicyContext.class, CATALOG_SCOPE, IDENTITY_IDENTITY_KEY);
+        this.bindPermissionFunction(new IdentityFunction<>(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, IDENTITY_IDENTITY_KEY);
+        this.bindPermissionFunction(new IdentityFunction<>(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, IDENTITY_IDENTITY_KEY);
     }
 
     private <C extends PolicyContext> void bindPermissionFunction(AtomicConstraintRuleFunction<Permission, C> function, Class<C> contextClass, String scope, String constraintType) {
-        this.ruleBindingRegistry.bind("use", scope);
-        this.ruleBindingRegistry.bind(ODRL_SCHEMA + "use", scope);
+        this.ruleBindingRegistry.bind(USE, scope);
+        this.ruleBindingRegistry.bind(ODRL_SCHEMA + USE, scope);
         this.ruleBindingRegistry.bind(constraintType, scope);
 
         this.policyEngine.registerFunction(contextClass, Permission.class, constraintType, function);
