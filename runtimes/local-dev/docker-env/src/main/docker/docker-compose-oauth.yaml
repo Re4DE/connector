@@ -135,7 +135,7 @@ services:
   postgresql:
     image: bitnamilegacy/postgresql:17.2.0
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRESQL_DATABASE: edc
       POSTGRESQL_USERNAME: edc
