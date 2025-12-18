@@ -55,6 +55,7 @@ edc-spi-json-ld = { module = "org.eclipse.edc:json-ld-spi", version.ref = "edc" 
 edc-spi-policy-monitor = { module = "org.eclipse.edc:policy-monitor-spi", version.ref = "edc" }
 edc-spi-jwt-signer = { module = "org.eclipse.edc:jwt-signer-spi", version.ref = "edc" }
 edc-spi-protocol = { module = "org.eclipse.edc:protocol-spi", version.ref = "edc" }
+edc-spi-protocol-dsp-http = { module = "org.eclipse.edc:dsp-http-spi", version.ref = "edc" }
 edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
 edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
 edc-spi-catalog = { module = "org.eclipse.edc:catalog-spi", version.ref = "edc" }

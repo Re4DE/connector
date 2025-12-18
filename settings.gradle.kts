@@ -39,11 +39,12 @@ include(":extensions:common:iam:x509")
 include(":extensions:common:iam:oauth2:oauth2-core")
 include(":extensions:common:iam:oauth2:oauth2-service")
 
-include(":extensions:control-plane:self-registration:participant-self-registration-oauth2")
-include(":extensions:control-plane:self-registration:participant-self-registration-ssi")
+include(":extensions:control-plane:self-registration")
 include(":extensions:control-plane:policy-functions")
 include(":extensions:control-plane:target-node-resolver")
 include(":extensions:control-plane:scope-functions")
+
+include(":extensions:control-plane:lib:connector-registry-lib")
 
 include(":extensions:data-plane:data-plane-https-oauth2-userflow")
 include(":extensions:data-plane:data-plane-public-api-v2")

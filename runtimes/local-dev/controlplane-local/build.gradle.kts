@@ -29,7 +29,6 @@ dependencies {
     //runtimeOnly(libs.bundles.fc.oauth2)
     //runtimeOnly(libs.edc.spi.jwt)
 
-    //runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-oauth2"))
     //runtimeOnly(project(":extensions:common:iam:oauth2:oauth2-service"))
 
     // X509 Specific
@@ -41,7 +40,7 @@ dependencies {
     // The federated catalog can not be tested locally with real connectors, as the real connectors can not resolve local DIDs
     //runtimeOnly(libs.bundles.fc.ssi)
 
-    runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-ssi"))
+    runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:scope-functions"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 }

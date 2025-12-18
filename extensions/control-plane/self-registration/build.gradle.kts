@@ -20,9 +20,11 @@ dependencies {
     api(libs.edc.spi.http)
     api(libs.edc.spi.token)
     api(libs.edc.spi.protocol)
-    api(libs.edc.spi.oauth2)
+    api(libs.edc.spi.protocol.dsp.http)
     api(libs.edc.spi.identity.did)
 
     implementation(libs.edc.spi.core)
     implementation(libs.edc.jsonld)
+
+    implementation(project(":extensions:control-plane:lib:connector-registry-lib"))
 }

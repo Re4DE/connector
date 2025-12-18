@@ -25,7 +25,7 @@ dependencies {
     runtimeOnly(libs.edc.policy.monitor)
     runtimeOnly(libs.bundles.fc.oauth2)
 
-    runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-oauth2"))
+    runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
     runtimeOnly(project(":extensions:common:iam:x509"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))

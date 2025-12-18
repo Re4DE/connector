@@ -25,7 +25,7 @@ dependencies {
     runtimeOnly(libs.edc.policy.monitor)
     runtimeOnly(libs.bundles.fc.ssi)
 
-    runtimeOnly(project(":extensions:control-plane:self-registration:participant-self-registration-ssi"))
+    runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
     runtimeOnly(project(":extensions:control-plane:scope-functions"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
