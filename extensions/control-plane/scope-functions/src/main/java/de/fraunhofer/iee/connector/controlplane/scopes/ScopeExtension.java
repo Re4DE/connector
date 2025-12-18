@@ -67,10 +67,6 @@ public class ScopeExtension implements ServiceExtension {
         var suite = new Jws2020SignatureSuite(this.typeManager.getMapper(JSON_LD));
         this.signatureSuiteRegistry.register(VcConstants.JWS_2020_SIGNATURE_SUITE, suite);
 
-        // register dataspace issuer
-        this.trustedIssuerRegistry.register(new Issuer("did:web:issuer-dena.services.iee.fraunhofer.de:issuer"), TrustedIssuerRegistry.WILDCARD);
-        this.trustedIssuerRegistry.register(new Issuer("did:web:localhost%3A20085:issuer"), TrustedIssuerRegistry.WILDCARD);
-
         // register default scopes provider
         var contextMappingFunction = new DefaultScopeMappingFunction(Set.of("org.eclipse.edc.vc.type:MembershipCredential:read"));
 
