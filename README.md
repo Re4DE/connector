@@ -80,7 +80,7 @@ If the chart is not used, then the following components need to be deployed firs
 
 The configuration is depending on the chosen Identity Service:
 
-- [SSI](charts/connector-ssi/README.md)
+- [SSI](charts/connector-dcp/README.md)
 
 ### Local development
 

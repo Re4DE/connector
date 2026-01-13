@@ -75,7 +75,7 @@ restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssu
 
 [bundles]
 fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
-fc-ssi = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
+fc-dcp = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
 
 [plugins]
 docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }

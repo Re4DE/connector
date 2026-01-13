@@ -34,11 +34,11 @@ dependencies {
     // X509 Specific
     // runtimeOnly(project(":extensions:common:iam:x509"))
 
-    // SSI Specific
+    // DCP Specific
     runtimeOnly(libs.edc.bom.controlplane.dcp)
 
     // The federated catalog can not be tested locally with real connectors, as the real connectors can not resolve local DIDs
-    //runtimeOnly(libs.bundles.fc.ssi)
+    //runtimeOnly(libs.bundles.fc.dcp)
 
     runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:scope-functions"))

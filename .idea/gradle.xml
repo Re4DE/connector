@@ -27,8 +27,8 @@
             <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-https-oauth2-userflow" />
             <option value="$PROJECT_DIR$/extensions/data-plane/data-plane-public-api-v2" />
             <option value="$PROJECT_DIR$/runtimes" />
+            <option value="$PROJECT_DIR$/runtimes/controlplane-dcp" />
             <option value="$PROJECT_DIR$/runtimes/controlplane-oauth2" />
-            <option value="$PROJECT_DIR$/runtimes/controlplane-ssi" />
             <option value="$PROJECT_DIR$/runtimes/controlplane-x509" />
             <option value="$PROJECT_DIR$/runtimes/dataplane" />
             <option value="$PROJECT_DIR$/runtimes/local-dev" />

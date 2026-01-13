@@ -28,7 +28,7 @@ pluginManagement {
 
 // add dependencies
 include(":runtimes:controlplane-oauth2")
-include(":runtimes:controlplane-ssi")
+include(":runtimes:controlplane-dcp")
 include(":runtimes:controlplane-x509")
 include(":runtimes:dataplane")
 include(":runtimes:local-dev:controlplane-local")

@@ -27,4 +27,3 @@ put_if_missing() {
 
 put_if_missing secret/signer-key "$SIGNER_KEY"
 put_if_missing secret/verifier-key "$VERIFIER_KEY"
-put_if_missing secret/connector-registry-client-secret "$CLIENT_SECRET"

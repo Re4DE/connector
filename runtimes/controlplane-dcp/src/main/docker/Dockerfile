@@ -19,7 +19,7 @@ WORKDIR /app
 COPY . .
 
 RUN chmod +x ./gradlew
-RUN ./gradlew clean runtimes:controlplane-ssi:build
+RUN ./gradlew clean runtimes:controlplane-dcp:build
 
 FROM eclipse-temurin:22.0.2_9-jre-alpine
 
@@ -30,7 +30,7 @@ RUN apk --no-cache add curl
 
 WORKDIR /app
 
-COPY --from=builder /app/runtimes/controlplane-ssi/build/libs/controlplane-ssi.jar edc-controlplane.jar
+COPY --from=builder /app/runtimes/controlplane-dcp/build/libs/controlplane-dcp.jar edc-controlplane.jar
 
 HEALTHCHECK --interval=5s --timeout=5s --retries=10 CMD curl --fail http://localhost:8080/api/check/health
 
