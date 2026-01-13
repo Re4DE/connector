@@ -19,9 +19,9 @@ There are currently three Identity Services for the controlplane available.
 
 - Oauth2
 - x509
-- SSI
+- DCP
 
-This chart uses `SSI` as Identity Service.
+This chart uses `DCP` as Identity Service.
 
 ## Configuration
 
