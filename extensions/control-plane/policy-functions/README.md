@@ -4,16 +4,16 @@ This extension is a collection of energy sector specific policy functions.
 
 ## Settings
 
-| Setting                                 | Example Value                | Description                                                                     |
-|-----------------------------------------|------------------------------|---------------------------------------------------------------------------------|
-| edc.policy.pm.url                       | https://pm.50hertz.com       | The URL of the permission administrator                                         |
-| edc.policy.pm.token.url                 | https://pm.50hertz.com/token | The URL of the token endpoint to retrieve JWTs for the permission administrator |
-| edc.policy.pm.token.client-id           | john-doe                     | The client id to use the token endpoint                                         |
-| edc.policy.pm.token.client-secret-alias | pm-secret                    | The alias name of the client secret in the vault to use the token endpoint      |
+| Setting                                 | Example Value                | Description                                                                               |
+|-----------------------------------------|------------------------------|-------------------------------------------------------------------------------------------|
+| edc.policy.pm.url                       | https://pm.50hertz.com       | The URL of the `50Hertz Permission Administrator`                                         |
+| edc.policy.pm.token.url                 | https://pm.50hertz.com/token | The URL of the token endpoint to retrieve JWTs for the `50Hertz Permission Administrator` |
+| edc.policy.pm.token.client-id           | john-doe                     | The client id to use the token endpoint                                                   |
+| edc.policy.pm.token.client-secret-alias | pm-secret                    | The alias name of the client secret in the `HashiCorp Vault` to use the token endpoint    |
 
 ## Permission Administrator Function (Experimental)
 
-With this policy function, the permission administrator from 50Hertz can be used to check whether the original
+With this policy function, the `50Hertz Permission Administrator` can be used to check whether the original
 data producer, such as a household, gives his/her permission to share the data with the requesting participant.
 
 ```
@@ -53,7 +53,7 @@ This policy function is currently only for demonstration purpose!
 ## Membership Credential Type Function
 
 With this policy function it can be checked whether a requesting participant is part of the regulated market
-communication. That will be validated through the membership credential type.
+communication. That will be validated through the Membership Credential type.
 
 ### Usage
 
