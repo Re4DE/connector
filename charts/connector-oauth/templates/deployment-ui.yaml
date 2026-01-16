@@ -27,15 +27,16 @@ spec:
     metadata:
       labels: {{- include "ui.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.ui.image.pullSecret }}
+      volumes:
+        - name: config-vol
+          configMap:
+            name: ui
+            defaultMode: 0755
       containers:
         - name: ui
           image: {{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag }}
           imagePullPolicy: Always
-          env:
-            - name: EDC_UI_MANAGEMENT_API_URL
-              value: {{ include "ui.managementUrl" . }}
-            - name: EDC_UI_CATALOG_URLS
-              value: {{ include "ui.catalogUrl" . }}
+          volumeMounts:
+            - name: config-vol
+              mountPath: /app/config
 {{- end }}
