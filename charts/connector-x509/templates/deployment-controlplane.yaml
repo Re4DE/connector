@@ -26,8 +26,6 @@ spec:
     metadata:
       labels: {{- include "controlplane.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.global.pullSecret }}
       {{- if .Values.controlplane.scheduling.label }}
       nodeSelector:
         {{- with .Values.controlplane.scheduling.label }}
@@ -174,17 +172,39 @@ spec:
             - name: EDC_CATALOG_REGISTRY_ENABLED
               value: {{ .Values.controlplane.edc.catalog.registryEnabled | quote }}
             - name: EDC_CATALOG_REGISTRY_URL
-              value: {{ .Values.controlplane.edc.catalog.targetNodeDirectoryUrl | quote }}
+              value: {{ .Values.controlplane.edc.registry.url | quote }}
+            - name: EDC_CATALOG_REGISTRY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.controlplane.existingSecret | quote }}
+                  key: registry-api-key
             - name: EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS
               value: {{ .Values.controlplane.edc.catalog.timeBetweenRuns | quote }}
             - name: EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS
               value: {{ .Values.controlplane.edc.catalog.delayUntilStart | quote }}
             - name: EDC_CATALOG_CACHE_PARTITION_NUM_CRAWLERS
               value: {{ .Values.controlplane.edc.catalog.numberOfCrawlers | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_ENABLED
+            - name: EDC_REGISTRATION_REGISTRY_ENABLED
               value: {{ .Values.controlplane.edc.selfRegistration.enabled | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_URL
-              value: {{ .Values.controlplane.edc.selfRegistration.registryUrl | quote }}
+            - name: EDC_REGISTRATION_PARTICIPANT_CONTEXT_ENABLED
+              value: "false"
+            - name: EDC_REGISTRATION_MEMBERSHIP_ISSUANCE_ENABLED
+              value: "false"
+            - name: EDC_REGISTRATION_CONNECTOR_NAME
+              value: {{ .Values.global.connectorName | quote }}
+            - name: EDC_REGISTRATION_REGISTRY_URL
+              value: {{ .Values.controlplane.edc.registry.url | quote }}
+            - name: EDC_REGISTRATION_REGISTRY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.controlplane.existingSecret | quote }}
+                  key: registry-api-key
+            - name: EDC_REGISTRATION_IH_IDENTITY_URL
+              value: "not-used"
+            - name: EDC_REGISTRATION_IH_CREDENTIALS_URL
+              value: "not-used"
+            - name: EDC_REGISTRATION_ISSUER_DID
+              value: "not-used"
             - name: EDC_POLICY_PM_URL
               value: {{ .Values.controlplane.edc.policy.permissionAdministrator.url | quote }}
             - name: EDC_POLICY_PM_TOKEN_URL

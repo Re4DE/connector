@@ -26,8 +26,6 @@ spec:
     metadata:
       labels: {{- include "dataplane.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.global.pullSecret }}
       {{- if .Values.dataplane.scheduling.label }}
       nodeSelector:
         {{- with .Values.dataplane.scheduling.label }}
