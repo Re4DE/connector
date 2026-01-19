@@ -36,7 +36,6 @@ data:
 
     put_if_missing secret/$SIGN_ALIAS "$SIGN_KEY"
     put_if_missing secret/$VERI_ALIAS "$VERI_KEY"
-    put_if_missing secret/$REGISTRY_ALIAS "$REGISTRY_KEY"
   docker-entrypoint.sh: |
     #!/usr/bin/dumb-init /bin/sh
     # Copyright (c) HashiCorp, Inc.

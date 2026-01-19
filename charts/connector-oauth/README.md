@@ -18,7 +18,7 @@ It will be deployed:
 There are currently three Identity Services for the Control Plane available.
 
 - OAuth2
-- x509
+- X509
 - DCP
 
 This chart uses `OAuth2` as Identity Service. 
