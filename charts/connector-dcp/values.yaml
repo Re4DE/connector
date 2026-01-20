@@ -16,10 +16,9 @@ install:
   postgresql: true
 
 global:
-  participantId: did:web:identityhub:connector
-  connectorName: connector
-  defaultStorageClass: harvester
-  pullSecret: gitlab
+  participantId: changeme
+  connectorName: null
+  defaultStorageClass: default
   security:
     allowInsecureImages: true
 
@@ -27,8 +26,8 @@ namespaceOverride: ""
 
 controlplane:
   image:
-    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-controlplane-ssi
-    tag: 0.8.3
+    repository: ghcr.io/re4de/connector-controlplane-dcp
+    tag: 1.0.0-edc0.14.0
   existingSecret: controlplane-secret
   scheduling:
     label: null
@@ -61,7 +60,7 @@ controlplane:
     enabled: true
   ingress:
     enabled: true
-    host: controlplane-dena.services.iee.fraunhofer.de
+    host: changeme
     tls:
       enabled: false
       issuer: cert-issuer
@@ -89,12 +88,14 @@ controlplane:
       logOnRetryAbort: false
     iam:
       didWebHttps: true
-      stsUrl: https://identityhub/api/sts/token
+      stsUrl: changeme
       revocationMimetype: application/json
-      tokenUrl: https://auth-dena.services.iee.fraunhofer.de/realms/dena-testfeld/protocol/openid-connect/token
-      tokenClientSecretAlias: connector-registry-client-secret
       tokenClientSecret: changeme
       keyAliasOverwrite: null
+      trustedIssuer:
+        0:
+          id: did:web:dataspace:issuer
+          type: ["*"]
     policy:
       reevaluateWait: 30000
       permissionAdministrator:
@@ -118,24 +119,26 @@ controlplane:
       secretPath: /v1/secret
     sql:
       fetchSize: 5000
+    registry:
+      url: changeme
+      apiKey: changeme
     catalog:
-      registryEnabled: true
-      targetNodeDirectoryUrl: https://registry-dena.services.iee.fraunhofer.de/api/registry
+      enabled: true
       numberOfCrawlers: 1
       timeBetweenRuns: 3600
       delayUntilStart: 60
     selfRegistration:
       enabled: true
-      registryUrl: https://registry-dena.services.iee.fraunhofer.de/api/registry
+      identityHubRegistration: true
       membershipIssuanceEnabled: true
-      ihIdentityUrl: https://identityhub/api/identity
-      ihCredentialUrl: https://identityhub/api/credentials
-      issuerDid: did:web:dataspaceissuer:issuer
+      ihIdentityUrl: changeme
+      ihCredentialUrl: changeme
+      issuerDid: did:web:dataspace:issuer
 
 dataplane:
   image:
-    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector/connector-dataplane
-    tag: 0.8.3
+    repository: ghcr.io/re4de/connector-dataplane
+    tag: 1.0.0-edc0.14.0
   scheduling:
     label: null
   endpoints:
@@ -155,7 +158,7 @@ dataplane:
     enabled: true
   ingress:
     enabled: true
-    host: dataplane-dena.services.iee.fraunhofer.de
+    host: changeme
     tls:
       enabled: false
       issuer: cert-issuer
@@ -207,9 +210,8 @@ dataplane:
 
 identityhub:
   image:
-    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/identity-hub/identityhub
-    tag: 0.8.0
-    pullSecret: gitlab-ih
+    repository: ghcr.io/re4de/identity-hub
+    tag: 1.0.0-edc0.14.0
   scheduling:
     label: null
   endpoints:
@@ -241,7 +243,7 @@ identityhub:
     enabled: true
   ingress:
     enabled: true
-    host: identityhub-dena.service.iee.fraunhofer.de
+    host: changeme
     tls:
       enabled: false
       issuer: cert-issuer
@@ -292,9 +294,8 @@ identityhub:
 ui:
   enabled: true
   image:
-    repository: container-registry.gitlab.cc-asp.fraunhofer.de/future-energy-lab-testfeld/connector-data-dashboard-ui
-    tag: 0.3.0
-    pullSecret: gitlab-ui
+    repository: ghcr.io/re4de/connector-ui
+    tag: 1.0.0-edc0.14.0
   service:
     port: 80
   ingress:
@@ -316,7 +317,6 @@ vault:
   extraEnvironmentVars:
     SIGN_ALIAS: signer-key
     VERI_ALIAS: verifier-key
-    REGISTRY_ALIAS: connector-registry-client-secret
   extraSecretEnvironmentVars:
     - envName: SIGN_KEY
       secretName: vault-secret
@@ -324,9 +324,6 @@ vault:
     - envName: VERI_KEY
       secretName: vault-secret
       secretKey: verifier-key
-    - envName: REGISTRY_KEY
-      secretName: vault-secret
-      secretKey: connector-registry-client-secret
 
 postgresql:
   image:

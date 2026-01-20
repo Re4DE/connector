@@ -1,6 +1,6 @@
 # OAuth 2 Service
 
-This BOM provides a ready-to-use version of the [Oauth2 IdentityService](../oauth2-core) including the [Oauth2 Client](../oauth2-client)
+This BOM provides a ready-to-use version of the [Oauth2 IdentityService](../oauth2-core) including the [Oauth2 Client](https://github.com/eclipse-edc/Connector/tree/release/0.14.0/extensions/common/iam/oauth2/oauth2-client)
 provided by the EDC.
 
 > **_NOTE:_**  Unless you are sure of what you are doing, you do not want to implement your own Oauth2 Client in most cases.

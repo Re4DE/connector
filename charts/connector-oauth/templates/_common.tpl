@@ -121,7 +121,21 @@ app.kubernetes.io/component: ui
 Generates the management api path of the controlplane for the ui
 */}}
 {{- define "ui.managementUrl" -}}
-{{- printf "https://%s%s/v3" .Values.controlplane.ingress.host .Values.controlplane.endpoints.management.path | quote }}
+{{- printf "https://%s%s" .Values.controlplane.ingress.host .Values.controlplane.endpoints.management.path | quote }}
+{{- end -}}
+
+{{/*
+Generates the default api path of the controlplane for the ui
+*/}}
+{{- define "ui.defaultUrl" -}}
+{{- printf "https://%s%s" .Values.controlplane.ingress.host .Values.controlplane.endpoints.default.path | quote }}
+{{- end -}}
+
+{{/*
+Generates the dsp api path of the controlplane for the ui
+*/}}
+{{- define "ui.dspUrl" -}}
+{{- printf "https://%s%s" .Values.controlplane.ingress.host .Values.controlplane.endpoints.protocol.path | quote }}
 {{- end -}}
 
 {{/*

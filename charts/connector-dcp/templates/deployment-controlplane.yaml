@@ -26,8 +26,6 @@ spec:
     metadata:
       labels: {{- include "controlplane.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.global.pullSecret }}
       {{- if .Values.controlplane.scheduling.label }}
       nodeSelector:
         {{- with .Values.controlplane.scheduling.label }}
@@ -81,6 +79,12 @@ spec:
               value: "{{ include "controlplane.stsClientSuffix" . }}-sts-client-secret"
             - name: EDC_IAM_CREDENTIAL_REVOCATION_MIMETYPE
               value: {{ .Values.controlplane.edc.iam.revocationMimetype | quote }}
+            {{- range $k, $v := .Values.controlplane.edc.iam.trustedIssuer }}
+            - name: EDC_IAM_TRUSTED-ISSUER_{{ $k }}_ID
+              value: {{ $v.id | quote }}
+            - name: EDC_IAM_TRUSTED-ISSUER_{{ $k }}_SUPPORTEDTYPES
+              value: {{ $v.type | quote }}
+            {{- end }}
             - name: EDC_CORE_RETRY_RETRIES_MAX
               value: {{ .Values.controlplane.edc.core.retriesMax | quote }}
             - name: EDC_CORE_RETRY_BACKOFF_MIN
@@ -174,46 +178,44 @@ spec:
             - name: EDC_DATASOURCE_DEFAULT_URL
               value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"
             - name: EDC_CATALOG_REGISTRY_ENABLED
-              value: {{ .Values.controlplane.edc.catalog.registryEnabled | quote }}
+              value: {{ .Values.controlplane.edc.catalog.enabled | quote }}
             - name: EDC_CATALOG_REGISTRY_URL
-              value: {{ .Values.controlplane.edc.catalog.targetNodeDirectoryUrl | quote }}
-            - name: EDC_CATALOG_REGISTRY_TOKEN_URL
-              value: {{ .Values.controlplane.edc.iam.tokenUrl | quote }}
-            - name: EDC_CATALOG_REGISTRY_TOKEN_CLIENT_ID
-              value: {{ .Values.global.participantId | quote }}
-            - name: EDC_CATALOG_REGISTRY_TOKEN_CLIENT_SECRET_ALIAS
-              value: {{ .Values.controlplane.edc.iam.tokenClientSecretAlias | quote }}
+              value: {{ .Values.controlplane.edc.registry.url | quote }}
+            - name: EDC_CATALOG_REGISTRY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.controlplane.existingSecret | quote }}
+                  key: registry-api-key
             - name: EDC_CATALOG_CACHE_EXECUTION_PERIOD_SECONDS
               value: {{ .Values.controlplane.edc.catalog.timeBetweenRuns | quote }}
             - name: EDC_CATALOG_CACHE_EXECUTION_DELAY_SECONDS
               value: {{ .Values.controlplane.edc.catalog.delayUntilStart | quote }}
             - name: EDC_CATALOG_CACHE_PARTITION_NUM_CRAWLERS
               value: {{ .Values.controlplane.edc.catalog.numberOfCrawlers | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_ENABLED
+            - name: EDC_REGISTRATION_REGISTRY_ENABLED
               value: {{ .Values.controlplane.edc.selfRegistration.enabled | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_MEMBERSHIP_ISSUANCE_ENABLED
+            - name: EDC_REGISTRATION_PARTICIPANT_CONTEXT_ENABLED
+              value: {{ .Values.controlplane.edc.selfRegistration.identityHubRegistration | quote }}
+            - name: EDC_REGISTRATION_MEMBERSHIP_ISSUANCE_ENABLED
               value: {{ .Values.controlplane.edc.selfRegistration.membershipIssuanceEnabled | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_URL
-              value: {{ .Values.controlplane.edc.selfRegistration.registryUrl | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_TOKEN_URL
-              value: {{ .Values.controlplane.edc.iam.tokenUrl | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_TOKEN_CLIENT_ID
-              value: {{ .Values.global.participantId | quote }}
-            - name: EDC_PARTICIPANT_REGISTRATION_TOKEN_CLIENT_SECRET_ALIAS
-              value: {{ .Values.controlplane.edc.iam.tokenClientSecretAlias | quote }}
-            {{- if .Values.controlplane.edc.selfRegistration.ihIdentityUrl }}
-            - name: EDC_PARTICIPANT_REGISTRATION_IH_IDENTITY_URL
+            - name: EDC_REGISTRATION_CONNECTOR_NAME
+              value: {{ .Values.global.connectorName | quote }}
+            - name: EDC_REGISTRATION_REGISTRY_URL
+              value: {{ .Values.controlplane.edc.registry.url | quote }}
+            - name: EDC_REGISTRATION_REGISTRY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.controlplane.existingSecret | quote }}
+                  key: registry-api-key
+            - name: EDC_REGISTRATION_IH_IDENTITY_URL
               value: {{ .Values.controlplane.edc.selfRegistration.ihIdentityUrl | quote }}
-            {{- end }}
-            {{- if .Values.controlplane.edc.selfRegistration.ihCredentialUrl }}
-            - name: EDC_PARTICIPANT_REGISTRATION_IH_CREDENTIALS_URL
+            - name: EDC_REGISTRATION_IH_CREDENTIALS_URL
               value: {{ .Values.controlplane.edc.selfRegistration.ihCredentialUrl | quote }}
-            {{- end }}
             {{- if .Values.controlplane.edc.iam.keyAliasOverwrite }}
-            - name: EDC_PARTICIPANT_REGISTRATION_KEYS_NAME_OVERWRITE
+            - name: EDC_REGISTRATION_KEYS_NAME_OVERWRITE
               value: {{ .Values.controlplane.edc.iam.keyAliasOverwrite | quote }}
             {{- end }}
-            - name: EDC_PARTICIPANT_REGISTRATION_ISSUER_DID
+            - name: EDC_REGISTRATION_ISSUER_DID
               value: {{ .Values.controlplane.edc.selfRegistration.issuerDid | quote }}
             - name: EDC_POLICY_PM_URL
               value: {{ .Values.controlplane.edc.policy.permissionAdministrator.url | quote }}

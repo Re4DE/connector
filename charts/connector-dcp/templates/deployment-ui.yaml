@@ -27,8 +27,6 @@ spec:
     metadata:
       labels: {{- include "ui.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.ui.image.pullSecret }}
       volumes:
         - name: config-vol
           configMap:

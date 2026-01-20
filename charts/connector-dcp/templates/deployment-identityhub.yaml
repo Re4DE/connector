@@ -26,8 +26,6 @@ spec:
     metadata:
       labels: {{- include "identityhub.labels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.identityhub.image.pullSecret }}
       {{- if .Values.identityhub.scheduling.label }}
       nodeSelector:
         {{- with .Values.identityhub.scheduling.label }}

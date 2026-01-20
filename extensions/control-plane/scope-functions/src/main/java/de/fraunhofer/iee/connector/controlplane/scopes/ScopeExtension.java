@@ -15,11 +15,9 @@
 package de.fraunhofer.iee.connector.controlplane.scopes;
 
 import de.fraunhofer.iee.connector.controlplane.scopes.core.DefaultScopeMappingFunction;
-import de.fraunhofer.iee.connector.controlplane.scopes.core.MembershipTypeCredentialScopeExtractor;
 import org.eclipse.edc.iam.identitytrust.spi.scope.ScopeExtractorRegistry;
 import org.eclipse.edc.iam.identitytrust.spi.verification.SignatureSuiteRegistry;
 import org.eclipse.edc.iam.verifiablecredentials.spi.VcConstants;
-import org.eclipse.edc.iam.verifiablecredentials.spi.model.Issuer;
 import org.eclipse.edc.iam.verifiablecredentials.spi.validation.TrustedIssuerRegistry;
 import org.eclipse.edc.policy.context.request.spi.RequestCatalogPolicyContext;
 import org.eclipse.edc.policy.context.request.spi.RequestContractNegotiationPolicyContext;
@@ -74,9 +72,6 @@ public class ScopeExtension implements ServiceExtension {
         this.policyEngine.registerPostValidator(RequestContractNegotiationPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestTransferProcessPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestVersionPolicyContext.class, contextMappingFunction::apply);
-
-        // register custom scope extractor
-        this.scopeExtractorRegistry.registerScopeExtractor(new MembershipTypeCredentialScopeExtractor());
 
         // register type transformer for json-ld
         this.typeTransformerRegistry.register(new JsonValueToGenericTypeTransformer(this.typeManager, JSON_LD));
