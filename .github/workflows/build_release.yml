@@ -1,0 +1,31 @@
+name: "Release Build and Publish"
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+-edc[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ghcr.io/re4de/connector
+
+jobs:
+  Release:
+    name: "Test, Build and Publish Docker Release image"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [ controlplane-oauth2, controlplane-x509, controlplane-dcp, dataplane ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Prepare
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          chmod +x ./gradlew
+      - name: Test
+        run: ./gradlew -p ./runtimes/${{ matrix.dir }} test
+      - name: Docker Build
+        run: docker build -t $IMAGE_NAME-${{ matrix.dir }}:${{ github.ref_name }} -f ./runtimes/${{ matrix.dir }}/src/main/docker/Dockerfile .
+      - name: Docker Push
+        run: docker push $IMAGE_NAME-${{ matrix.dir }}:${{ github.ref_name }}

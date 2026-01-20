@@ -1,0 +1,26 @@
+name: "Helm Charts Build and Publish"
+
+on:
+  workflow_dispatch:
+
+env:
+  REPOSITORY: ghcr.io/re4de
+
+jobs:
+  Helm:
+    name: "Build and Publish Release Helm Charts"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [ connector-oauth, connector-x509, connector-dcp ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Helm Login
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Helm Package
+        run: |
+          helm dependency update ./charts/${{ matrix.dir }}
+          helm package ./chart/${{ matrix.dir }}
+      - name: Helm Publish
+        run: helm push ./*.tgz oci://$REPOSITORY/charts
