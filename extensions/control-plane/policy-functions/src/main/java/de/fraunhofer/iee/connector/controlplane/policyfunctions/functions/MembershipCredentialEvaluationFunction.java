@@ -19,14 +19,12 @@ import org.eclipse.edc.policy.engine.spi.AtomicConstraintRuleFunction;
 import org.eclipse.edc.policy.model.Operator;
 import org.eclipse.edc.policy.model.Permission;
 
-import java.util.Map;
+import java.time.Instant;
 
 public class MembershipCredentialEvaluationFunction<C extends ParticipantAgentPolicyContext> extends AbstractCredentialEvaluationFunction implements AtomicConstraintRuleFunction<Permission, C> {
     public static final String MEMBERSHIP_CONSTRAINT_KEY = "MembershipCredential";
 
-    private static final String MEMBERSHIP_CLAIM = "membership";
-    private static final String TYPE_CLAIM = "membershipType";
-    private static final String MAKO = "mako";
+    private static final String ACTIVE = "active";
 
     private MembershipCredentialEvaluationFunction() {}
 
@@ -34,15 +32,14 @@ public class MembershipCredentialEvaluationFunction<C extends ParticipantAgentPo
         return new MembershipCredentialEvaluationFunction<C>();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean evaluate(Operator operator, Object rightValue, Permission rule, C context) {
         if (!operator.equals(Operator.EQ)) {
             context.reportProblem("Cannot evaluate operator %s, only %s is supported".formatted(operator, Operator.EQ));
             return false;
         }
-        if (!MAKO.equals(rightValue)) {
-            context.reportProblem("Right-value must be equal to '%s', but was '%s'".formatted(MAKO, rightValue));
+        if (!ACTIVE.equals(rightValue)) {
+            context.reportProblem("Right-value must be equal to '%s', but was '%s'".formatted(ACTIVE, rightValue));
             return false;
         }
 
@@ -61,11 +58,10 @@ public class MembershipCredentialEvaluationFunction<C extends ParticipantAgentPo
         return credentialResult.getContent()
                 .stream()
                 .filter(vc -> vc.getType().stream().anyMatch(t -> t.endsWith(MEMBERSHIP_CONSTRAINT_KEY)))
-                .flatMap(vc -> vc.getCredentialSubject().stream().filter(cs -> cs.getClaims().containsKey(MEMBERSHIP_CLAIM)))
                 .anyMatch(credential -> {
-                    var claim = (Map<String, ?>) credential.getClaim("", MEMBERSHIP_CLAIM);
-                    var type = claim.get(TYPE_CLAIM);
-                    return MAKO.equals(type);
+                    var membershipStartDate = credential.getIssuanceDate();
+                    var membershipEndDate = credential.getExpirationDate();
+                    return membershipStartDate.isBefore(Instant.now()) && membershipEndDate.isAfter(Instant.now());
                 });
     }
 }
