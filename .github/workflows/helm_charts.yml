@@ -21,6 +21,6 @@ jobs:
       - name: Helm Package
         run: |
           helm dependency update ./charts/${{ matrix.dir }}
-          helm package ./chart/${{ matrix.dir }}
+          helm package ./charts/${{ matrix.dir }}
       - name: Helm Publish
         run: helm push ./*.tgz oci://$REPOSITORY/charts
