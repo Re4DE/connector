@@ -209,6 +209,7 @@ dataplane:
         publicKeyAlias: verifier-key
 
 identityhub:
+  enabled: true
   image:
     repository: ghcr.io/re4de/identity-hub
     tag: 1.0.0-edc0.14.0
