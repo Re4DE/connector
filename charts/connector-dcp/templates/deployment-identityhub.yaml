@@ -12,6 +12,7 @@ Contributors:
 
 */}}
 
+{{- if .Values.identityhub.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -152,3 +153,4 @@ spec:
                   key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
             - name: EDC_DATASOURCE_DEFAULT_URL
               value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"
+{{- end }}

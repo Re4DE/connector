@@ -12,7 +12,7 @@ Contributors:
 
 */}}
 
-{{- if .Values.identityhub.service.enabled }}
+{{- if and .Values.identityhub.enabled .Values.identityhub.service.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,4 +30,4 @@ spec:
       targetPort: {{ $v.port }}
       protocol: TCP
     {{- end }}
-  {{- end }}
+{{- end }}

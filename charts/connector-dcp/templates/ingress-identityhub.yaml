@@ -12,7 +12,7 @@ Contributors:
 
 */}}
 
-{{- if .Values.identityhub.ingress.enabled }}
+{{- if and .Values.identityhub.enabled .Values.identityhub.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
