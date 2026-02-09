@@ -89,8 +89,9 @@ controlplane:
     iam:
       didWebHttps: true
       stsUrl: changeme
+      stsClientIdOverwrite: null
+      stsClientSecretOverwrite: null
       revocationMimetype: application/json
-      tokenClientSecret: changeme
       keyAliasOverwrite: null
       trustedIssuer:
         0:

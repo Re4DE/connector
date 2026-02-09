@@ -33,7 +33,9 @@ data:
         vault kv put "$path" content="$value" >/dev/null
       fi
     }
-
+    {{- if .Values.controlplane.edc.iam.stsClientSecretOverwrite }}
+    vault kv put secret/{{ include "controlplane.stsClientSuffix" . }}-sts-client-secret content="{{ .Values.controlplane.edc.iam.stsClientSecretOverwrite }}" >/dev/null
+    {{- end }}
     put_if_missing secret/$SIGN_ALIAS "$SIGN_KEY"
     put_if_missing secret/$VERI_ALIAS "$VERI_KEY"
   docker-entrypoint.sh: |

@@ -74,7 +74,7 @@ spec:
             - name: EDC_IAM_STS_OAUTH_TOKEN_URL
               value: {{ .Values.controlplane.edc.iam.stsUrl | quote }}
             - name: EDC_IAM_STS_OAUTH_CLIENT_ID
-              value: {{ .Values.global.participantId | quote }}
+              value: {{ include "controlplane.stsClientId" . | quote }}
             - name: EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS
               value: "{{ include "controlplane.stsClientSuffix" . }}-sts-client-secret"
             - name: EDC_IAM_CREDENTIAL_REVOCATION_MIMETYPE

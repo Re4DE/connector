@@ -47,6 +47,13 @@ app.kubernetes.io/component: controlplane
 {{- end -}}
 
 {{/*
+Generates the oauth sts client it, if overwrite value is set, otherwise use participant id
+*/}}
+{{- define "controlplane.stsClientId" -}}
+{{- default .Values.global.participantId .Values.controlplane.edc.iam.stsClientIdOverwrite }}
+{{- end -}}
+
+{{/*
 Generates the ouath sts client suffix, depedening whether the overwrite key is settet or not
 */}}
 {{- define "controlplane.stsClientSuffix" -}}
