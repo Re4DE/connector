@@ -83,7 +83,7 @@ spec:
             - name: EDC_IAM_TRUSTED-ISSUER_{{ $k }}_ID
               value: {{ $v.id | quote }}
             - name: EDC_IAM_TRUSTED-ISSUER_{{ $k }}_SUPPORTEDTYPES
-              value: {{ $v.type | quote }}
+              value: {{ toJson $v.type | quote }}
             {{- end }}
             - name: EDC_CORE_RETRY_RETRIES_MAX
               value: {{ .Values.controlplane.edc.core.retriesMax | quote }}
