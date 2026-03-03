@@ -88,7 +88,6 @@ Generates the data plane control url
 {{- printf "http://dataplane:%v%s" .Values.controlplane.endpoints.control.port .Values.controlplane.endpoints.control.path | quote }}
 {{- end -}}
 
-
 {{/*
 Generates the data plane selector url
 */}}
