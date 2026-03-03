@@ -71,7 +71,7 @@ public class RequestBuilder {
         return new Request.Builder()
                 .url("%s/v1alpha/participants".formatted(identityUrl))
                 .addHeader(X_API_KEY, superUserApiKey)
-                .post(RequestBody.create(json.toString(), TYPE_JSON))
+                .post(RequestBody.create(json.build().toString(), TYPE_JSON))
                 .build();
     }
 

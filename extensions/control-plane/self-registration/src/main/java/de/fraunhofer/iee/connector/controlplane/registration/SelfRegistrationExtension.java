@@ -131,7 +131,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
         var superApiKey = ofNullable(this.vault.resolveSecret(SUPER_USER_APIKEY))
                 .orElseThrow(() -> new EdcException("Missing Super User api key in vault."));
         var dsp = this.dspBaseWebhookAddress.get();
-        var keySuffix = this.overwriteKey.isEmpty() ? this.participantId : this.overwriteKey;
+        var keySuffix = this.overwriteKey == null ? this.participantId : this.overwriteKey;
 
         // Check whether the participant context is already created
         var reqGet = RequestBuilder.buildGetParticipantContextRequest(this.ihIdenUrl, participantIdB64, superApiKey);
