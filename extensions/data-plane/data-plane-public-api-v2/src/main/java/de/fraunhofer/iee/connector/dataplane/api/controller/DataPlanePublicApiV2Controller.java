@@ -131,6 +131,7 @@ public class DataPlanePublicApiV2Controller implements DataPlanePublicApiV2 {
         }
 
         var sourceDataAddress = authorizationService.authorize(token, buildRequestData(requestContext));
+        sourceDataAddress.getContent().getProperties().put("header:Authorization-EDC", token);
         if (sourceDataAddress.failed()) {
             response.resume(error(FORBIDDEN, sourceDataAddress.getFailureMessages()));
             return;
