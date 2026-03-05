@@ -24,22 +24,19 @@ This policy function is currently only for demonstration purpose!
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
   "@id": "permission-administrator-required",
+  "@type": "PolicyDefinition",
   "policy": {
-    "@context": "http://www.w3.org/ns/odrl.jsonld",
     "@type": "Set",
     "permission": [
       {
         "action": "use",
         "constraint": {
-          "@type": "AtomicContstraint",
           "leftOperand": "permission_request_id",
-          "operator": {
-            "@id": "odrl:eq"
-          },
+          "operator": "eq",
           "rightOperand": "7ae960cb-464e-43fd-bab8-b176825cc0d2"
         }
       }
@@ -50,29 +47,28 @@ This policy function is currently only for demonstration purpose!
 }
 ```
 
-## Membership Credential Type Function
+## Membership Credential active membership
 
-With this policy function it can be checked whether a requesting participant is part of the regulated market
-communication. That will be validated through the Membership Credential type.
+With this policy function it can be checked whether a requesting participant has a active membership
 
 ### Usage
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@id": "mako-required",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
+  "@id": "require-membership",
   "policy": {
-    "@context": "http://www.w3.org/ns/odrl.jsonld",
     "@type": "Set",
     "permission": [
       {
         "action": "use",
         "constraint": {
-          "leftOperand": "Membership.membershipType",
+          "leftOperand": "MembershipCredential",
           "operator": "eq",
-          "rightOperand": "mako"
+          "rightOperand": "active"
         }
       }
     ],
@@ -90,12 +86,12 @@ With this policy function the access to negotiations and the catalog can be rest
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
   "@id": "single-participant-allowed",
   "policy": {
-    "@context": "http://www.w3.org/ns/odrl.jsonld",
     "@type": "Set",
     "permission": [
       {
@@ -117,12 +113,12 @@ With this policy function the access to negotiations and the catalog can be rest
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
   "@id": "multiple-participants-allowed",
   "policy": {
-    "@context": "http://www.w3.org/ns/odrl.jsonld",
     "@type": "Set",
     "permission": [
       {

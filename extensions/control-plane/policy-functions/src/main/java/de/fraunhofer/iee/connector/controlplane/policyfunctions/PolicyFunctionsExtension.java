@@ -47,7 +47,7 @@ import static org.eclipse.edc.policy.model.OdrlNamespace.ODRL_SCHEMA;
 @Extension(value = "Policy functions for the dataspace")
 public class PolicyFunctionsExtension implements ServiceExtension {
     private static final String PERMISSION_ADMINISTRATOR_POLICY_KEY = "permission_request_id";
-    private static final String MEMBERSHIP_KEY = "Membership.membershipType";
+    private static final String MEMBERSHIP_KEY = "MembershipCredential";
     private static final String IDENTITY_IDENTITY_KEY = "identity";
     private static final String USE = "use";
 
@@ -88,7 +88,7 @@ public class PolicyFunctionsExtension implements ServiceExtension {
         this.monitor = context.getMonitor();
 
         this.registerPMPolicy();
-        this.registerMembershipTypePolicy();
+        this.registerMembershipPolicy();
         this.registerIdentityPolicy();
     }
 
@@ -100,7 +100,7 @@ public class PolicyFunctionsExtension implements ServiceExtension {
         this.bindPermissionFunction(new PermissionAdministratorFunction<>(monitor, this.httpclient, this.typeManager, tokenRetriever, this.pmUrl), PolicyMonitorContext.class, POLICY_MONITOR_SCOPE, PERMISSION_ADMINISTRATOR_POLICY_KEY);
     }
 
-    private void registerMembershipTypePolicy() {
+    private void registerMembershipPolicy() {
         this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, MEMBERSHIP_KEY);
         this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, MEMBERSHIP_KEY);
         this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, MEMBERSHIP_KEY);
