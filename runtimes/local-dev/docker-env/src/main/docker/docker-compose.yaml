@@ -75,16 +75,7 @@ services:
     volumes:
       - "../resources/vault-init.sh:/scripts/vault-init.sh"
       - "../resources/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
-      - type: volume
-        source: vault_data
-        target: /vault/file
-        volume:
-          subpath: file
-      - type: volume
-        source: vault_data
-        target: /vault/unseal
-        volume:
-          subpath: unseal
+      - "vault_data:/vault"
 
   postgresql:
     image: bitnamilegacy/postgresql:17.2.0

@@ -216,16 +216,6 @@ The build and run commands can also be configured to be used out of you IDE like
 
 ### Know issues
 
-#### Cannot access path in local dev (windows with WSL)
-
-Docker is not able to create the subpath in volumes.
-Follow this link in your file explorer:
-
-```
-\\wsl.localhost\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\dena-connector-local-dev_vault_data\_data
-```
-
-and create the two folder `file` and `unseal` in that folder.
 
 ## Centralized deployment
 
