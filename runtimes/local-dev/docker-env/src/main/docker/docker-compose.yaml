@@ -88,3 +88,4 @@ services:
     volumes:
       - "postgres_data:/bitnami/postgresql"
       - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
+      - "../resources/marketpartner-attestation.sql:/docker-entrypoint-initdb.d/marketpartner-attestation.sql"
