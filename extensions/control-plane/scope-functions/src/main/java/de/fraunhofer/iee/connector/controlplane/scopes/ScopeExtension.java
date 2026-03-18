@@ -15,6 +15,7 @@
 package de.fraunhofer.iee.connector.controlplane.scopes;
 
 import de.fraunhofer.iee.connector.controlplane.scopes.core.DefaultScopeMappingFunction;
+import de.fraunhofer.iee.connector.controlplane.scopes.credentials.MarketPartnerCredentialScopeExtractor;
 import org.eclipse.edc.iam.identitytrust.spi.scope.ScopeExtractorRegistry;
 import org.eclipse.edc.iam.identitytrust.spi.verification.SignatureSuiteRegistry;
 import org.eclipse.edc.iam.verifiablecredentials.spi.VcConstants;
@@ -72,6 +73,9 @@ public class ScopeExtension implements ServiceExtension {
         this.policyEngine.registerPostValidator(RequestContractNegotiationPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestTransferProcessPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestVersionPolicyContext.class, contextMappingFunction::apply);
+
+        // register market partner credential scope extractor
+        this.scopeExtractorRegistry.registerScopeExtractor(new MarketPartnerCredentialScopeExtractor());
 
         // register type transformer for json-ld
         this.typeTransformerRegistry.register(new JsonValueToGenericTypeTransformer(this.typeManager, JSON_LD));
