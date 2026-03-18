@@ -132,6 +132,7 @@ controlplane:
       enabled: true
       identityHubRegistration: true
       membershipIssuanceEnabled: true
+      marketPartnerIssuanceEnabled: false
       ihIdentityUrl: changeme
       ihCredentialUrl: changeme
       issuerDid: did:web:dataspace:issuer
