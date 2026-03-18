@@ -36,6 +36,8 @@ import static org.eclipse.edc.http.spi.FallbackFactories.retryWhenStatusNot2xxOr
 
 @Extension(value = "Participant self registration service")
 public class SelfRegistrationExtension implements ServiceExtension {
+    private final static String MEMBERSHIP_CREDENTIAL_TYPE = "MembershipCredential";
+    private final static String MARKET_PARTNER_CREDENTIAL_TYPE = "MarketPartnerCredential";
     private final static String SUPER_USER_APIKEY = "super-user-apikey";
 
     @Setting(key = "edc.registration.registry.enabled", description = "Switch to activate/deactivate the self registration in the connector registry. If deactivated, this connector will not appear in the data space catalog of other participants", defaultValue = "true")
@@ -46,6 +48,9 @@ public class SelfRegistrationExtension implements ServiceExtension {
 
     @Setting(key = "edc.registration.membership.issuance.enabled", description = "Switch to enable self issuance of a Membership Credential. If deactivated, this connector can not communicate with other participants with SSI. Membership Credential need to be issued manual", defaultValue = "true")
     private boolean enabledIssuance;
+
+    @Setting(key = "edc.registration.marketPartner.issuance.enabled", description = "Switch to enable self issuance of a Market Partner Credential. Default is false, if activate this participant is part of the regulated market communication", defaultValue = "false")
+    private boolean enableMarketPartner;
 
     @Setting(key = "edc.registration.connector.name", description = "A human readable name of the connector, if not used the participant id is then used", required = false)
     private String connectorName;
@@ -84,12 +89,13 @@ public class SelfRegistrationExtension implements ServiceExtension {
 
     private Monitor monitor;
     private String participantId;
-
+    private String participantIdB64;
 
     @Override
     public void initialize(ServiceExtensionContext context) {
         this.monitor = context.getMonitor();
         this.participantId = context.getParticipantId();
+        this.participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
 
         this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, this.registryUrl, this.apiKey);
         this.connectorName = this.connectorName == null ? this.participantId : this.connectorName;
@@ -117,6 +123,13 @@ public class SelfRegistrationExtension implements ServiceExtension {
         } else {
             this.monitor.warning("Self issuance of MembershipCredential is deactivated, this connector is not able to communicate with other participants in the Dataspace as long as a Membership Credential is issued!");
         }
+
+        if (this.enableMarketPartner) {
+            // Obtain market partner credential if not present in identity hub
+            this.issueMarketPartnerCredential();
+        } else {
+            this.monitor.info("Self issuance of MarketPartnerCredential is deactivated.");
+        }
     }
 
     private void registerInConnectorRegistry() {
@@ -127,14 +140,13 @@ public class SelfRegistrationExtension implements ServiceExtension {
     // Using the seed Super User to register this connector with a participant context in the Identity Hub
     // This setup is only possible, if this connector and its Identity Hub uses the same Vault instance!!
     private void registerInIdentityHub() {
-        var participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
         var superApiKey = ofNullable(this.vault.resolveSecret(SUPER_USER_APIKEY))
                 .orElseThrow(() -> new EdcException("Missing Super User api key in vault."));
         var dsp = this.dspBaseWebhookAddress.get();
         var keySuffix = this.overwriteKey == null ? this.participantId : this.overwriteKey;
 
         // Check whether the participant context is already created
-        var reqGet = RequestBuilder.buildGetParticipantContextRequest(this.ihIdenUrl, participantIdB64, superApiKey);
+        var reqGet = RequestBuilder.buildGetParticipantContextRequest(this.ihIdenUrl, this.participantIdB64, superApiKey);
         try (var res = this.httpClient.execute(reqGet, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (res.isSuccessful()) {
                 this.monitor.info("Participant context already created.");
@@ -145,7 +157,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
         }
 
         // Create participant context
-        var reqPost = RequestBuilder.buildCreateParticipantContextRequest(this.ihIdenUrl, this.ihCredUrl, this.participantId, participantIdB64, superApiKey, dsp, keySuffix);
+        var reqPost = RequestBuilder.buildCreateParticipantContextRequest(this.ihIdenUrl, this.ihCredUrl, this.participantId, this.participantIdB64, superApiKey, dsp, keySuffix);
         try (var res = this.httpClient.execute(reqPost, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (res.isSuccessful()) {
                 this.monitor.info("Successfully created participant context.");
@@ -159,25 +171,23 @@ public class SelfRegistrationExtension implements ServiceExtension {
 
     // After successfully creating a participant context, issue the membership credential (if it is not present)
     private void issueMembershipCredential() {
-        var participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
-
         var superApiKey = ofNullable(this.vault.resolveSecret(SUPER_USER_APIKEY))
                 .orElseThrow(() -> new EdcException("Missing Super User api key in vault."));
 
-        // Check whether the Membership Credential is already issued
-        if (this.hasMembershipCredentials(participantIdB64, superApiKey)) {
+        // Check whether the membership credential is already issued
+        if (this.hasCredentialType(this.participantIdB64, superApiKey, MEMBERSHIP_CREDENTIAL_TYPE)) {
             this.monitor.info("Membership credential already issued.");
             return;
         }
 
         // Start a membership credential issuance process
-        var reqPost = RequestBuilder.buildCreateMembershipCredentialRequest(this.ihIdenUrl, participantIdB64, superApiKey, this.issuerDid);
+        var reqPost = RequestBuilder.buildCreateMembershipCredentialRequest(this.ihIdenUrl, this.participantIdB64, superApiKey, this.issuerDid);
         try (var response = this.httpClient.execute(reqPost, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (response.isSuccessful()) {
                 // Check whether the credentials were issued correctly, try three times, through warning of not successful
                 for (int i = 0; i < 3; i++) {
                     Thread.sleep(1000);
-                    if (this.hasMembershipCredentials(participantIdB64, superApiKey)) {
+                    if (this.hasCredentialType(this.participantIdB64, superApiKey, MEMBERSHIP_CREDENTIAL_TYPE)) {
                         this.monitor.info("Membership credential successful issued.");
                         return;
                     }
@@ -191,15 +201,47 @@ public class SelfRegistrationExtension implements ServiceExtension {
         }
     }
 
-    private boolean hasMembershipCredentials(String participantIdB64, String superApiKey) {
-        var reqGet = RequestBuilder.buildGetMembershipCredentialRequest(this.ihIdenUrl, participantIdB64, superApiKey);
+    // After successfully creating a participant context, issue the market partner credential (if it is not present)
+    private void issueMarketPartnerCredential() {
+        var superApiKey = ofNullable(this.vault.resolveSecret(SUPER_USER_APIKEY))
+                .orElseThrow(() -> new EdcException("Missing Super User api key in vault."));
+
+        // Check whether the market partner credential is already issued
+        if (this.hasCredentialType(this.participantIdB64, superApiKey, MARKET_PARTNER_CREDENTIAL_TYPE)) {
+            this.monitor.info("Market Partner credential already issued.");
+            return;
+        }
+
+        // Start a market partner credential issuance process
+        var reqPost = RequestBuilder.buildCreateMarketPartnerCredentialRequest(this.ihIdenUrl, this.participantIdB64, superApiKey, this.issuerDid);
+        try (var response = this.httpClient.execute(reqPost, List.of(retryWhenStatusNot2xxOr4xx()))) {
+            if (response.isSuccessful()) {
+                // Check whether the credentials were issued correctly, try three times, through warning of not successful
+                for (int i = 0; i < 3; i++) {
+                    Thread.sleep(1000);
+                    if (this.hasCredentialType(this.participantIdB64, superApiKey, MARKET_PARTNER_CREDENTIAL_TYPE)) {
+                        this.monitor.info("Market partner credential successful issued.");
+                        return;
+                    }
+                }
+                this.monitor.warning("Market partner credential issuance failed.");
+            } else {
+                this.monitor.warning("Market partner credential request failed with error: %s - %s.".formatted(response.code(), response.message()));
+            }
+        } catch (Exception e) {
+            throw new EdcException("Could not start market partner credential request.", e);
+        }
+    }
+
+    private boolean hasCredentialType(String participantIdB64, String superApiKey, String credentialType) {
+        var reqGet = RequestBuilder.buildGetCredentialTypeRequest(this.ihIdenUrl, participantIdB64, superApiKey, credentialType);
         try (var res = this.httpClient.execute(reqGet, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (res.isSuccessful()) {
                 return !res.body().string().equals("[]");
             }
             return false;
         } catch (Exception e) {
-            throw new EdcException("Could not query membership credentials.", e);
+            throw new EdcException("Could not query credentials of type: %s".formatted(credentialType), e);
         }
     }
 }
