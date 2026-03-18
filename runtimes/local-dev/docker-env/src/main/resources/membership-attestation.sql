@@ -11,23 +11,12 @@
 --       Fraunhofer IEE - initial API and implementation
 --
 
-DO $$ BEGIN
-    CREATE TYPE membershiptype AS ENUM (
-        'regular',
-        'mako'
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
 CREATE TABLE IF NOT EXISTS membership_attestations
 (
-    membership_type     membershiptype      default 'regular'                   ,
     holder_id           varchar                                         not null,
-    company_name        varchar                                         not null,
     since               timestamp           default now()               not null,
     id                  varchar             default gen_random_uuid()   not null
-        constraint attestations_pk
+        constraint mem_attestations_pk
             primary key
 );
 
