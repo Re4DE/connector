@@ -10,7 +10,7 @@ public class RequestBuilder {
     private final static String GET = "GET";
 
     private final static String NAME = "name";
-    private final static String ID = "id";
+    private final static String PARTICIPANT_ID = "participantId";
     private final static String URL = "url";
     private final static String SUPPORTED_PROTOCOLS = "supportedProtocols";
     private final static String DATASPACE_PROTOCOL_HTTP = "dataspace-protocol-http";
@@ -35,7 +35,7 @@ public class RequestBuilder {
     public static JsonObject buildPostRequestBody(String connectorName, String participantId, String dsp) {
         return Json.createObjectBuilder()
                 .add(NAME, connectorName)
-                .add(ID, participantId)
+                .add(PARTICIPANT_ID, participantId)
                 .add(URL, dsp)
                 .add(SUPPORTED_PROTOCOLS, Json.createArrayBuilder().add(DATASPACE_PROTOCOL_HTTP))
                 .build();
