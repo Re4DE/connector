@@ -29,7 +29,7 @@ public class MarketPartnerCredentialScopeExtractor implements ScopeExtractor {
     public Set<String> extractScopes(Object leftValue, Operator operator, Object rightValue, RequestPolicyContext context) {
         Set<String> scopes = Set.of();
         if (leftValue instanceof String leftOperand) {
-            if (leftOperand.equals(MARKET_PARTNER_CONSTRAINT_PREFIX)) {
+            if (leftOperand.startsWith(MARKET_PARTNER_CONSTRAINT_PREFIX)) {
                 scopes = Set.of("%s:%s:read".formatted(CREDENTIAL_TYPE_NAMESPACE, MARKET_PARTNER_CREDENTIAL_TYPE));
             }
         }
