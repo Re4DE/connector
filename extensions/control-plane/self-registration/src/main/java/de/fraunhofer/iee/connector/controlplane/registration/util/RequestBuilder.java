@@ -32,6 +32,8 @@ public class RequestBuilder {
     private static final String MEMBERSHIP_CREDENTIAL_DEF = "membership-credential-def-1";
     private static final String MEMBERSHIP_CREDENTIAL = "MembershipCredential";
     private static final String VC1_0_JWT = "VC1_0_JWT";
+    private static final String MARKET_PARTNER_CREDENTIAL_DEF = "marketpartner-credential-def-1";
+    private static final String MARKET_PARTNER_CREDENTIAL = "MarketPartnerCredential";
 
     public static Request buildGetParticipantContextRequest(String identityUrl, String participantIdB64, String superUserApiKey) {
         return new Request.Builder()
@@ -75,9 +77,9 @@ public class RequestBuilder {
                 .build();
     }
 
-    public static Request buildGetMembershipCredentialRequest(String identityUrl, String participantIdB64, String superUserApiKey) {
+    public static Request buildGetCredentialTypeRequest(String identityUrl, String participantIdB64, String superUserApiKey, String credentialType) {
         return new Request.Builder()
-                .url("%s/v1alpha/participants/%s/credentials?type=MembershipCredential".formatted(identityUrl, participantIdB64))
+                .url("%s/v1alpha/participants/%s/credentials?type=%s".formatted(identityUrl, participantIdB64, credentialType))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .build();
     }
@@ -89,6 +91,24 @@ public class RequestBuilder {
                         .add(Json.createObjectBuilder()
                                 .add(ID, MEMBERSHIP_CREDENTIAL_DEF)
                                 .add(TYPE, MEMBERSHIP_CREDENTIAL)
+                                .add(FORMAT, VC1_0_JWT))
+                )
+                .build();
+
+        return new Request.Builder()
+                .url("%s/v1alpha/participants/%s/credentials/request".formatted(identityUrl, participantIdB64))
+                .addHeader(X_API_KEY, superUserApiKey)
+                .post(RequestBody.create(json.toString(), TYPE_JSON))
+                .build();
+    }
+
+    public static Request buildCreateMarketPartnerCredentialRequest(String identityUrl, String participantIdB64, String superUserApiKey, String issuerDid) {
+        var json = Json.createObjectBuilder()
+                .add(ISSUER_DID, issuerDid)
+                .add(CREDENTIALS, Json.createArrayBuilder()
+                        .add(Json.createObjectBuilder()
+                                .add(ID, MARKET_PARTNER_CREDENTIAL_DEF)
+                                .add(TYPE, MARKET_PARTNER_CREDENTIAL)
                                 .add(FORMAT, VC1_0_JWT))
                 )
                 .build();

@@ -198,6 +198,8 @@ spec:
               value: {{ .Values.controlplane.edc.selfRegistration.identityHubRegistration | quote }}
             - name: EDC_REGISTRATION_MEMBERSHIP_ISSUANCE_ENABLED
               value: {{ .Values.controlplane.edc.selfRegistration.membershipIssuanceEnabled | quote }}
+            - name: EDC_REGISTRATION_MARKETPARTNER_ISSUANCE_ENABLED
+              value: {{ .Values.controlplane.edc.selfRegistration.marketPartnerIssuanceEnabled | quote }}
             - name: EDC_REGISTRATION_CONNECTOR_NAME
               value: {{ .Values.global.connectorName | quote }}
             - name: EDC_REGISTRATION_REGISTRY_URL

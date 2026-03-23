@@ -196,8 +196,8 @@ Follow these step to use the `local-dev` runtime.
 
 #### 1. Start environment with docker compose
 ```shell
-cd runtimes/local-dev/src/main/docker
-docker compose up -f docker-compose.yaml -d
+cd runtimes/local-dev/docker-env/src/main/docker
+docker compose up -d
 ```
 
 You need to run this command everytime!
@@ -215,17 +215,6 @@ The build command is only needed if you have done some changes on the source cod
 The build and run commands can also be configured to be used out of you IDE like IntelliJ.
 
 ### Know issues
-
-#### Cannot access path in local dev (windows with WSL)
-
-Docker is not able to create the subpath in volumes.
-Follow this link in your file explorer:
-
-```
-\\wsl.localhost\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\dena-connector-local-dev_vault_data\_data
-```
-
-and create the two folder `file` and `unseal` in that folder.
 
 ## Centralized deployment
 

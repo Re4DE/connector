@@ -103,6 +103,8 @@ if [ "$1" = 'vault' ]; then
     fi
 
     # Here's my customization:
+    mkdir -p /vault/file
+    mkdir -p /vault/unseal
     if [ ! -f /vault/unseal/sealfile ]; then
       # start in dev mode, in the background to record the unseal key
       su-exec vault vault server \
