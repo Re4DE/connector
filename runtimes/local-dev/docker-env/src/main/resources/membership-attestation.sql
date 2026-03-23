@@ -14,7 +14,6 @@
 CREATE TABLE IF NOT EXISTS membership_attestations
 (
     holder_id           varchar                                         not null,
-    since               timestamp           default now()               not null,
     id                  varchar             default gen_random_uuid()   not null
         constraint mem_attestations_pk
             primary key

@@ -17,11 +17,8 @@ CREATE TABLE IF NOT EXISTS marketpartner_attestations
     company_uid         varchar                                         not null,
     sector              varchar             default 'electricity'       not null,
     code_issuing_body   varchar             default 'BDEW'              not null,
-    market_role_mp_id   varchar                                         not null,
-    market_role_name    varchar                                         not null,
-    market_role_abbrv   varchar                                         not null,
+    market_role         json                                            not null,
     holder_id           varchar                                         not null,
-    since               timestamp           default now()               not null,
     id                  varchar             default gen_random_uuid()   not null
         constraint markt_attestations_pk
             primary key
