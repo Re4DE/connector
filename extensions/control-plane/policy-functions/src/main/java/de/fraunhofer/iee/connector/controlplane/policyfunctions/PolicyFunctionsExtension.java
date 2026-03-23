@@ -14,9 +14,7 @@
 
 package de.fraunhofer.iee.connector.controlplane.policyfunctions;
 
-import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.IdentityFunction;
-import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.MembershipCredentialEvaluationFunction;
-import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.PermissionAdministratorFunction;
+import de.fraunhofer.iee.connector.controlplane.policyfunctions.functions.*;
 import de.fraunhofer.iee.connector.controlplane.policyfunctions.oauth2.AccessTokenRetriever;
 import org.eclipse.edc.connector.controlplane.catalog.spi.policy.CatalogPolicyContext;
 import org.eclipse.edc.connector.controlplane.contract.spi.policy.ContractNegotiationPolicyContext;
@@ -87,9 +85,29 @@ public class PolicyFunctionsExtension implements ServiceExtension {
     public void initialize(ServiceExtensionContext context) {
         this.monitor = context.getMonitor();
 
-        this.registerPMPolicy();
         this.registerMembershipPolicy();
+        this.registerMarketPartnerPolicies();
+        this.registerPMPolicy();
         this.registerIdentityPolicy();
+    }
+
+    private void registerMembershipPolicy() {
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, MEMBERSHIP_KEY);
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, MEMBERSHIP_KEY);
+        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, MEMBERSHIP_KEY);
+    }
+
+    private void registerMarketPartnerPolicies() {
+        var roleKey = "MarketPartner.role";
+        var mpIdKey = "MarketPartner.mpId";
+
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), CatalogPolicyContext.class, CATALOG_SCOPE, roleKey);
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, roleKey);
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), TransferProcessPolicyContext.class, TRANSFER_SCOPE, roleKey);
+
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), CatalogPolicyContext.class, CATALOG_SCOPE, mpIdKey);
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, mpIdKey);
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), TransferProcessPolicyContext.class, TRANSFER_SCOPE, mpIdKey);
     }
 
     private void registerPMPolicy() {
@@ -98,12 +116,6 @@ public class PolicyFunctionsExtension implements ServiceExtension {
         this.bindPermissionFunction(new PermissionAdministratorFunction<>(monitor, this.httpclient, this.typeManager, tokenRetriever, this.pmUrl), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, PERMISSION_ADMINISTRATOR_POLICY_KEY);
         this.bindPermissionFunction(new PermissionAdministratorFunction<>(monitor, this.httpclient, this.typeManager, tokenRetriever, this.pmUrl), TransferProcessPolicyContext.class, TRANSFER_SCOPE, PERMISSION_ADMINISTRATOR_POLICY_KEY);
         this.bindPermissionFunction(new PermissionAdministratorFunction<>(monitor, this.httpclient, this.typeManager, tokenRetriever, this.pmUrl), PolicyMonitorContext.class, POLICY_MONITOR_SCOPE, PERMISSION_ADMINISTRATOR_POLICY_KEY);
-    }
-
-    private void registerMembershipPolicy() {
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, MEMBERSHIP_KEY);
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, MEMBERSHIP_KEY);
-        this.bindPermissionFunction(MembershipCredentialEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, MEMBERSHIP_KEY);
     }
 
     private void registerIdentityPolicy() {

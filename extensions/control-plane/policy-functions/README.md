@@ -78,6 +78,122 @@ With this policy function it can be checked whether a requesting participant has
 }
 ```
 
+## Market Partner role Function
+
+With this policy function the access to negotiations and the catalog can be restricted to one or multiple market partner roles.
+
+### Usage with a single role
+
+```json
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
+  "@id": "only-biko-allowed",
+  "policy": {
+    "@type": "Set",
+    "permission": [
+      {
+        "action": "use",
+        "constraint": {
+          "leftOperand": "MarketPartner.role",
+          "operator": "eq",
+          "rightOperand": "BIKO"
+        }
+      }
+    ],
+    "prohibition": [],
+    "obligation": []
+  }
+}
+```
+
+### Usage with multiple roles
+
+```json
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
+  "@id": "biko-msb-allowed",
+  "policy": {
+    "@type": "Set",
+    "permission": [
+      {
+        "action": "use",
+        "constraint": {
+          "leftOperand": "MarketPartner.role",
+          "operator": "isAnyOf",
+          "rightOperand": "BIKO,MSB"
+        }
+      }
+    ],
+    "prohibition": [],
+    "obligation": []
+  }
+}
+```
+
+## Market Partner ID Function
+
+With this policy function the access to negotiations and the catalog can be restricted to one or multiple market partner ids.
+
+### Usage with a single market partner id
+
+```json
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
+  "@id": "only-mp-with-id-allowed",
+  "policy": {
+    "@type": "Set",
+    "permission": [
+      {
+        "action": "use",
+        "constraint": {
+          "leftOperand": "MarketPartner.mpId",
+          "operator": "eq",
+          "rightOperand": "4045399000008"
+        }
+      }
+    ],
+    "prohibition": [],
+    "obligation": []
+  }
+}
+```
+
+### Usage with multiple market partner ids
+
+```json
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v0.0.1"
+  ],
+  "@type": "PolicyDefinition",
+  "@id": "only-mps-with-ids-allowed",
+  "policy": {
+    "@type": "Set",
+    "permission": [
+      {
+        "action": "use",
+        "constraint": {
+          "leftOperand": "MarketPartner.role",
+          "operator": "isAnyOf",
+          "rightOperand": "4242424242425,4242424242426"
+        }
+      }
+    ],
+    "prohibition": [],
+    "obligation": []
+  }
+}
+```
+
 ## Identity Function
 
 With this policy function the access to negotiations and the catalog can be restricted to one or multiple participants.
