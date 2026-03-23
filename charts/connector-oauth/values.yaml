@@ -28,7 +28,7 @@ namespaceOverride: ""
 controlplane:
   image:
     repository: ghcr.io/re4de/connector-controlplane-oauth2
-    tag: 1.0.2-edc0.14.0
+    tag: 1.1.0-edc0.14.0
   existingSecret: controlplane-secret
   scheduling:
     label: null
@@ -133,7 +133,7 @@ controlplane:
 dataplane:
   image:
     repository: ghcr.io/re4de/connector-dataplane
-    tag: 1.0.2-edc0.14.0
+    tag: 1.1.0-edc0.14.0
   scheduling:
     label: null
   endpoints:
