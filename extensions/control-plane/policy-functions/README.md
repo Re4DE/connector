@@ -182,7 +182,7 @@ With this policy function the access to negotiations and the catalog can be rest
       {
         "action": "use",
         "constraint": {
-          "leftOperand": "MarketPartner.role",
+          "leftOperand": "MarketPartner.mpId",
           "operator": "isAnyOf",
           "rightOperand": "4242424242425,4242424242426"
         }
