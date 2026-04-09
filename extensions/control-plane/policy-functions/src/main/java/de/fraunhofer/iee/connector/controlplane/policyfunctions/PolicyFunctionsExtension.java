@@ -101,13 +101,13 @@ public class PolicyFunctionsExtension implements ServiceExtension {
         var roleKey = "MarketPartner.role";
         var mpIdKey = "MarketPartner.mpId";
 
-        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), CatalogPolicyContext.class, CATALOG_SCOPE, roleKey);
-        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, roleKey);
-        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(this.typeManager.getMapper()), TransferProcessPolicyContext.class, TRANSFER_SCOPE, roleKey);
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, roleKey);
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, roleKey);
+        this.bindPermissionFunction(MarketPartnerRoleEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, roleKey);
 
-        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), CatalogPolicyContext.class, CATALOG_SCOPE, mpIdKey);
-        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, mpIdKey);
-        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(this.typeManager.getMapper()), TransferProcessPolicyContext.class, TRANSFER_SCOPE, mpIdKey);
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(), CatalogPolicyContext.class, CATALOG_SCOPE, mpIdKey);
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(), ContractNegotiationPolicyContext.class, NEGOTIATION_SCOPE, mpIdKey);
+        this.bindPermissionFunction(MarketPartnerIdEvaluationFunction.create(), TransferProcessPolicyContext.class, TRANSFER_SCOPE, mpIdKey);
     }
 
     private void registerPMPolicy() {

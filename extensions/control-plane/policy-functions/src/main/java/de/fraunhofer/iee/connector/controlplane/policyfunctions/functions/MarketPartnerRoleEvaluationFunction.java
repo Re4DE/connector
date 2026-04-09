@@ -1,12 +1,13 @@
 package de.fraunhofer.iee.connector.controlplane.policyfunctions.functions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.edc.participant.spi.ParticipantAgentPolicyContext;
 import org.eclipse.edc.policy.engine.spi.AtomicConstraintRuleFunction;
 import org.eclipse.edc.policy.model.Operator;
 import org.eclipse.edc.policy.model.Permission;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -17,14 +18,10 @@ public class MarketPartnerRoleEvaluationFunction<C extends ParticipantAgentPolic
     private static final String ROLE_NAME = "roleName";
     private static final String ROLE_ABBREVIATION = "roleAbbreviation";
 
-    private final ObjectMapper mapper;
+    private MarketPartnerRoleEvaluationFunction() {}
 
-    private MarketPartnerRoleEvaluationFunction(ObjectMapper mapper) {
-        this.mapper = mapper;
-    }
-
-    public static <C extends ParticipantAgentPolicyContext> MarketPartnerRoleEvaluationFunction<C> create(ObjectMapper mapper) {
-        return new MarketPartnerRoleEvaluationFunction<>(mapper);
+    public static <C extends ParticipantAgentPolicyContext> MarketPartnerRoleEvaluationFunction<C> create() {
+        return new MarketPartnerRoleEvaluationFunction<>();
     }
 
     @Override
@@ -73,49 +70,49 @@ public class MarketPartnerRoleEvaluationFunction<C extends ParticipantAgentPolic
                 .filter(vc -> vc.getType().stream().anyMatch(t -> t.endsWith(MARKET_PARTNER_CONSTRAINT_KEY)))
                 .flatMap(credential -> credential.getCredentialSubject().stream())
                 .anyMatch(credentialSubject -> {
-                    var rawJson = credentialSubject.getClaim("", MARKET_ROLE);
-                    if (rawJson instanceof String) {
-                        try {
-                            var marketRole = this.mapper.readTree((String) rawJson);
+                    var raw = credentialSubject.getClaim("", MARKET_ROLE);
 
-                            // There is only a single role
-                            if (marketRole.isObject()) {
-                                var name = marketRole.get(ROLE_NAME).asText();
-                                var abbrv = marketRole.get(ROLE_ABBREVIATION).asText();
+                    // There is only a single role, so the role can be parsed directly to a Map
+                    if (raw instanceof Map) {
+                        var marketRole = (Map<String, Object>) raw;
+                        var name = marketRole.get(ROLE_NAME);
+                        var abbrv = marketRole.get(ROLE_ABBREVIATION);
 
-                                // Both need to be present otherwise reject
-                                if (name == null || abbrv == null) {
-                                    return false;
-                                }
-
-                                // Check whether the full role name or the abbreviation is used
-                                return switch (operator) {
-                                    case EQ -> Objects.equals(name, roles.get(0)) || Objects.equals(abbrv, roles.get(0));
-                                    case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(name, role) || Objects.equals(abbrv, role));
-                                    default -> false;
-                                };
-                            // There are multiple roles
-                            } else if (marketRole.isArray()) {
-                                boolean isRoleName = marketRole.findValuesAsText(ROLE_NAME)
-                                        .stream()
-                                        .anyMatch(name -> switch (operator) {
-                                            case EQ -> Objects.equals(name, roles.get(0));
-                                            case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(name, role));
-                                            default -> false;
-                                        });
-                                boolean isRoleAbbrv = marketRole.findValuesAsText(ROLE_ABBREVIATION)
-                                        .stream()
-                                        .anyMatch(abbrv -> switch (operator) {
-                                            case EQ -> Objects.equals(abbrv, roles.get(0));
-                                            case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(abbrv, role));
-                                            default -> false;
-                                        });
-                                return isRoleName || isRoleAbbrv;
-                            }
-                        } catch (Exception e) {
-                            context.reportProblem("Could not parse MarketPartnerCredential from participant context");
+                        // Both need to be present otherwise reject
+                        if (name == null || abbrv == null) {
+                            return false;
                         }
+
+                        // Check whether the full role name or the abbreviation is used
+                        return switch (operator) {
+                            case EQ -> Objects.equals(name, roles.get(0)) || Objects.equals(abbrv, roles.get(0));
+                            case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(name, role) || Objects.equals(abbrv, role));
+                            default -> false;
+                        };
                     }
+
+                    // There are multiple roles
+                    if (raw instanceof ArrayList) {
+                        var marketRoles = (ArrayList<Map<String, Object>>) raw;
+                        boolean isRoleName = marketRoles
+                                .stream()
+                                .map((m) -> m.get(ROLE_NAME))
+                                .anyMatch(name -> switch (operator) {
+                                    case EQ -> Objects.equals(name, roles.get(0));
+                                    case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(name, role));
+                                    default -> false;
+                                });
+                        boolean isRoleAbbrv = marketRoles
+                                .stream()
+                                .map((m) -> m.get(ROLE_ABBREVIATION))
+                                .anyMatch(abbrv -> switch (operator) {
+                                    case EQ -> Objects.equals(abbrv, roles.get(0));
+                                    case IS_ANY_OF -> roles.stream().anyMatch(role -> Objects.equals(abbrv, role));
+                                    default -> false;
+                                });
+                        return isRoleName || isRoleAbbrv;
+                    }
+
                     return false;
                 });
     }

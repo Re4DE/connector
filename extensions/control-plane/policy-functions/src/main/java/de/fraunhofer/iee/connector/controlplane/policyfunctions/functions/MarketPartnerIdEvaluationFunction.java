@@ -1,12 +1,13 @@
 package de.fraunhofer.iee.connector.controlplane.policyfunctions.functions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.edc.participant.spi.ParticipantAgentPolicyContext;
 import org.eclipse.edc.policy.engine.spi.AtomicConstraintRuleFunction;
 import org.eclipse.edc.policy.model.Operator;
 import org.eclipse.edc.policy.model.Permission;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -16,14 +17,10 @@ public class MarketPartnerIdEvaluationFunction <C extends ParticipantAgentPolicy
     private static final String MARKET_ROLE = "marketRole";
     private static final String MP_ID = "mpId";
 
-    private final ObjectMapper mapper;
+    private MarketPartnerIdEvaluationFunction() {}
 
-    private MarketPartnerIdEvaluationFunction(ObjectMapper mapper) {
-        this.mapper = mapper;
-    }
-
-    public static <C extends ParticipantAgentPolicyContext> MarketPartnerIdEvaluationFunction<C> create(ObjectMapper mapper) {
-        return new MarketPartnerIdEvaluationFunction<>(mapper);
+    public static <C extends ParticipantAgentPolicyContext> MarketPartnerIdEvaluationFunction<C> create() {
+        return new MarketPartnerIdEvaluationFunction<>();
     }
 
     @Override
@@ -72,40 +69,39 @@ public class MarketPartnerIdEvaluationFunction <C extends ParticipantAgentPolicy
                 .filter(vc -> vc.getType().stream().anyMatch(t -> t.endsWith(MARKET_PARTNER_CONSTRAINT_KEY)))
                 .flatMap(credential -> credential.getCredentialSubject().stream())
                 .anyMatch(credentialSubject -> {
-                    var rawJson = credentialSubject.getClaim("", MARKET_ROLE);
-                    if (rawJson instanceof String) {
-                        try {
-                            var marketRole = this.mapper.readTree((String) rawJson);
+                    var raw = credentialSubject.getClaim("", MARKET_ROLE);
 
-                            // There is only a single role
-                            if (marketRole.isObject()) {
-                                var mpId = marketRole.get(MP_ID).asText();
+                    // There is only a single role, so the role can be parsed directly to a Map
+                    if (raw instanceof Map) {
+                        var marketRole = (Map<String, Object>) raw;
+                        var mpId = marketRole.get(MP_ID);
 
-                                // Need to be present otherwise reject
-                                if (mpId == null) {
-                                    return false;
-                                }
+                        // Need to be present otherwise reject
+                        if (mpId == null) {
+                            return false;
+                        }
 
-                                // Check the marked partner id is matching
-                                return switch (operator) {
+                        // Check the marked partner id is matching
+                        return switch (operator) {
+                            case EQ -> Objects.equals(mpId, mpIds.get(0));
+                            case IS_ANY_OF -> mpIds.stream().anyMatch(m -> Objects.equals(mpId, m));
+                            default -> false;
+                        };
+                    }
+
+                    // There are multiple roles
+                    if (raw instanceof ArrayList) {
+                        var marketRoles = (ArrayList<Map<String, Object>>) raw;
+                        return marketRoles
+                                .stream()
+                                .map((m) -> m.get(MP_ID).toString()) // The market partner id will be initially parsed as long, so make a String
+                                .anyMatch(mpId -> switch (operator) {
                                     case EQ -> Objects.equals(mpId, mpIds.get(0));
                                     case IS_ANY_OF -> mpIds.stream().anyMatch(m -> Objects.equals(mpId, m));
                                     default -> false;
-                                };
-                            // There are multiple roles
-                            } else if (marketRole.isArray()) {
-                                return marketRole.findValuesAsText(MP_ID)
-                                        .stream()
-                                        .anyMatch(mpId -> switch (operator) {
-                                            case EQ -> Objects.equals(mpId, mpIds.get(0));
-                                            case IS_ANY_OF -> mpIds.stream().anyMatch(m -> Objects.equals(mpId, m));
-                                            default -> false;
-                                        });
-                            }
-                        } catch (Exception e) {
-                            context.reportProblem("Could not parse MarketPartnerCredential from participant context");
-                        }
+                                });
                     }
+
                     return false;
                 });
     }
