@@ -96,7 +96,7 @@ spec:
             - name: EDC_VAULT_HASHICORP_URL
               value: {{ include "common.vault.url" . }}
             - name: EDC_VAULT_HASHICORP_TOKEN
-              value: {{ .Values.vault.server.dev.devRootToken | quote }}
+              value: {{ .Values.vault.dev.devRootToken | quote }}
             - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_ENABLED
               value: {{ .Values.controlplane.edc.vault.healthCheck | quote }}
             - name: EDC_VAULT_HASHICORP_HEALTH_CHECK_STANDBY_OK
@@ -161,14 +161,14 @@ spec:
             - name: EDC_SQL_FETCH_SIZE
               value: {{ .Values.controlplane.edc.sql.fetchSize | quote }}
             - name: EDC_DATASOURCE_DEFAULT_USER
-              value: {{ .Values.postgresql.auth.username | quote }}
+              value: {{ .Values.postgres.customUser.name | quote }}
             - name: EDC_DATASOURCE_DEFAULT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.auth.existingSecret }}
-                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+                  name: {{ .Values.postgres.auth.existingSecret }}
+                  key: {{ .Values.postgres.customUser.secretKeys.password }}
             - name: EDC_DATASOURCE_DEFAULT_URL
-              value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgres:{{ .Values.postgres.service.port }}/{{ .Values.postgres.customUser.database }}"
             - name: EDC_CATALOG_REGISTRY_ENABLED
               value: {{ .Values.controlplane.edc.catalog.registryEnabled | quote }}
             - name: EDC_CATALOG_REGISTRY_URL
@@ -191,7 +191,7 @@ spec:
             - name: EDC_REGISTRATION_MEMBERSHIP_ISSUANCE_ENABLED
               value: "false"
             - name: EDC_REGISTRATION_CONNECTOR_NAME
-              value: {{ .Values.global.connectorName | quote }}
+              value: {{ default .Values.global.participantId .Values.global.connectorName | quote }}
             - name: EDC_REGISTRATION_REGISTRY_URL
               value: {{ .Values.controlplane.edc.registry.url | quote }}
             - name: EDC_REGISTRATION_REGISTRY_API_KEY

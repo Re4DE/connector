@@ -13,15 +13,11 @@
 #
 
 install:
-  vault: true
   postgresql: true
 
 global:
   participantId: changeme
   connectorName: changeme
-  defaultStorageClass: default
-  security:
-    allowInsecureImages: true
 
 namespaceOverride: ""
 
@@ -216,46 +212,45 @@ ui:
       issuer: cert-issuer
 
 vault:
-  injector:
-    enabled: false
-  server:
-    extraEnvironmentVars:
-      CERT_ALIAS: client-cert
-      PRIV_ALIAS: client-key
-      SIGN_ALIAS: signer-key
-      VERI_ALIAS: verifier-key
-    extraSecretEnvironmentVars:
-      - envName: CERT
-        secretName: vault-secret
-        secretKey: client-cert
-      - envName: PRIV_KEY
-        secretName: vault-secret
-        secretKey: client-key
-      - envName: SIGN_KEY
-        secretName: vault-secret
-        secretKey: signer-key
-      - envName: VERI_KEY
-        secretName: vault-secret
-        secretKey: verifier-key
-    postStart:
-      - sh
-      - -c
-      - |-
-        {
-        sleep 5
-        /bin/vault kv put secret/$CERT_ALIAS content="$CERT"
-        /bin/vault kv put secret/$PRIV_ALIAS content="$PRIV_KEY"
-        /bin/vault kv put secret/$SIGN_ALIAS content="$SIGN_KEY"
-        /bin/vault kv put secret/$VERI_ALIAS content="$VERI_KEY"
-        }
-    dev:
-      enabled: true
-      devRootToken: changeme
-
-postgresql:
+  enabled: true
   image:
-    repository: bitnamilegacy/postgresql
+    repository: hashicorp/vault
+    tag: 1.18.1
+  dev:
+    devRootToken: changeme
+  persistence:
+    size: 8Gi
+    volumeName: vault-vol
+    storageClass: changeme
+  extraEnvironmentVars:
+    CERT_ALIAS: client-cert
+    PRIV_ALIAS: client-key
+    SIGN_ALIAS: signer-key
+    VERI_ALIAS: verifier-key
+  extraSecretEnvironmentVars:
+    - envName: CERT
+      secretName: vault-secret
+      secretKey: client-cert
+    - envName: PRIV_KEY
+      secretName: vault-secret
+      secretKey: client-key
+    - envName: SIGN_KEY
+      secretName: vault-secret
+      secretKey: signer-key
+    - envName: VERI_KEY
+      secretName: vault-secret
+      secretKey: verifier-key
+
+postgres:
+  persistence:
+    storageClass: changeme
   auth:
-    username: edc
+    existingSecret: postgres-secret
+  customUser:
+    name: edc
     database: edc
     existingSecret: postgres-secret
+    secretKeys:
+      name: null
+      database: null
+      password: password

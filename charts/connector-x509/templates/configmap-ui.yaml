@@ -65,7 +65,7 @@ data:
   edc-connector-config.json: |
     [
       {
-        "connectorName": {{ .Values.global.connectorName | quote }},
+        "connectorName": {{ default .Values.global.participantId .Values.global.connectorName | quote }},
         "managementUrl": {{ include "ui.managementUrl" . }},
         "defaultUrl": {{ include "ui.defaultUrl" . }},
         "protocolUrl": {{ include "ui.dspUrl" . }},

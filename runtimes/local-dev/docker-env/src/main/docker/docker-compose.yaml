@@ -79,15 +79,15 @@ services:
       - "vault_data:/vault"
 
   postgresql:
-    image: bitnamilegacy/postgresql:17.2.0
+    image: postgres:18.2-alpine3.23
     ports:
       - "5432:5432"
     environment:
-      POSTGRESQL_DATABASE: edc
-      POSTGRESQL_USERNAME: edc
+      POSTGRES_DB: edc
+      POSTGRES_USER: edc
       POSTGRESQL_PASSWORD: devpass
     volumes:
-      - "postgres_data:/bitnami/postgresql"
+      - "postgres_data:/var/lib/postgresql/18/docker"
       - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
       - "../resources/marketpartner-attestation.sql:/docker-entrypoint-initdb.d/marketpartner-attestation.sql"
 

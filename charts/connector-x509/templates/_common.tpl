@@ -96,6 +96,52 @@ Generates the base public api url
 {{- end -}}
 
 {{/*
+Generates the vault labels
+*/}}
+{{- define "vault.labels" -}}
+app.kubernetes.io/name: connector
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: vault
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Generates vault labels to match immutable field like deployment templates or services
+*/}}
+{{- define "vault.matchLabels" -}}
+app.kubernetes.io/name: connector
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: vault
+{{- end -}}
+
+{{/*
+Inject extra environment vars in the format key:value, if populated
+*/}}
+{{- define "vault.extraEnvironmentVars" -}}
+{{- if .Values.vault.extraEnvironmentVars -}}
+{{- range $key, $value := .Values.vault.extraEnvironmentVars }}
+- name: {{ printf "%s" $key | replace "." "_" | upper | quote }}
+  value: {{ $value | quote }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Inject extra environment populated by secrets, if populated
+*/}}
+{{- define "vault.extraSecretEnvironmentVars" -}}
+{{- if .Values.vault.extraSecretEnvironmentVars -}}
+{{- range .Values.vault.extraSecretEnvironmentVars }}
+- name: {{ .envName }}
+  valueFrom:
+   secretKeyRef:
+     name: {{ .secretName }}
+     key: {{ .secretKey }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Generates the ui labels
 */}}
 {{- define "ui.labels" -}}

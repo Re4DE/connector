@@ -18,9 +18,6 @@ install:
 global:
   participantId: changeme
   connectorName: null
-  defaultStorageClass: default
-  security:
-    allowInsecureImages: true
 
 namespaceOverride: ""
 
@@ -316,6 +313,7 @@ vault:
     devRootToken: changeme
   persistence:
     size: 8Gi
+    storageClass: changeme
     volumeName: vault-vol
   extraEnvironmentVars:
     SIGN_ALIAS: signer-key
@@ -328,10 +326,16 @@ vault:
       secretName: vault-secret
       secretKey: verifier-key
 
-postgresql:
-  image:
-    repository: bitnamilegacy/postgresql
+postgres:
+  persistence:
+    storageClass: changeme
   auth:
-    username: edc
+    existingSecret: postgres-secret
+  customUser:
+    name: edc
     database: edc
     existingSecret: postgres-secret
+    secretKeys:
+      name: null
+      database: null
+      password: password

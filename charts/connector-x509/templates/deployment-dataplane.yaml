@@ -106,7 +106,7 @@ spec:
             - name: EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS
               value: {{ .Values.dataplane.edc.token.verifier.publicKeyAlias | quote }}
             - name: EDC_VAULT_HASHICORP_TOKEN
-              value: {{ .Values.vault.server.dev.devRootToken | quote }}
+              value: {{ .Values.vault.dev.devRootToken | quote }}
             - name: EDC_HTTP_CLIENT_HTTPS_ENFORCE
               value: {{ .Values.dataplane.edc.http.clientHttpsEnforce | quote }}
             - name: EDC_HTTP_CLIENT_TIMEOUT_CONNECT
@@ -138,11 +138,11 @@ spec:
             - name: EDC_SQL_FETCH_SIZE
               value: {{ .Values.dataplane.edc.sql.fetchSize | quote }}
             - name: EDC_DATASOURCE_DEFAULT_USER
-              value: {{ .Values.postgresql.auth.username | quote }}
+              value: {{ .Values.postgres.customUser.name | quote }}
             - name: EDC_DATASOURCE_DEFAULT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.postgresql.auth.existingSecret }}
-                  key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+                  name: {{ .Values.postgres.auth.existingSecret }}
+                  key: {{ .Values.postgres.customUser.secretKeys.password }}
             - name: EDC_DATASOURCE_DEFAULT_URL
-              value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:{{ .Values.postgresql.containerPorts.postgresql }}/{{ .Values.postgresql.auth.database }}"
+              value: "jdbc:postgresql://{{ .Release.Name }}-postgres:{{ .Values.postgres.service.port }}/{{ .Values.postgres.customUser.database }}"
