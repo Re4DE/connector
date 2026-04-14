@@ -49,7 +49,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
     @Setting(key = "edc.registration.membership.issuance.enabled", description = "Switch to enable self issuance of a Membership Credential. If deactivated, this connector can not communicate with other participants with SSI. Membership Credential need to be issued manual", defaultValue = "true")
     private boolean enabledIssuance;
 
-    @Setting(key = "edc.registration.marketPartner.issuance.enabled", description = "Switch to enable self issuance of a Market Partner Credential. Default is false, if activate this participant is part of the regulated market communication", defaultValue = "false")
+    @Setting(key = "edc.registration.marketpartner.issuance.enabled", description = "Switch to enable self issuance of a Market Partner Credential. Default is false, if activate this participant is part of the regulated market communication", defaultValue = "false")
     private boolean enableMarketPartner;
 
     @Setting(key = "edc.registration.connector.name", description = "A human readable name of the connector, if not used the participant id is then used", required = false)
