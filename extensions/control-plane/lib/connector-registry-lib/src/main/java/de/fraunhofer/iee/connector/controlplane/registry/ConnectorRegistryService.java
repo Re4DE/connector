@@ -60,7 +60,7 @@ public class ConnectorRegistryService {
                 // Connector is already registered, not need to act
                 if (res.code() == 400) {
                     var expectedMsg = "Connector already registered";
-                    if (res.body().toString().contains(expectedMsg) || res.message().contains(expectedMsg)) {
+                    if (res.body().string().contains(expectedMsg) || res.message().contains(expectedMsg)) {
                         this.monitor.info("Connector is already registered in Connector Registry.");
                         return;
                     }
