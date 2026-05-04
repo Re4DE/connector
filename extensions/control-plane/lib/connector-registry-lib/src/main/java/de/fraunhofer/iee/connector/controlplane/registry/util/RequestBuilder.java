@@ -2,12 +2,14 @@ package de.fraunhofer.iee.connector.controlplane.registry.util;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class RequestBuilder {
     private final static String X_API_KEY = "x-api-key";
     private final static String GET = "GET";
+    private final static String PARTICIPANT_ID = "participantId";
 
     private final static String NAME = "name";
     private final static String ID = "id";
@@ -24,9 +26,13 @@ public class RequestBuilder {
                 .build();
     }
 
-    public static Request buildGetRequest(String url, String apiKey) {
+    public static Request buildGetRequest(String participantId, String url, String apiKey) {
+        var httpUrl = HttpUrl.parse(url).newBuilder();
+        if (participantId != null && !participantId.isEmpty()) {
+            httpUrl.addQueryParameter(PARTICIPANT_ID, participantId);
+        }
         return new Request.Builder()
-                .url(url)
+                .url(httpUrl.build())
                 .header(X_API_KEY, apiKey)
                 .method(GET, null)
                 .build();

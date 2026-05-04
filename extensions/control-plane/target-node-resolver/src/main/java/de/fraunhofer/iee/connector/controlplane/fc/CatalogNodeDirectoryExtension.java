@@ -50,7 +50,7 @@ public class CatalogNodeDirectoryExtension implements ServiceExtension {
         if (this.enabled) {
             this.typeManager.registerTypes(TargetNode.class);
 
-            var registryClient = new ConnectorRegistryService(this.httpclient, context.getMonitor(), this.typeManager.getMapper(), this.connectorRegistryUrl, this.apiKey);
+            var registryClient = new ConnectorRegistryService(this.httpclient, context.getMonitor(), this.typeManager.getMapper(), context.getParticipantId(), this.connectorRegistryUrl, this.apiKey);
 
             var targetNodeDirectory = new CatalogNodeDirectory(context.getMonitor(), registryClient);
             context.registerService(TargetNodeDirectory.class, targetNodeDirectory);

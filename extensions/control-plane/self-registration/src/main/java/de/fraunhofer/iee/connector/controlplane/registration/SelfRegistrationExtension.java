@@ -97,7 +97,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
         this.participantId = context.getParticipantId();
         this.participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
 
-        this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, this.registryUrl, this.apiKey);
+        this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, null, this.registryUrl, this.apiKey);
         this.connectorName = this.connectorName == null ? this.participantId : this.connectorName;
     }
 
