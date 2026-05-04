@@ -97,7 +97,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
         this.participantId = context.getParticipantId();
         this.participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
 
-        this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, null, this.registryUrl, this.apiKey);
+        this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, participantId, this.registryUrl, this.apiKey);
         this.connectorName = this.connectorName == null ? this.participantId : this.connectorName;
     }
 
@@ -134,7 +134,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
 
     private void registerInConnectorRegistry() {
         this.monitor.debug("Initiate self registration with Connector Registry.");
-        this.registryService.registerConnector(connectorName, this.participantId, this.dspBaseWebhookAddress.get());
+        this.registryService.registerConnector(connectorName, this.dspBaseWebhookAddress.get());
     }
 
     // Using the seed Super User to register this connector with a participant context in the Identity Hub

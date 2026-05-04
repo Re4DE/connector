@@ -37,28 +37,31 @@ public class ConnectorRegistryService {
 
     private final TypeReference<List<TargetNode>> targetNodeRef;
 
+    private final String participantId;
     private final String url;
     private final String apiKey;
 
-    public ConnectorRegistryService(EdcHttpClient client, Monitor monitor, ObjectMapper mapper, String url, String apiKey) {
+    public ConnectorRegistryService(EdcHttpClient client, Monitor monitor, ObjectMapper mapper, String participantId, String url, String apiKey) {
         this.client = client;
         this.monitor = monitor;
         this.mapper = mapper;
+        this.participantId = participantId;
         this.url = url;
         this.apiKey = apiKey;
 
         this.targetNodeRef = new TypeReference<>() {};
     }
 
-    public void registerConnector(String connectorName, String participantId, String dsp) {
-        var body = RequestBuilder.buildPostRequestBody(connectorName, participantId, dsp);
+    public void registerConnector(String connectorName, String dsp) {
+        var body = RequestBuilder.buildPostRequestBody(connectorName, this.participantId, dsp);
         var req = RequestBuilder.buildPostRequest(this.url, this.apiKey, RequestBody.create(body.toString(), TYPE_JSON));
         try (var res = this.client.execute(req, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (!res.isSuccessful()) {
                 // Connector is already registered, not need to act
                 if (res.code() == 400) {
-                    if (res.body().toString().contains("Connector already registered")) {
-                        this.monitor.info("Connector is already registered in Connector Registry");
+                    var expectedMsg = "Connector already registered";
+                    if (res.body().toString().contains(expectedMsg) || res.message().contains(expectedMsg)) {
+                        this.monitor.info("Connector is already registered in Connector Registry.");
                         return;
                     }
                 }
@@ -67,14 +70,14 @@ public class ConnectorRegistryService {
                 this.monitor.debug("Response body: %s".formatted(res.body().string()));
                 return;
             }
-            this.monitor.info("Connector registration complete");
+            this.monitor.info("Connector registration complete.");
         } catch (Exception e) {
             throw new EdcException(e);
         }
     }
 
     public List<TargetNode> getAllConnectors() {
-        var req = RequestBuilder.buildGetRequest(this.url, this.apiKey);
+        var req = RequestBuilder.buildGetRequest(this.participantId, this.url, this.apiKey);
         try (var res = this.client.execute(req, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (!res.isSuccessful()) {
                 this.monitor.debug("Failed pulling connectors from registry, response not 200, but is: %s %s".formatted(res.code(), res.message()));
