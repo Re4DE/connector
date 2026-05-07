@@ -57,6 +57,7 @@ controlplane:
     enabled: true
   ingress:
     enabled: true
+    className: nginx
     host: changeme
     tls:
       enabled: false
@@ -157,6 +158,7 @@ dataplane:
     enabled: true
   ingress:
     enabled: true
+    className: nginx
     host: changeme
     tls:
       enabled: false
@@ -243,6 +245,7 @@ identityhub:
     enabled: true
   ingress:
     enabled: true
+    className: nginx
     host: changeme
     tls:
       enabled: false
@@ -300,6 +303,7 @@ ui:
     port: 80
   ingress:
     enabled: true
+    className: nginx
     tls:
       enabled: false
       issuer: cert-issuer
