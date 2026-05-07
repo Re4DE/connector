@@ -1,0 +1,9 @@
+# All files are checked into the repo with LF
+* text=auto
+
+# Make sure that windows shell scripts are encoded with CRLF
+*.bat eol=crlf
+
+# Make sure that linux shell scripts are encoded with LF
+gradlew eol=lf
+*.sh eol=lf
