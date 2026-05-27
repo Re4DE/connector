@@ -12,7 +12,7 @@
 #
 #
 
-name: dena-connector-local-dev
+name: re4de-connector-local-dev
 
 volumes:
   vault_data:
