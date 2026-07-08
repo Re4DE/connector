@@ -18,20 +18,9 @@ The settings of this extension:
 
 ## E2E Testing
 
-### Requirements
-
-- The whole setup must be running (EDC with mTLS extension enabled).
 - You need to create certificates, key pairs, keystores and truststore
-  for the server and the client. This is described in the following section.
-- A valid authentication token from a `transferprocess` is required.
-
-### Create example certificates, keystore and truststore
-
-First create a matching set of certificates signed by the same Root CA
-for both server and client.
-
-- The root certificate, server certificate and server private key need to be stored
-  in HashiCorp Vault with the aliases defined in the settings above.
+  for the server and the client.
+- The created certificates and keys are only used for testing, don't use them in production.
 - Place the created client keystore and truststore in the `test/resources/certs/` folder.
 
 #### Trusted Root CA and signed certificates
