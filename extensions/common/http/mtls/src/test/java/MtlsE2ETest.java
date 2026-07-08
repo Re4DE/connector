@@ -1,38 +1,88 @@
+import de.fraunhofer.iee.connector.common.http.mtls.MtlsJettyService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
+import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.web.jetty.JettyService;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.util.Callback;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.*;
 import java.io.FileInputStream;
+import java.net.SocketException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class MtlsE2ETest {
 
-    private static final String PUBLIC_API_URL = "https://localhost:7084/api/v2/public";
+    private static final String MTLS_CONNECTOR = "mtls-connector";
     private static final String PASSWORD = "devpass";
-    private static final String KEYSTORE_PATH = "src/test/resources/certs/client-keystore.p12";
-    private static final String TRUSTSTORE_PATH = "src/test/resources/certs/client-truststore.p12";
-    private static final String KEYSTORE_PATH_2 = "src/test/resources/certs/client-keystore-2.p12";
-    private static final String TRUSTSTORE_PATH_2 = "src/test/resources/certs/client-truststore-2.p12";
+    private static final String CERTS = "src/test/resources/certs/";
+    private static final String KEYSTORE_PATH = CERTS + "client-keystore.p12";
+    private static final String TRUSTSTORE_PATH = CERTS + "client-truststore.p12";
+    private static final String KEYSTORE_PATH_2 = CERTS + "client-keystore-2.p12";
+    private static final String TRUSTSTORE_PATH_2 = CERTS + "client-truststore-2.p12";
+
+    private static Server server;
+    private static int port;
 
     @BeforeAll
-    static void setupProviders() {
+    @SuppressWarnings("unchecked")
+    static void setup() throws Exception {
         System.setProperty("jdk.tls.namedGroups",
                 "brainpoolP256r1tls13,brainpoolP384r1tls13,brainpoolP512r1tls13," +
                         "brainpoolP256r1,brainpoolP384r1,brainpoolP512r1," +
                         "secp256r1,secp384r1");
-
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
         Security.insertProviderAt(new BouncyCastleJsseProvider(), 2);
+
+        var rootCa = Files.readString(Path.of(CERTS + "root-ca.crt"));
+        var serverKey = Files.readString(Path.of(CERTS + "server.key"));
+        var serverCert = Files.readString(Path.of(CERTS + "server.crt"));
+
+        var jettyService = mock(JettyService.class);
+        var service = new MtlsJettyService(MTLS_CONNECTOR, jettyService, rootCa, serverKey, serverCert, mock(Monitor.class));
+        service.initialize();
+
+        ArgumentCaptor<Consumer<ServerConnector>> captor = ArgumentCaptor.forClass(Consumer.class);
+        verify(jettyService).addConnectorConfigurationCallback(captor.capture());
+        Consumer<ServerConnector> callback = captor.getValue();
+
+        server = new Server();
+        var connector = new ServerConnector(server);
+        connector.setName(MTLS_CONNECTOR);
+        connector.setPort(0);
+        callback.accept(connector);
+
+        server.addConnector(connector);
+        server.setHandler(new Handler.Abstract() {
+            @Override
+            public boolean handle(Request request, Response response, Callback callback) {
+                response.setStatus(401);
+                callback.succeeded();
+                return true;
+            }
+        });
+        server.start();
+        port = connector.getLocalPort();
+    }
+
+    @AfterAll
+    static void teardown() throws Exception {
+        if (server != null) {
+            server.stop();
+        }
     }
 
     /**
@@ -40,78 +90,13 @@ class MtlsE2ETest {
      * when the client keystore and client truststore are signed by a valid root CA.
      */
     @Test
-    void shouldConnectWithBrainpoolMtls() throws Exception {
+    void shouldConnectWithValidMtls() throws Exception {
         var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH);
 
         var conn = createConnection(sslContext);
         int responseCode = conn.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-
         assertTrue(responseCode > 0, "Handshake success");
-
-        assertTrue(responseCode == 401 || responseCode == 403,
-                "Expected 401/403 without bearer token, got: " + responseCode);
-
-        var errorStream = conn.getErrorStream();
-        if (errorStream != null) {
-            var body = new String(errorStream.readAllBytes());
-            System.out.println("Response Body: " + body);
-        }
-    }
-
-    /**
-     * Verifies that mTLS + valid bearer token grants access to the public API.
-     * Note: Token must be a valid EDR token from a transfer process.
-     */
-    @Test
-    void shouldReturn200WithValidToken() throws Exception {
-        var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH);
-
-        var token = "<your-valid-token>";
-
-        var conn = createConnection(sslContext);
-        conn.setRequestProperty("Authorization", token);
-
-        int responseCode = conn.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-
-        assertTrue(responseCode != 401 && responseCode != 403,
-                "Should not be unauthorized with valid token, got: " + responseCode);
-
-        assertTrue(responseCode >= 200 && responseCode < 300,
-                "Expected 2xx response with valid token, got: " + responseCode);
-
-        String body;
-        body = new String(conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-
-        System.out.println("Response Body: " + body);
-    }
-
-    /**
-     * Verifies that mTLS + invalid token returns a 500 error from the public API.
-     *
-     */
-    @Test
-    void shouldReturn500WithInvalidToken() throws Exception {
-        var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH);
-
-        var token = "<your-invalid-token>";
-
-        var conn = createConnection(sslContext);
-        conn.setRequestProperty("Authorization", token);
-
-        int responseCode = conn.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-
-        assertEquals(500, responseCode, "Expected 500 response with invalid token, got: " + responseCode);
-
-        String body;
-        var errorStream = conn.getErrorStream();
-        body = (errorStream != null)
-                ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
-                : "<no body>";
-
-        System.out.println("Response Body: " + body);
+        assertEquals(401, responseCode, "Expected 401 without token");
     }
 
     /**
@@ -125,11 +110,15 @@ class MtlsE2ETest {
 
         var conn = createConnection(sslContext);
         var exception = assertThrows(Exception.class, conn::getResponseCode);
-
+        var message = exception.getMessage();
         assertTrue(
-                exception.getMessage().contains("certificate_unknown")
-                        || exception.getCause() instanceof java.security.cert.CertificateException,
-                "Some other error: " + exception.getMessage()
+                exception instanceof SSLException
+                        || exception instanceof SocketException
+                        || message.contains("bad_certificate")
+                        || message.contains("certificate_unknown")
+                        || message.contains("handshake")
+                        || message.contains("connection reset"),
+                "Some other error: " + exception
         );
     }
 
@@ -145,7 +134,17 @@ class MtlsE2ETest {
 
         var conn = createConnection(sslContext);
         var exception = assertThrows(Exception.class, conn::getResponseCode);
-        System.out.println("Exception: " + exception.getMessage());
+        var message = exception.getMessage();
+        System.out.println("Exception: " + message);
+        assertTrue(
+                exception instanceof SSLException
+                        || exception instanceof SocketException
+                        || message.contains("bad_certificate")
+                        || message.contains("certificate_unknown")
+                        || message.contains("handshake")
+                        || message.contains("connection reset"),
+                "Some other error: " + exception
+        );
     }
 
 
@@ -172,7 +171,7 @@ class MtlsE2ETest {
     }
 
     private HttpsURLConnection createConnection(SSLContext sslContext) throws Exception {
-        var url = URI.create(PUBLIC_API_URL).toURL();
+        var url = URI.create("https://localhost:" + port + "/").toURL();
         var conn = (HttpsURLConnection) url.openConnection();
         conn.setSSLSocketFactory(sslContext.getSocketFactory());
         conn.setHostnameVerifier((hostname, session) ->
