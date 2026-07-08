@@ -36,7 +36,6 @@ class MtlsE2ETest {
     }
 
     /**
-     * Prerequisite: The server must already be running with a valid certificate.
      * This test verifies that a successful mTLS connection can be established
      * when the client keystore and client truststore are signed by a valid root CA.
      */
@@ -47,7 +46,6 @@ class MtlsE2ETest {
         var conn = createConnection(sslContext);
         int responseCode = conn.getResponseCode();
         System.out.println("Response Code: " + responseCode);
-        System.out.println("Cipher Suite: " + conn.getCipherSuite());
 
         assertTrue(responseCode > 0, "Handshake success");
 
@@ -76,7 +74,6 @@ class MtlsE2ETest {
 
         int responseCode = conn.getResponseCode();
         System.out.println("Response Code: " + responseCode);
-        System.out.println("Cipher Suite: " + conn.getCipherSuite());
 
         assertTrue(responseCode != 401 && responseCode != 403,
                 "Should not be unauthorized with valid token, got: " + responseCode);
@@ -98,14 +95,13 @@ class MtlsE2ETest {
     void shouldReturn500WithInvalidToken() throws Exception {
         var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH);
 
-        var token = "<your-invalid-token";
+        var token = "<your-invalid-token>";
 
         var conn = createConnection(sslContext);
         conn.setRequestProperty("Authorization", token);
 
         int responseCode = conn.getResponseCode();
         System.out.println("Response Code: " + responseCode);
-        System.out.println("Cipher Suite: " + conn.getCipherSuite());
 
         assertEquals(500, responseCode, "Expected 500 response with invalid token, got: " + responseCode);
 
@@ -119,7 +115,6 @@ class MtlsE2ETest {
     }
 
     /**
-     * Prerequisite: The server must already be running with a valid certificate.
      * This test verifies that the connection fails when the client truststore
      * does not contain the CA that signed the server certificate.
      * The client therefore cannot verify the server's identity.
@@ -139,7 +134,6 @@ class MtlsE2ETest {
     }
 
     /**
-     * Prerequisite: The server must already be running with a valid certificate.
      * This test verifies that the connection fails when the client presents
      * a certificate signed by a CA that the server does not trust.
      * The client truststore is correct, so the client trusts the server,

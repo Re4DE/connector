@@ -58,10 +58,10 @@ public class MtlsJettyService {
 
     private void configureJettyConnector() {
         monitor.info("Initializing mTLS Jetty extension");
-        // Register a connector configuration callback that will be invoked during JettyService.start()
+        // Register a connector configuration
         jettyService.addConnectorConfigurationCallback(connector -> {
-            monitor.info("Configuring connector '" + connector.getName() + "' for mTLS");
-            // Only apply mTLS configuration to the specified connector (default: "public")
+            monitor.info("Configuring connector '" + connector.getName() + "'");
+            // Only apply mTLS configuration to the specified connector
             if (mtlsConnectorName.equals(connector.getName())) {
                 addSslToConnector(connector);
             }

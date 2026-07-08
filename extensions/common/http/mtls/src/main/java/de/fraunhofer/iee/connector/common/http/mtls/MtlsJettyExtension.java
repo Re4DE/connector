@@ -15,16 +15,16 @@ import java.util.Optional;
 
 @Extension(value = "mTLS Data Plane Extension")
 public class MtlsJettyExtension implements ServiceExtension {
-    @Setting(key = "edc.web.https.mtls.enabled", description = "Flag to enable mTLS for the specified connector", defaultValue = "false")
+    @Setting(key = "edc.web.https.mtls.enabled", description = "Flag to enable mTLS")
     private boolean mtlsEnabled;
 
-    @Setting(key = "edc.web.https.mtls.connector.name", description = "Name of the connector to apply mTLS", defaultValue = "public")
+    @Setting(key = "edc.web.https.mtls.connector.name", description = "Name of the connector to apply mTLS")
     private String mtlsConnectorName;
 
     @Setting(key = "edc.web.https.mtls.ca.alias", description = "Vault alias for the root CA certificate used to create truststore")
     private String rootCaAlias;
 
-    @Setting(key = "edc.web.https.mtls.key.alias", description = "Vault alias for the private key from server  used to create keystore")
+    @Setting(key = "edc.web.https.mtls.key.alias", description = "Vault alias for the private key from server used to create keystore")
     private String privateKeyAlias;
 
     @Setting(key = "edc.web.https.mtls.certificate.alias", description = "Vault alias for the public certificate from server used to create keystore")
