@@ -50,3 +50,5 @@ include(":extensions:data-plane:data-plane-https-oauth2-userflow")
 include(":extensions:data-plane:data-plane-public-api-v2")
 
 include(":spi:common:iee-oauth2-spi")
+
+include("extensions:common:http:mtls")

@@ -24,6 +24,7 @@ dependencies {
 
     runtimeOnly(project(":extensions:data-plane:data-plane-https-oauth2-userflow"))
     runtimeOnly(project(":extensions:data-plane:data-plane-public-api-v2"))
+    runtimeOnly(project(":extensions:common:http:mtls"))
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
