@@ -14,6 +14,7 @@
 
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -22,4 +23,9 @@ dependencies {
     implementation(libs.edc.spi.core)
     implementation(libs.edc.fc.crawler.spi)
     implementation(libs.edc.jsonld)
+
+    testImplementation(libs.edc.junit)
+    testImplementation(libs.wiremock)
+    testImplementation(testFixtures(project(":extensions:control-plane:lib:connector-registry-lib")))
+    testImplementation(testFixtures(libs.edc.http.lib))
 }

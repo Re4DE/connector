@@ -20,16 +20,12 @@ import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.eclipse.edc.spi.types.domain.transfer.DataFlowStartMessage;
 import org.eclipse.edc.spi.types.domain.transfer.FlowType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static org.eclipse.edc.connector.dataplane.spi.schema.DataFlowRequestSchema.*;
 
 public class DataFlowRequestSupplier implements BiFunction<ContainerRequestContextApi, DataAddress, DataFlowStartMessage> {
-
     /**
      * Put all properties of the incoming request (method, request body, query params...) into a map.
      */

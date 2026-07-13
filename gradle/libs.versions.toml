@@ -10,6 +10,7 @@ nimbus = "10.3"
 restAssured = "5.5.5"
 rsApi = "4.0.0"
 swagger = "2.2.34"
+wiremock = "3.13.1"
 
 [libraries]
 # BOM mobules
@@ -72,6 +73,7 @@ mockserver-client = { module = "org.mock-server:mockserver-client-java", version
 mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "httpMockServer" }
 nimbus-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
 restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
+wiremock = { module = "org.wiremock:wiremock-jetty12", version.ref = "wiremock" }
 
 [bundles]
 fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
