@@ -16,7 +16,7 @@ The settings of this extension:
 | edc.web.https.mtls.certificate.alias | client-key    | The key alias for the server Private Key in the `HashiCorp Vault` |
 | edc.web.https.mtls.ca.alias          | root-ca       | The key alias for the root Certificate in the `HashiCorp Vault`   |
 
-## E2E Testing
+## Testing
 
 - You need to create certificates, key pairs, keystores and truststore
   for the server and the client.

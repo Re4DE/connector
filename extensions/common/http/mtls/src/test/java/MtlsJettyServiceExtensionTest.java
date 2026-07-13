@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-class MtlsE2ETest {
+class MtlsJettyServiceExtensionTest {
 
     private static final String MTLS_CONNECTOR = "mtls-connector";
     private static final String PASSWORD = "devpass";
@@ -33,6 +33,9 @@ class MtlsE2ETest {
     private static final String TRUSTSTORE_PATH = CERTS + "client-truststore.p12";
     private static final String KEYSTORE_PATH_2 = CERTS + "client-keystore-2.p12";
     private static final String TRUSTSTORE_PATH_2 = CERTS + "client-truststore-2.p12";
+    private static BouncyCastleProvider bcProvider;
+    private static BouncyCastleJsseProvider bcJsseProvider;
+    private static String previousNamedGroups;
 
     private static Server server;
     private static int port;
@@ -40,12 +43,14 @@ class MtlsE2ETest {
     @BeforeAll
     @SuppressWarnings("unchecked")
     static void setup() throws Exception {
-        System.setProperty("jdk.tls.namedGroups",
+        previousNamedGroups = System.setProperty("jdk.tls.namedGroups",
                 "brainpoolP256r1tls13,brainpoolP384r1tls13,brainpoolP512r1tls13," +
                         "brainpoolP256r1,brainpoolP384r1,brainpoolP512r1," +
                         "secp256r1,secp384r1");
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);
-        Security.insertProviderAt(new BouncyCastleJsseProvider(), 2);
+        bcProvider = new BouncyCastleProvider();
+        bcJsseProvider = new BouncyCastleJsseProvider();
+        Security.insertProviderAt(bcProvider, 1);
+        Security.insertProviderAt(bcJsseProvider, 2);
 
         var rootCa = Files.readString(Path.of(CERTS + "root-ca.crt"));
         var serverKey = Files.readString(Path.of(CERTS + "server.key"));
@@ -83,6 +88,11 @@ class MtlsE2ETest {
         if (server != null) {
             server.stop();
         }
+        if (previousNamedGroups != null) {
+            System.setProperty("jdk.tls.namedGroups", previousNamedGroups);
+        }
+        Security.removeProvider(bcProvider.getName());
+        Security.removeProvider(bcJsseProvider.getName());
     }
 
     /**
@@ -135,7 +145,6 @@ class MtlsE2ETest {
         var conn = createConnection(sslContext);
         var exception = assertThrows(Exception.class, conn::getResponseCode);
         var message = exception.getMessage();
-        System.out.println("Exception: " + message);
         assertTrue(
                 exception instanceof SSLException
                         || exception instanceof SocketException
