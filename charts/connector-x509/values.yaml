@@ -125,6 +125,8 @@ controlplane:
       delayUntilStart: 60
     selfRegistration:
       enabled: true
+      autoReregister: false
+      autoReregisterDelay: 3600
 
 dataplane:
   image:
