@@ -24,13 +24,13 @@ allprojects {
 
     configure<org.eclipse.edc.plugins.edcbuild.extensions.BuildExtension> {
         pom {
-            scmUrl.set("https://github.com/OWNER/REPO.git")
-            scmConnection.set("scm:git:git@github.com:OWNER/REPO.git")
-            developerName.set("yourcompany")
-            developerEmail.set("admin@yourcompany.com")
-            projectName.set("your cool project based on EDC")
-            projectUrl.set("www.coolproject.com")
-            description.set("your description")
+            scmUrl.set("https://github.com/Re4DE/connector.git")
+            scmConnection.set("scm:git@github.com:Re4DE/connector.git")
+            developerName.set("Fraunhofer IEE")
+            developerEmail.set("sebastian.copei@iee.fraunhofer.de")
+            projectName.set("Re4DE")
+            projectUrl.set("https://github.com/Re4DE")
+            description.set("Re4DE for everyone :D")
             licenseUrl.set("https://opensource.org/licenses/MIT")
         }
     }

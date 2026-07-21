@@ -35,6 +35,7 @@ include(":runtimes:local-dev:controlplane-local")
 include(":runtimes:local-dev:dataplane-local")
 include(":runtimes:local-dev:docker-env")
 
+include("extensions:common:http:mtls")
 include(":extensions:common:iam:x509")
 include(":extensions:common:iam:oauth2:oauth2-core")
 include(":extensions:common:iam:oauth2:oauth2-service")
@@ -50,5 +51,3 @@ include(":extensions:data-plane:data-plane-https-oauth2-userflow")
 include(":extensions:data-plane:data-plane-public-api-v2")
 
 include(":spi:common:iee-oauth2-spi")
-
-include("extensions:common:http:mtls")
