@@ -201,6 +201,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.controlplane.existingSecret | quote }}
                   key: registry-api-key
+            - name: EDC_REGISTRATION_REGISTRY_AUTO
+              value: {{ .Values.controlplane.edc.selfRegistration.autoReregister | quote }}
+            - name: EDC_REGISTRATION_REGISTRY_AUTO_DELAY
+              value: {{ .Values.controlplane.edc.selfRegistration.autoReregisterDelay | quote }}
             - name: EDC_REGISTRATION_IH_IDENTITY_URL
               value: "not-used"
             - name: EDC_REGISTRATION_IH_CREDENTIALS_URL

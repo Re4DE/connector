@@ -5,12 +5,13 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/extensions" />
             <option value="$PROJECT_DIR$/extensions/common" />
+            <option value="$PROJECT_DIR$/extensions/common/http" />
+            <option value="$PROJECT_DIR$/extensions/common/http/mtls" />
             <option value="$PROJECT_DIR$/extensions/common/iam" />
             <option value="$PROJECT_DIR$/extensions/common/iam/oauth2" />
             <option value="$PROJECT_DIR$/extensions/common/iam/oauth2/oauth2-core" />

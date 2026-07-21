@@ -131,6 +131,8 @@ controlplane:
       identityHubRegistration: true
       membershipIssuanceEnabled: true
       marketPartnerIssuanceEnabled: false
+      autoReregister: false
+      autoReregisterDelay: 3600
       ihIdentityUrl: changeme
       ihCredentialUrl: changeme
       issuerDid: did:web:dataspace:issuer

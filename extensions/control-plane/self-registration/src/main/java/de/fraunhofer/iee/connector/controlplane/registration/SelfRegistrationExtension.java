@@ -14,6 +14,7 @@
 
 package de.fraunhofer.iee.connector.controlplane.registration;
 
+import de.fraunhofer.iee.connector.controlplane.registration.registration.RegistryReregisterService;
 import de.fraunhofer.iee.connector.controlplane.registration.util.RequestBuilder;
 import de.fraunhofer.iee.connector.controlplane.registry.ConnectorRegistryService;
 import org.eclipse.edc.http.spi.EdcHttpClient;
@@ -61,6 +62,12 @@ public class SelfRegistrationExtension implements ServiceExtension {
     @Setting(key = "edc.registration.registry.api.key", description = "The api key needed to authenticated at the Connector Registry")
     private String apiKey;
 
+    @Setting(key = "edc.registration.registry.auto", description = "Automatically reregister this connector, if connection to the Connector Registry is lost", defaultValue = "false")
+    private boolean enableAutoReregister;
+
+    @Setting(key = "edc.registration.registry.auto.delay", description = "Time to wait until the connector attempts to reach the Connector Registry, in seconds", defaultValue = "3600")
+    private int autoRegistrationDelay;
+
     @Setting(key = "edc.registration.keys.name.overwrite", description = "Override the suffix name of all keys that will saved in the vault for this participant", required = false, warnOnMissingConfig = true)
     private String overwriteKey;
 
@@ -86,6 +93,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
     private Hostname hostname;
 
     private ConnectorRegistryService registryService;
+    private RegistryReregisterService reregisterService;
 
     private Monitor monitor;
     private String participantId;
@@ -99,6 +107,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
 
         this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, participantId, this.registryUrl, this.apiKey);
         this.connectorName = this.connectorName == null ? this.participantId : this.connectorName;
+        this.reregisterService = new RegistryReregisterService(this.monitor, this.registryService, this.connectorName, this.dspBaseWebhookAddress.get());
     }
 
     @Override
@@ -130,11 +139,25 @@ public class SelfRegistrationExtension implements ServiceExtension {
         } else {
             this.monitor.info("Self issuance of MarketPartnerCredential is deactivated.");
         }
+
+        if (this.enableAutoReregister) {
+            // Start the auto reregister service
+            this.reregisterService.start(this.autoRegistrationDelay);
+        } else {
+            this.monitor.info("Re-Registration in Connector Registry is deactivated, if Connector Registry goes down, this connector might not be visible in Dataspace catalog");
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        if (this.reregisterService != null) {
+            this.reregisterService.stop();
+        }
     }
 
     private void registerInConnectorRegistry() {
         this.monitor.debug("Initiate self registration with Connector Registry.");
-        this.registryService.registerConnector(connectorName, this.dspBaseWebhookAddress.get());
+        this.registryService.registerConnector(this.connectorName, this.dspBaseWebhookAddress.get());
     }
 
     // Using the seed Super User to register this connector with a participant context in the Identity Hub
