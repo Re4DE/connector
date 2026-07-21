@@ -21,9 +21,13 @@ dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
     runtimeOnly(libs.edc.bom.dataplane.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
+    shadow(libs.bouncyCastle.bctlsJdk18on)
+    shadow(libs.bouncyCastle.bcpkixJdk18on)
+    shadow(libs.bouncyCastle.bcprovJdk18on)
 
     runtimeOnly(project(":extensions:data-plane:data-plane-https-oauth2-userflow"))
     runtimeOnly(project(":extensions:data-plane:data-plane-public-api-v2"))
+    runtimeOnly(project(":extensions:common:http:mtls"))
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {

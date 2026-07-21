@@ -3,13 +3,14 @@ format.version = "1.1"
 
 [versions]
 edc = "0.14.0"
-buncycastle = "1.81"
+buncycastle = "1.84"
 httpMockServer = "5.15.0"
 jersey = "3.1.10"
 nimbus = "10.3"
 restAssured = "5.5.5"
 rsApi = "4.0.0"
 swagger = "2.2.34"
+jetty = "12.0.23"
 
 [libraries]
 # BOM mobules
@@ -41,6 +42,7 @@ edc-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref = "e
 edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
 edc-http = { module = "org.eclipse.edc:http", version.ref = "edc" }
 edc-jersey-core = { module = "org.eclipse.edc:jersey-core", version.ref = "edc" }
+edc-jetty-core = { module = "org.eclipse.edc:jetty-core", version.ref = "edc" }
 
 # Additional edc spis
 edc-spi-core = { module = "org.eclipse.edc:core-spi", version.ref = "edc" }
@@ -72,6 +74,7 @@ mockserver-client = { module = "org.mock-server:mockserver-client-java", version
 mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "httpMockServer" }
 nimbus-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
 restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
+jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty" }
 
 [bundles]
 fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
