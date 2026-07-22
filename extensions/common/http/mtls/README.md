@@ -8,13 +8,13 @@ certificates.
 
 The settings of this extension:
 
-| Setting                              | Example Value | Description                                                       |
-|--------------------------------------|---------------|-------------------------------------------------------------------|
-| edc.web.https.mtls.enabled           | true          | Set to true so enabale mTLS                                       |
-| edc.web.https.mtls.connector.name    | public        | Name of the connector where mTLS should be active                 |
-| edc.web.https.mtls.key.alias         | client-cert   | The key alias of the server Certificate in the `HashiCorp Vault`  |
-| edc.web.https.mtls.certificate.alias | client-key    | The key alias for the server Private Key in the `HashiCorp Vault` |
-| edc.web.https.mtls.ca.alias          | root-ca       | The key alias for the root Certificate in the `HashiCorp Vault`   |
+| Setting                              | Example Value | Description                                                                                   |
+|--------------------------------------|---------------|-----------------------------------------------------------------------------------------------|
+| edc.web.https.mtls.enabled           | true          | Set to true so enabale mTLS                                                                   |
+| edc.web.https.mtls.web.context       | public        | Name of the web context where mTLS should be active, for example `public` in the `Data Plane` |
+| edc.web.https.mtls.key.alias         | client-cert   | The key alias of the server Certificate in the `HashiCorp Vault`                              |
+| edc.web.https.mtls.certificate.alias | client-key    | The key alias for the server Private Key in the `HashiCorp Vault`                             |
+| edc.web.https.mtls.ca.alias          | root-ca       | The key alias for the root Certificate in the `HashiCorp Vault`                               |
 
 ## Testing
 

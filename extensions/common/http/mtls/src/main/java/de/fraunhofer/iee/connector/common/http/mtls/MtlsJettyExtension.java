@@ -18,8 +18,8 @@ public class MtlsJettyExtension implements ServiceExtension {
     @Setting(key = "edc.web.https.mtls.enabled", description = "Flag to enable mTLS")
     private boolean mtlsEnabled;
 
-    @Setting(key = "edc.web.https.mtls.connector.name", description = "Name of the connector to apply mTLS")
-    private String mtlsConnectorName;
+    @Setting(key = "edc.web.https.mtls.web.context", description = "Name of the web context to apply mTLS")
+    private String mtlsWebContextName;
 
     @Setting(key = "edc.web.https.mtls.ca.alias", description = "Vault alias for the root CA certificate used to create truststore")
     private String rootCaAlias;
@@ -65,7 +65,7 @@ public class MtlsJettyExtension implements ServiceExtension {
                     .orElseThrow(() -> new RuntimeException("Public certificate not found in vault"));
 
             var mtlsService = new MtlsJettyService(
-                    this.mtlsConnectorName,
+                    this.mtlsWebContextName,
                     this.jettyService,
                     rawRootCa,
                     rawServerPrivateKey,
