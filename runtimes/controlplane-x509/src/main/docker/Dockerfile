@@ -33,7 +33,9 @@ WORKDIR /app
 
 COPY --from=builder /app/runtimes/controlplane-x509/build/libs/controlplane-x509.jar edc-controlplane.jar
 
-HEALTHCHECK --interval=5s --timeout=5s --retries=10 CMD curl --fail http://localhost:8080/api/check/health
+ENV WEB_HTTP_PORT=8181
+
+HEALTHCHECK --interval=5s --timeout=5s --retries=10 CMD curl --fail http://localhost:${WEB_HTTP_PORT}/api/check/health
 
 # Use "exec" for graceful termination (SIGINT) to reach JVM.
 # ARG can not be used in ENTRYPOINT so storing value in an ENV variable
