@@ -15,19 +15,19 @@ import java.util.Optional;
 
 @Extension(value = "mTLS Data Plane Extension")
 public class MtlsJettyExtension implements ServiceExtension {
-    @Setting(key = "edc.web.https.mtls.enabled", description = "Flag to enable mTLS")
+    @Setting(key = "edc.web.https.mtls.enabled", description = "Flag to enable mTLS", defaultValue = "false")
     private boolean mtlsEnabled;
 
-    @Setting(key = "edc.web.https.mtls.web.context", description = "Name of the web context to apply mTLS")
+    @Setting(key = "edc.web.https.mtls.web.context", description = "Name of the web context to apply mTLS", defaultValue = "public")
     private String mtlsWebContextName;
 
-    @Setting(key = "edc.web.https.mtls.ca.alias", description = "Vault alias for the root CA certificate used to create truststore")
+    @Setting(key = "edc.web.https.mtls.ca.alias", description = "Vault alias for the root CA certificate used to create truststore", defaultValue = "root-ca")
     private String rootCaAlias;
 
-    @Setting(key = "edc.web.https.mtls.key.alias", description = "Vault alias for the private key from server used to create keystore")
+    @Setting(key = "edc.web.https.mtls.key.alias", description = "Vault alias for the private key from server used to create keystore", defaultValue = "client-key")
     private String privateKeyAlias;
 
-    @Setting(key = "edc.web.https.mtls.certificate.alias", description = "Vault alias for the public certificate from server used to create keystore")
+    @Setting(key = "edc.web.https.mtls.certificate.alias", description = "Vault alias for the public certificate from server used to create keystore", defaultValue = "client-cert")
     private String publicCertificateAlias;
 
     @Inject
