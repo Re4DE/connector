@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.verify;
 
 class MtlsJettyServiceExtensionTest {
 
-    private static final String MTLS_CONNECTOR = "mtls-connector";
+    private static final String MTLS_WEB_CONTEXT_NAME = "mtls-connector";
     private static final String PASSWORD = "devpass";
 
     private static final String CERTS_TRUSTED = "src/test/resources/certs/trusted/";
@@ -41,6 +43,7 @@ class MtlsJettyServiceExtensionTest {
     private static BouncyCastleProvider bcProvider;
     private static BouncyCastleJsseProvider bcJsseProvider;
     private static String previousNamedGroups;
+    private static Level previousBcLogLevel;
 
     private static Server server;
     private static int port;
@@ -57,12 +60,16 @@ class MtlsJettyServiceExtensionTest {
         Security.insertProviderAt(bcProvider, 1);
         Security.insertProviderAt(bcJsseProvider, 2);
 
+        var bcLogger = Logger.getLogger("org.bouncycastle");
+        previousBcLogLevel = bcLogger.getLevel();
+        bcLogger.setLevel(Level.SEVERE);
+
         var rootCa = Files.readString(Path.of(CERTS_TRUSTED + "root-ca.crt"));
         var serverKey = Files.readString(Path.of(CERTS_TRUSTED + "server.key"));
         var serverCert = Files.readString(Path.of(CERTS_TRUSTED + "server.crt"));
 
         var jettyService = mock(JettyService.class);
-        var service = new MtlsJettyService(MTLS_CONNECTOR, jettyService, rootCa, serverKey, serverCert, mock(Monitor.class));
+        var service = new MtlsJettyService(MTLS_WEB_CONTEXT_NAME, jettyService, rootCa, serverKey, serverCert, mock(Monitor.class));
         service.initialize();
 
         ArgumentCaptor<Consumer<ServerConnector>> captor = ArgumentCaptor.forClass(Consumer.class);
@@ -71,7 +78,7 @@ class MtlsJettyServiceExtensionTest {
 
         server = new Server();
         var connector = new ServerConnector(server);
-        connector.setName(MTLS_CONNECTOR);
+        connector.setName(MTLS_WEB_CONTEXT_NAME);
         connector.setPort(0);
         callback.accept(connector);
 
@@ -98,6 +105,7 @@ class MtlsJettyServiceExtensionTest {
         }
         Security.removeProvider(bcProvider.getName());
         Security.removeProvider(bcJsseProvider.getName());
+        Logger.getLogger("org.bouncycastle").setLevel(previousBcLogLevel);
     }
 
     /**
