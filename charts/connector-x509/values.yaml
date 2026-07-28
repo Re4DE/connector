@@ -205,8 +205,8 @@ dataplane:
       enabled: false
       webContext: public
       caAlias: root-ca
-      clientCertAlias: client-cert
-      clientKeyAlias: client-key
+      serverCertAlias: server-cert
+      serverKeyAlias: server-key
 
 ui:
   enabled: true
