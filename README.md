@@ -196,7 +196,7 @@ vault:
 ### 2. Deploy with Helm
 
 ```bash
-$ helm install connector -f overwrite.yaml oci://ghcr.io/re4de/charts/connector-dcp --version 1.1.3 --namespace connector --create-namespace
+$ helm install connector -f overwrite.yaml oci://ghcr.io/re4de/charts/connector-dcp --version 1.2.0 --namespace connector --create-namespace
 ```
 
 ### Local development
