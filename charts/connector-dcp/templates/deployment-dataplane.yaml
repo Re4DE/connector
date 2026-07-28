@@ -129,6 +129,16 @@ spec:
               value: {{ .Values.dataplane.endpoints.public.path | quote }}
             - name: WEB_HTTP_PUBLIC_PORT
               value: {{ .Values.dataplane.endpoints.public.port | quote }}
+            - name: EDC_WEB_HTTPS_MTLS_ENABLED
+              value: {{ .Values.dataplane.edc.mtls.enabled | quote }}
+            - name: EDC_WEB_HTTPS_MTLS_WEB_CONTEXT
+              value: {{ .Values.dataplane.edc.mtls.webContext | quote }}
+            - name: EDC_WEB_HTTPS_MTLS_CA_ALIAS
+              value: {{ .Values.dataplane.edc.mtls.caAlias | quote }}
+            - name: EDC_WEB_HTTPS_MTLS_CERTIFICATE_ALIAS
+              value: {{ .Values.dataplane.edc.mtls.clientCertAlias | quote }}
+            - name: EDC_WEB_HTTPS_MTLS_KEY_ALIAS
+              value: {{ .Values.dataplane.edc.mtls.clientKeyAlias | quote }}
             - name: EDC_CONTROL_ENDPOINT
               value: {{ include "dataplane.controlUrl" . }}
             - name: EDC_DATAPLANE_API_PUBLIC_BASEURL

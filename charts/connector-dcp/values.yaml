@@ -210,6 +210,12 @@ dataplane:
       verifier:
         publicKey: changeme
         publicKeyAlias: verifier-key
+    mtls:
+      enabled: false
+      webContext: public
+      caAlias: root-ca
+      clientCertAlias: client-cert
+      clientKeyAlias: client-key
 
 identityhub:
   enabled: true
