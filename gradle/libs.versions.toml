@@ -2,15 +2,18 @@
 format.version = "1.1"
 
 [versions]
-edc = "0.14.0"
 buncycastle = "1.84"
+edc = "0.14.0"
+edc-build = "1.1.1"
+docker = "9.4.0"
 httpMockServer = "5.15.0"
 jersey = "3.1.10"
+jetty = "12.0.23"
 nimbus = "10.3"
 restAssured = "5.5.5"
 rsApi = "4.0.0"
+shadow = "8.3.6"
 swagger = "2.2.34"
-jetty = "12.0.23"
 
 [libraries]
 # BOM mobules
@@ -81,7 +84,7 @@ fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
 fc-dcp = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
 
 [plugins]
-docker = { id = "com.bmuschko.docker-remote-api", version = "9.4.0" }
-edc-build = { id = "org.eclipse.edc.edc-build", version = "1.1.1" }
-shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
+docker = { id = "com.bmuschko.docker-remote-api", version.ref = "docker" }
+edc-build = { id = "org.eclipse.edc.edc-build", version.ref = "edc-build" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 swagger = { id = "io.swagger.core.v3.swagger-gradle-plugin", version.ref = "swagger" }
