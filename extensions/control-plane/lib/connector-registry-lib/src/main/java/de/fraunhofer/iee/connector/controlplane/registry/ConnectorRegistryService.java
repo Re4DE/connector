@@ -57,17 +57,18 @@ public class ConnectorRegistryService {
         var req = RequestBuilder.buildPostRequest(this.url, this.apiKey, RequestBody.create(body.toString(), TYPE_JSON));
         try (var res = this.client.execute(req, List.of(retryWhenStatusNot2xxOr4xx()))) {
             if (!res.isSuccessful()) {
+                var responseBody = res.body().string();
                 // Connector is already registered, not need to act
                 if (res.code() == 400) {
                     var expectedMsg = "Connector already registered";
-                    if (res.body().string().contains(expectedMsg) || res.message().contains(expectedMsg)) {
+                    if (responseBody.contains(expectedMsg) || res.message().contains(expectedMsg)) {
                         this.monitor.info("Connector is already registered in Connector Registry.");
                         return;
                     }
                 }
 
                 this.monitor.debug("Could not register in Connector Registry, response not 200, but is: %s %s".formatted(res.code(), res.message()));
-                this.monitor.debug("Response body: %s".formatted(res.body().string()));
+                this.monitor.debug("Response body: %s".formatted(responseBody));
                 return;
             }
             this.monitor.info("Connector registration complete.");
