@@ -36,15 +36,15 @@ public class MtlsJettyService {
     private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
     private static final String END_CERT = "-----END CERTIFICATE-----";
 
-    private final String mtlsConnectorName;
+    private final String mtlsWebContextName;
     private final JettyService jettyService;
     private final String rawRootCa;
     private final String rawServerPrivateKey;
     private final String rawServerCertificate;
     private final Monitor monitor;
 
-    public MtlsJettyService(String mtlsConnectorName, JettyService jettyService, String rawRootCa, String rawServerPrivateKey, String rawServerCertificate, Monitor monitor) {
-        this.mtlsConnectorName = mtlsConnectorName;
+    public MtlsJettyService(String mtlsWebContextName, JettyService jettyService, String rawRootCa, String rawServerPrivateKey, String rawServerCertificate, Monitor monitor) {
+        this.mtlsWebContextName = mtlsWebContextName;
         this.jettyService = jettyService;
         this.rawRootCa = rawRootCa;
         this.rawServerPrivateKey = rawServerPrivateKey;
@@ -59,19 +59,19 @@ public class MtlsJettyService {
     private void configureJettyConnector() {
         monitor.info("Initializing mTLS Jetty extension");
         // Register a connector configuration
-        jettyService.addConnectorConfigurationCallback(connector -> {
-            monitor.info("Configuring connector '" + connector.getName() + "'");
+        jettyService.addConnectorConfigurationCallback(context -> {
+            monitor.info("Configuring context '" + context.getName() + "'");
             // Only apply mTLS configuration to the specified connector
-            if (mtlsConnectorName.equals(connector.getName())) {
-                addSslToConnector(connector);
+            if (mtlsWebContextName.equals(context.getName())) {
+                addSslToConnector(context);
             }
         });
     }
 
-    private void addSslToConnector(ServerConnector connector) {
+    private void addSslToConnector(ServerConnector context) {
         try {
-            monitor.info("Adding mTLS SSL to connector '" + connector.getName()
-                    + "' (port " + connector.getPort() + ")");
+            monitor.info("Adding mTLS SSL to context '" + context.getName()
+                    + "' (port " + context.getPort() + ")");
 
             var privateKeyString = rawServerPrivateKey
                     .replace(BEGIN_PRIV, "")
@@ -106,28 +106,28 @@ public class MtlsJettyService {
             var sslContext = SSLContext.getInstance(TLS, BCJSSE);
             sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-            // Create a new SSL factory and add it to the connector that comes from jetty
+            // Create a new SSL factory and add it to the context that comes from jetty
             var sslContextFactoryServer = new SslContextFactory.Server();
             this.setSslContextFactoryServerConfigurations(sslContext, sslContextFactoryServer);
 
             var httpsConfig = new HttpConfiguration();
-            setHttpsConfigurations(httpsConfig, connector);
+            setHttpsConfigurations(httpsConfig, context);
 
-            connector.clearConnectionFactories();
+            context.clearConnectionFactories();
             var sslConnectionFactory = new SslConnectionFactory(
                     sslContextFactoryServer, HttpVersion.HTTP_1_1.asString());
             var httpConnectionFactory = new HttpConnectionFactory(httpsConfig);
 
-            connector.addConnectionFactory(sslConnectionFactory);
-            connector.addConnectionFactory(httpConnectionFactory);
-            connector.setDefaultProtocol(sslConnectionFactory.getProtocol());
+            context.addConnectionFactory(sslConnectionFactory);
+            context.addConnectionFactory(httpConnectionFactory);
+            context.setDefaultProtocol(sslConnectionFactory.getProtocol());
 
-            monitor.info("mTLS with Brainpool EC configured on connector '"
-                    + connector.getName() + "' (port " + connector.getPort() + ")");
+            monitor.info("mTLS with Brainpool EC configured on context '"
+                    + context.getName() + "' (port " + context.getPort() + ")");
 
         } catch (Exception e) {
-            throw new EdcException("Failed to add mTLS to connector '"
-                    + connector.getName() + "'", e);
+            throw new EdcException("Failed to add mTLS to context '"
+                    + context.getName() + "'", e);
         }
     }
 

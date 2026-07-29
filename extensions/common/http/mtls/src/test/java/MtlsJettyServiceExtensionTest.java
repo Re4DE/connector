@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -26,16 +28,22 @@ import static org.mockito.Mockito.verify;
 
 class MtlsJettyServiceExtensionTest {
 
-    private static final String MTLS_CONNECTOR = "mtls-connector";
+    private static final String MTLS_WEB_CONTEXT_NAME = "mtls-connector";
     private static final String PASSWORD = "devpass";
-    private static final String CERTS = "src/test/resources/certs/";
-    private static final String KEYSTORE_PATH = CERTS + "client-keystore.p12";
-    private static final String TRUSTSTORE_PATH = CERTS + "client-truststore.p12";
-    private static final String KEYSTORE_PATH_2 = CERTS + "client-keystore-2.p12";
-    private static final String TRUSTSTORE_PATH_2 = CERTS + "client-truststore-2.p12";
+
+    private static final String CERTS_TRUSTED = "src/test/resources/certs/trusted/";
+    private static final String CERTS_UNTRUSTED = "src/test/resources/certs/untrusted/";
+
+    private static final String KEYSTORE_TRUSTED_PATH = CERTS_TRUSTED + "client-keystore.p12";
+    private static final String TRUSTSTORE_TRUSTED_PATH = CERTS_TRUSTED + "client-truststore.p12";
+
+    private static final String KEYSTORE_UNTRUSTED_PATH = CERTS_UNTRUSTED + "client-keystore.p12";
+    private static final String TRUSTSTORE_UNTRUSTED_PATH = CERTS_UNTRUSTED + "client-truststore.p12";
+
     private static BouncyCastleProvider bcProvider;
     private static BouncyCastleJsseProvider bcJsseProvider;
     private static String previousNamedGroups;
+    private static Level previousBcLogLevel;
 
     private static Server server;
     private static int port;
@@ -52,12 +60,16 @@ class MtlsJettyServiceExtensionTest {
         Security.insertProviderAt(bcProvider, 1);
         Security.insertProviderAt(bcJsseProvider, 2);
 
-        var rootCa = Files.readString(Path.of(CERTS + "root-ca.crt"));
-        var serverKey = Files.readString(Path.of(CERTS + "server.key"));
-        var serverCert = Files.readString(Path.of(CERTS + "server.crt"));
+        var bcLogger = Logger.getLogger("org.bouncycastle");
+        previousBcLogLevel = bcLogger.getLevel();
+        bcLogger.setLevel(Level.SEVERE);
+
+        var rootCa = Files.readString(Path.of(CERTS_TRUSTED + "root-ca.crt"));
+        var serverKey = Files.readString(Path.of(CERTS_TRUSTED + "server.key"));
+        var serverCert = Files.readString(Path.of(CERTS_TRUSTED + "server.crt"));
 
         var jettyService = mock(JettyService.class);
-        var service = new MtlsJettyService(MTLS_CONNECTOR, jettyService, rootCa, serverKey, serverCert, mock(Monitor.class));
+        var service = new MtlsJettyService(MTLS_WEB_CONTEXT_NAME, jettyService, rootCa, serverKey, serverCert, mock(Monitor.class));
         service.initialize();
 
         ArgumentCaptor<Consumer<ServerConnector>> captor = ArgumentCaptor.forClass(Consumer.class);
@@ -66,7 +78,7 @@ class MtlsJettyServiceExtensionTest {
 
         server = new Server();
         var connector = new ServerConnector(server);
-        connector.setName(MTLS_CONNECTOR);
+        connector.setName(MTLS_WEB_CONTEXT_NAME);
         connector.setPort(0);
         callback.accept(connector);
 
@@ -93,6 +105,7 @@ class MtlsJettyServiceExtensionTest {
         }
         Security.removeProvider(bcProvider.getName());
         Security.removeProvider(bcJsseProvider.getName());
+        Logger.getLogger("org.bouncycastle").setLevel(previousBcLogLevel);
     }
 
     /**
@@ -101,7 +114,7 @@ class MtlsJettyServiceExtensionTest {
      */
     @Test
     void shouldConnectWithValidMtls() throws Exception {
-        var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH);
+        var sslContext = createSslContext(KEYSTORE_TRUSTED_PATH, TRUSTSTORE_TRUSTED_PATH);
 
         var conn = createConnection(sslContext);
         int responseCode = conn.getResponseCode();
@@ -116,7 +129,7 @@ class MtlsJettyServiceExtensionTest {
      */
     @Test
     void shouldFailBecauseClientDoesNotTrustServer() throws Exception {
-        var sslContext = createSslContext(KEYSTORE_PATH, TRUSTSTORE_PATH_2);
+        var sslContext = createSslContext(KEYSTORE_TRUSTED_PATH, TRUSTSTORE_UNTRUSTED_PATH);
 
         var conn = createConnection(sslContext);
         var exception = assertThrows(Exception.class, conn::getResponseCode);
@@ -140,7 +153,7 @@ class MtlsJettyServiceExtensionTest {
      */
     @Test
     void shouldFailBecauseServerDoesNotTrustClient() throws Exception {
-        var sslContext = createSslContext(KEYSTORE_PATH_2, TRUSTSTORE_PATH);
+        var sslContext = createSslContext(KEYSTORE_UNTRUSTED_PATH, TRUSTSTORE_TRUSTED_PATH);
 
         var conn = createConnection(sslContext);
         var exception = assertThrows(Exception.class, conn::getResponseCode);

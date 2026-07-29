@@ -23,15 +23,27 @@ dependencies {
     runtimeOnly(libs.edc.bom.dataplane.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
 
-    // Extensions
+    runtimeOnly(project(":extensions:common:http:mtls"))
     runtimeOnly(project(":extensions:data-plane:data-plane-https-oauth2-userflow"))
     runtimeOnly(project(":extensions:data-plane:data-plane-public-api-v2"))
+
+    shadow(libs.bouncyCastle.bcpkixJdk18on)
+    shadow(libs.bouncyCastle.bcprovJdk18on)
+    shadow(libs.bouncyCastle.bctlsJdk18on)
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     exclude("**/pom.properties", "**/pom.xm")
     mergeServiceFiles()
     archiveFileName.set("${project.name}.jar")
+
+    // Exclude bouncy castle, as it should be loaded as seperated library to not lose the signed jar
+    dependencies {
+        exclude(dependency("org.bouncycastle:bcpkix-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bcprov-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bctls-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bcutil-jdk18on:1.84"))
+    }
 }
 
 application {

@@ -87,27 +87,32 @@ Many more configuration parameters are inherent from the EDCs, compare [EDC](htt
 The configuration parameters in the following table are the minimum fields needed to set up a local startup.
 Many more configuration parameters are inherent from the EDCs, compare [EDC](https://github.com/eclipse-edc/Connector).
 
-| Name                                              | Example Value                                    | Description                                                                               |
-|---------------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------------------|
-| edc.participant.id                                | did:web:localhost%3A10085:tester                 | The ID of this Connector, represented as DID:WEB                                          |
-| edc.component.id                                  | tester-connector                                 | The ID of this runtime component                                                          |
-| edc.hostname                                      | localhost                                        | Hostname of the Connector                                                                 |
-| edc.dpf.selector.url                              | http://localhost:9082/api/control/v1/dataplanes  | The url of the control endpoint of the Control Plane where the Data Plane register itself |
-| edc.dataplane.api.public.baseurl                  | http://localhost:7084/api/v2/public              | The url of the public api where data can be fetch from                                    |
-| edc.transfer.proxy.token.signer.privatekey.alias  | signer-key                                       | The alias key in the `HashiCorp Vault` of the private key to sign requests                |
-| edc.transfer.proxy.token.verifier.publickey.alias | verifier-key                                     | The alias key in the `HashiCorp Vault` of the public key to verify requests               |
-| web.http.path                                     | /api                                             | Default api path                                                                          |
-| web.http.port                                     | 7080                                             | Default api port                                                                          |
-| web.http.control.path                             | /api/control                                     | Control token api path                                                                    |
-| web.http.control.port                             | 7082                                             | Control token api port                                                                    |
-| web.http.public.path                              | /api/v2/public                                   | Public path                                                                               |
-| web.http.public.port                              | 7084                                             | Public port                                                                               |
-| edc.vault.hashicorp.url                           | http://localhost:8200                            | The url of the `HashiCorp Vault`                                                          |
-| edc.vault.hashicorp.token                         | devpass                                          | The `HashiCorp Vault` access token                                                        |
-| edc.sql.schema.autocreate                         | true                                             | Flag to autogenerate tables in the `PostgreSQL` if not already done                       |
-| edc.datasource.default.user                       | edc                                              | Username to authenticate in the database                                                  |
-| edc.datasource.default.password                   | devpass                                          | Password to authenticate in the database                                                  |
-| edc.datasource.default.url                        | jdbc:postgresql://localhost:5432/edc             | Connection url of the database                                                            |
+| Name                                              | Example Value                                   | Description                                                                                   |
+|---------------------------------------------------|-------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| edc.participant.id                                | did:web:localhost%3A10085:tester                | The ID of this Connector, represented as DID:WEB                                              |
+| edc.component.id                                  | tester-connector                                | The ID of this runtime component                                                              |
+| edc.hostname                                      | localhost                                       | Hostname of the Connector                                                                     |
+| edc.dpf.selector.url                              | http://localhost:9082/api/control/v1/dataplanes | The url of the control endpoint of the Control Plane where the Data Plane register itself     |
+| edc.dataplane.api.public.baseurl                  | http://localhost:7084/api/v2/public             | The url of the public api where data can be fetch from                                        |
+| edc.transfer.proxy.token.signer.privatekey.alias  | signer-key                                      | The alias key in the `HashiCorp Vault` of the private key to sign requests                    |
+| edc.transfer.proxy.token.verifier.publickey.alias | verifier-key                                    | The alias key in the `HashiCorp Vault` of the public key to verify requests                   |
+| web.http.path                                     | /api                                            | Default api path                                                                              |
+| web.http.port                                     | 7080                                            | Default api port                                                                              |
+| web.http.control.path                             | /api/control                                    | Control token api path                                                                        |
+| web.http.control.port                             | 7082                                            | Control token api port                                                                        |
+| web.http.public.path                              | /api/v2/public                                  | Public path                                                                                   |
+| web.http.public.port                              | 7084                                            | Public port                                                                                   |
+| edc.web.https.mtls.enabled                        | true                                            | Set to true so enabale mTLS                                                                   |
+| edc.web.https.mtls.web.context                    | public                                          | Name of the web context where mTLS should be active, for example `public` in the `Data Plane` |
+| edc.web.https.mtls.ca.alias                       | root-ca                                         | The key alias for the root Certificate in the `HashiCorp Vault`                               |
+| edc.web.https.mtls.certificate.alias              | server-cert                                     | The key alias for the server Private Key in the `HashiCorp Vault`                             |
+| edc.web.https.mtls.key.alias                      | server-key                                      | The key alias of the server Certificate in the `HashiCorp Vault`                              |
+| edc.vault.hashicorp.url                           | http://localhost:8200                           | The url of the `HashiCorp Vault`                                                              |
+| edc.vault.hashicorp.token                         | devpass                                         | The `HashiCorp Vault` access token                                                            |
+| edc.sql.schema.autocreate                         | true                                            | Flag to autogenerate tables in the `PostgreSQL` if not already done                           |
+| edc.datasource.default.user                       | edc                                             | Username to authenticate in the database                                                      |
+| edc.datasource.default.password                   | devpass                                         | Password to authenticate in the database                                                      |
+| edc.datasource.default.url                        | jdbc:postgresql://localhost:5432/edc            | Connection url of the database                                                                |
 
 ### Requirements
 
@@ -191,7 +196,7 @@ vault:
 ### 2. Deploy with Helm
 
 ```bash
-$ helm install connector -f overwrite.yaml oci://ghcr.io/re4de/charts/connector-dcp --version 1.1.3 --namespace connector --create-namespace
+$ helm install connector -f overwrite.yaml oci://ghcr.io/re4de/charts/connector-dcp --version 1.2.0 --namespace connector --create-namespace
 ```
 
 ### Local development
