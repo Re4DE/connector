@@ -45,10 +45,10 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
 
     // Exclude bouncy castle, as it should be loaded as separated library to not lose the signed jar
     dependencies {
-        exclude(dependency("org.bouncycastle:bcpkix-jdk18on:1.78.1"))
-        exclude(dependency("org.bouncycastle:bcprov-jdk18on:1.78.1"))
-        exclude(dependency("org.bouncycastle:bctls-jdk18on:1.78.1"))
-        exclude(dependency("org.bouncycastle:bcutil-jdk18on:1.78.1"))
+        exclude(dependency("org.bouncycastle:bcpkix-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bcprov-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bctls-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bcutil-jdk18on:1.84"))
     }
 
     mergeServiceFiles()
