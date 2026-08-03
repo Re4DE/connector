@@ -213,7 +213,7 @@ ui:
   enabled: true
   image:
     repository: ghcr.io/re4de/connector-ui
-    tag: 1.0.0-edc0.14.0
+    tag: 1.1.0-edc0.14.0
   service:
     port: 80
   ingress:
