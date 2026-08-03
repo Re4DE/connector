@@ -32,6 +32,7 @@ RUN apk --no-cache add curl
 WORKDIR /app
 
 COPY --from=builder /app/runtimes/controlplane-x509/build/libs/controlplane-x509.jar edc-controlplane.jar
+COPY --from=builder /app/runtimes/dataplane/build/libs/*-jdk18on-1.84.jar ./
 
 ENV WEB_HTTP_PORT=8181
 
