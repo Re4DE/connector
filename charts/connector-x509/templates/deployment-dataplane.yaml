@@ -129,6 +129,8 @@ spec:
               value: {{ .Values.dataplane.endpoints.public.path | quote }}
             - name: WEB_HTTP_PUBLIC_PORT
               value: {{ .Values.dataplane.endpoints.public.port | quote }}
+            - name: EDC_WEB_REST_CORS_ENABLED
+              value: {{ .Values.dataplane.edc.web.rest.cors.enabled | quote }}
             - name: EDC_WEB_HTTPS_MTLS_ENABLED
               value: {{ .Values.dataplane.edc.mtls.enabled | quote }}
             - name: EDC_WEB_HTTPS_MTLS_WEB_CONTEXT

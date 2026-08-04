@@ -210,6 +210,10 @@ dataplane:
       verifier:
         publicKey: changeme
         publicKeyAlias: verifier-key
+    web:
+      rest:
+        cors:
+          enabled: false
     mtls:
       enabled: false
       webContext: public
