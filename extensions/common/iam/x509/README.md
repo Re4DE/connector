@@ -1,7 +1,7 @@
 # X509 Identity Service Extension (Experimental)
 
 This extension adds a new `IdentityService` to the Connector.
-It´s allow authentication on an `AOuth2 provider` using 
+It´s allow authentication on an `OAuth2 provider` using 
 `X509 client certificates` during `mTLS`. Therefore, the chosen 
 `Identity Provider` need to support `mTLS`. 
 
