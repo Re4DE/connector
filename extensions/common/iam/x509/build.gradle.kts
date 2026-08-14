@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.edc.jsonld)
     implementation(libs.edc.spi.core)
     implementation(libs.edc.spi.keys)
+    implementation(libs.edc.spi.protocol)
     implementation(libs.edc.token.lib)
 
     implementation(libs.bouncyCastle.bcpkixJdk18on)
