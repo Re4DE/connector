@@ -21,4 +21,8 @@ dependencies {
     implementation(libs.edc.spi.data.plane.http)
 
     implementation(project(":spi:common:iee-oauth2-spi"))
+
+    testImplementation(libs.edc.junit)
+    testImplementation(libs.wiremock)
+    testImplementation(testFixtures(libs.edc.http.lib))
 }
