@@ -35,7 +35,7 @@ include(":runtimes:local-dev:controlplane-local")
 include(":runtimes:local-dev:dataplane-local")
 include(":runtimes:local-dev:docker-env")
 
-include("extensions:common:http:mtls")
+include(":extensions:common:http:mtls")
 include(":extensions:common:iam:x509")
 include(":extensions:common:iam:oauth2:oauth2-core")
 include(":extensions:common:iam:oauth2:oauth2-service")
