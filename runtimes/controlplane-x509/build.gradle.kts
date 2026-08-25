@@ -21,13 +21,14 @@ plugins {
 dependencies {
     runtimeOnly(libs.edc.bom.controlplane.base)
     runtimeOnly(libs.edc.bom.controlplane.sql)
+    runtimeOnly(libs.edc.oauth2.client)
     runtimeOnly(libs.edc.vault.hashicorp)
     runtimeOnly(libs.edc.policy.monitor)
     runtimeOnly(libs.bundles.fc.oauth2)
 
+    runtimeOnly(project(":extensions:common:iam:x509"))
     runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
-    runtimeOnly(project(":extensions:common:iam:x509"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 
     shadow(libs.bouncyCastle.bcpkixJdk18on)
