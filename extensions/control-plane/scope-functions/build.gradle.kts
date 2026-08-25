@@ -23,4 +23,6 @@ dependencies {
     implementation(libs.edc.spi.identity.trust)
     implementation(libs.edc.spi.catalog)
     implementation(libs.edc.spi.identity.did)
+
+    testImplementation(libs.edc.junit)
 }
