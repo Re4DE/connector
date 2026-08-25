@@ -27,4 +27,8 @@ dependencies {
     implementation(libs.edc.jsonld)
 
     implementation(project(":extensions:control-plane:lib:connector-registry-lib"))
+
+    testImplementation(libs.edc.junit)
+    testImplementation(libs.wiremock)
+    testImplementation(testFixtures(libs.edc.http.lib))
 }
