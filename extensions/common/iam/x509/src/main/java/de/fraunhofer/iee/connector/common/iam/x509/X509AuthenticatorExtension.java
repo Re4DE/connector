@@ -18,6 +18,7 @@ import de.fraunhofer.iee.connector.common.iam.x509.jwk.IdentityProviderKeyResolv
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 import org.eclipse.edc.http.spi.EdcHttpClient;
+import org.eclipse.edc.protocol.spi.DefaultParticipantIdExtractionFunction;
 import org.eclipse.edc.runtime.metamodel.annotation.*;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.iam.AudienceResolver;
@@ -98,5 +99,12 @@ public class X509AuthenticatorExtension implements ServiceExtension {
     @Provider(isDefault = true)
     public AudienceResolver defaultAudienceResolver() {
         return (msg) -> Result.success(msg.getCounterPartyAddress());
+    }
+
+    @Provider(isDefault = true)
+    public DefaultParticipantIdExtractionFunction defaultParticipantIdExtractionFunction() {
+        return (claimToken -> {
+            return claimToken.getStringClaim("client_id");
+        });
     }
 }
