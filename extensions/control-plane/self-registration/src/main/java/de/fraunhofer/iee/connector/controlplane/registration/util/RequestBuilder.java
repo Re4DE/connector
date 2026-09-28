@@ -6,7 +6,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class RequestBuilder {
-    private final static String X_API_KEY = "x-api-key";
+    private static final String X_API_KEY = "x-api-key";
     private static final String PROTOCOL_ENDPOINT = "ProtocolEndpoint";
     private static final MediaType TYPE_JSON = MediaType.parse("application/json");
 
