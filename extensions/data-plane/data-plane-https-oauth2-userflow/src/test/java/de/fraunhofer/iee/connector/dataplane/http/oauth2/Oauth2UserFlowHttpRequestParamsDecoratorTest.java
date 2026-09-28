@@ -13,8 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import static de.fraunhofer.iee.iam.oauth2.spi.Oauth2UserFlowDataAddressSchema.PASSWORD_SECRET_NAME;
 import static de.fraunhofer.iee.iam.oauth2.spi.Oauth2UserFlowDataAddressSchema.USERNAME;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.edc.iam.oauth2.spi.Oauth2DataAddressSchema.TOKEN_URL;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -60,8 +61,8 @@ class Oauth2UserFlowHttpRequestParamsDecoratorTest {
 
         var params = decorator.decorate(dataFlowStartMessage, httpDataAddress, builder);
 
-        assertSame(builder, params);
-        assertEquals("Bearer access-token", params.build().getHeaders().get("Authorization"));
+        assertThat(builder).isSameAs(params);
+        assertThat(params.build().getHeaders().get("Authorization")).isEqualTo("Bearer access-token");
 
         verify(requestFactory).create(httpDataAddress);
         verify(client).requestToken(credentialsRequest);
@@ -81,8 +82,8 @@ class Oauth2UserFlowHttpRequestParamsDecoratorTest {
 
         var result = decorator.decorate(dataFlowStartMessage, httpDataAddress, builder);
 
-        assertSame(builder, result);
-        assertNotEquals("Bearer access-token", result.build().getHeaders().get("Authorization"));
+        assertThat(builder).isSameAs(result);
+        assertThat(result.build().getHeaders().get("Authorization")).isNotEqualTo("Bearer access-token");
 
         verifyNoInteractions(requestFactory);
         verifyNoInteractions(client);
@@ -98,7 +99,7 @@ class Oauth2UserFlowHttpRequestParamsDecoratorTest {
             decorator.decorate(dataFlowStartMessage, httpDataAddress, builder);
         });
 
-        assertEquals("Cannot authenticate through OAuth2 UserFlow Failed to create credentials", exception.getMessage());
+        assertThat(exception.getMessage()).isEqualTo("Cannot authenticate through OAuth2 UserFlow Failed to create credentials");
         verify(requestFactory).create(httpDataAddress);
         verifyNoInteractions(client);
     }
@@ -121,7 +122,7 @@ class Oauth2UserFlowHttpRequestParamsDecoratorTest {
             decorator.decorate(dataFlowStartMessage, httpDataAddress, builder);
         });
 
-        assertEquals("Cannot authenticate through OAuth2 UserFlow Failed to request token", exception.getMessage());
+        assertThat(exception.getMessage()).isEqualTo("Cannot authenticate through OAuth2 UserFlow Failed to request token");
         verify(requestFactory).create(httpDataAddress);
         verify(client).requestToken(credentialsRequest);
     }

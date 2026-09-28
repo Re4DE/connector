@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,6 +43,6 @@ class DataPlaneHttpOauth2UserFlowExtensionTest {
 
     @Test
     void shouldReturnExtensionName() {
-        assertEquals(DataPlaneHttpOauth2UserFlowExtension.NAME, extension.name());
+        assertThat(extension.name()).isEqualTo(DataPlaneHttpOauth2UserFlowExtension.NAME);
     }
 }

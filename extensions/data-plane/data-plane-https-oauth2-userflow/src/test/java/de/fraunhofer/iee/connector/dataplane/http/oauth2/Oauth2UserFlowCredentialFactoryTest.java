@@ -4,7 +4,7 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.types.domain.DataAddress;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class Oauth2UserFlowCredentialFactoryTest {
@@ -26,17 +26,16 @@ class Oauth2UserFlowCredentialFactoryTest {
         when(dataAddress.getStringProperty("oauth2:username")).thenReturn(USERNAME_VALUE);
 
         var result = factory.create(dataAddress);
-        assertTrue(result.succeeded());
+        assertThat(result).isNotNull();
+        assertThat(result.succeeded()).isTrue();
 
         var request = result.getContent();
-        assertNotNull(request);
+        assertThat(request).isNotNull();
 
-        assertAll(
-                () -> assertEquals("https://localhost:8000/token", request.getUrl()),
-                () -> assertEquals("password", request.getGrantType()),
-                () -> assertEquals("user", request.getUsername()),
-                () -> assertEquals("resolvedPassword", request.getPassword())
-        );
+        assertThat(request.getUrl()).isEqualTo("https://localhost:8000/token");
+        assertThat(request.getGrantType()).isEqualTo("password");
+        assertThat(request.getUsername()).isEqualTo("user");
+        assertThat(request.getPassword()).isEqualTo("resolvedPassword");
 
         verify(vault).resolveSecret(SECRET_NAME);
     }
@@ -48,8 +47,8 @@ class Oauth2UserFlowCredentialFactoryTest {
         when(vault.resolveSecret(SECRET_NAME)).thenReturn(null);
 
         var result = factory.create(dataAddress);
-        assertTrue(result.failed());
-        assertEquals("Cannot resolve password from the vault: " + SECRET_NAME, result.getFailureDetail());
+        assertThat(result.failed()).isTrue();
+        assertThat(result.getFailureDetail()).isEqualTo("Cannot resolve password from the vault: " + SECRET_NAME);
 
         verify(vault).resolveSecret(SECRET_NAME);
     }
@@ -60,7 +59,7 @@ class Oauth2UserFlowCredentialFactoryTest {
         when(dataAddress.getStringProperty("oauth2:passwordSecretName")).thenReturn(null);
 
         var result = factory.create(dataAddress);
-        assertTrue(result.failed());
+        assertThat(result.failed()).isTrue();
         verifyNoInteractions(vault);
     }
 }
