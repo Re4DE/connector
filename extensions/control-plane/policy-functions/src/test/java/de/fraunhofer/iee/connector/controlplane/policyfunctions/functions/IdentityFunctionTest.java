@@ -87,7 +87,6 @@ class IdentityFunctionTest {
         assertThat(result).isFalse();
     }
 
-    // TODO: Maybe a hint is missing on what just happened. The identity may also be null.
     @Test
     void shouldFail_whenIdentityIsNull() {
         var rightValue = "did:web:test";

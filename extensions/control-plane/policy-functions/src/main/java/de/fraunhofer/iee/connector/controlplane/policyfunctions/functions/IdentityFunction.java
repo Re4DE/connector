@@ -46,6 +46,10 @@ public class IdentityFunction<C extends ParticipantAgentPolicyContext> implement
             return false;
         }
         var identity = pa.getIdentity();
+        if (identity == null || identity.isEmpty()) {
+            context.reportProblem("No Identity in ParticipantAgent found on context.");
+            return false;
+        }
 
         return switch (operator) {
             case EQ -> identities.get(0).equals(identity);
