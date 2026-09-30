@@ -44,7 +44,6 @@ class MarketPartnerIdEvaluationFunctionTest {
             assertThat(result).isFalse();
             verify(context).reportProblem("Operator expected to be eq or isAnyOf, but got %s".formatted(Operator.GT.getOdrlRepresentation()));
         }
-
     }
 
     @Nested
@@ -67,7 +66,6 @@ class MarketPartnerIdEvaluationFunctionTest {
             assertThat(result).isFalse();
             verify(context).reportProblem("A single market partner id was provided for right value, use operator eq");
         }
-
     }
 
     @Nested
@@ -115,7 +113,6 @@ class MarketPartnerIdEvaluationFunctionTest {
             var result = function.evaluate(Operator.EQ, rightValue, rule, context);
             assertThat(result).isFalse();
         }
-
     }
 
     @Nested
@@ -237,7 +234,6 @@ class MarketPartnerIdEvaluationFunctionTest {
             var result = function.evaluate(Operator.IS_ANY_OF, rightValue, rule, context);
             assertThat(result).isFalse();
         }
-
     }
 
     @Test

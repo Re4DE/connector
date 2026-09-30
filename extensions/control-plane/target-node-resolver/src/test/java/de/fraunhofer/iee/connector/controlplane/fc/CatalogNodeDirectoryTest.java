@@ -22,7 +22,6 @@ class CatalogNodeDirectoryTest {
         catalogNodeDirectory = new CatalogNodeDirectory(monitor, connectorRegistryService);
     }
 
-
     @Test
     void shouldDelegateToRegistryService() {
         var expectedNodes = new ArrayList<TargetNode>();

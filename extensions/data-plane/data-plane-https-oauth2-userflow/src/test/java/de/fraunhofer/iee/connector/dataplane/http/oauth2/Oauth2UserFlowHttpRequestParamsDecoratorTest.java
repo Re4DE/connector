@@ -66,7 +66,6 @@ class Oauth2UserFlowHttpRequestParamsDecoratorTest {
 
         verify(requestFactory).create(httpDataAddress);
         verify(client).requestToken(credentialsRequest);
-
     }
 
     @Test

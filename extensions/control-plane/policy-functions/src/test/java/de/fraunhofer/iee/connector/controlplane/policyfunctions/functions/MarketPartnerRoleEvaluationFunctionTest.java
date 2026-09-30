@@ -34,7 +34,6 @@ class MarketPartnerRoleEvaluationFunctionTest {
     private final Permission rule = mock();
     private final MarketPartnerRoleEvaluationFunction<ParticipantAgentPolicyContext> function = MarketPartnerRoleEvaluationFunction.create();
 
-
     @Nested
     class OperatorValidation {
         @Test
@@ -66,7 +65,6 @@ class MarketPartnerRoleEvaluationFunctionTest {
             verify(context).reportProblem("A single role was provided for right value, use operator eq");
             assertThat(result).isFalse();
         }
-
     }
 
     @Nested
@@ -160,7 +158,6 @@ class MarketPartnerRoleEvaluationFunctionTest {
             var result = function.evaluate(Operator.IS_ANY_OF, rightValue, rule, context);
             assertThat(result).isTrue();
         }
-
 
         @Test
         void shouldNotMatch_whenNeitherNameNorAbbreviationEqualsRightValue() {

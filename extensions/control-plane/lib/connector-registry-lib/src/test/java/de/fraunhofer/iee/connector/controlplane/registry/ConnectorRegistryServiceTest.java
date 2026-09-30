@@ -140,6 +140,5 @@ public class ConnectorRegistryServiceTest {
             assertThatThrownBy(() -> client.getAllConnectors())
                     .isInstanceOf(EdcException.class);
         }
-
     }
 }

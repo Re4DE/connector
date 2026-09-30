@@ -22,7 +22,6 @@ class RegistryReregisterServiceTest {
     private final ScheduledExecutorService executor = mock();
     private final RegistryReregisterService service = new RegistryReregisterService(monitor, registryService, CONNECTOR_NAME, DSP_URL, executor);
 
-
     @AfterEach
     void tearDown() {
         Thread.interrupted();

@@ -121,7 +121,6 @@ class PolicyFunctionsExtensionTest {
                 argThat(func -> func instanceof PermissionAdministratorFunction));
         verify(policyEngine).registerFunction(eq(PolicyMonitorContext.class), eq(Permission.class), eq(PM_KEY),
                 argThat(func -> func instanceof PermissionAdministratorFunction));
-
     }
 
     @Test

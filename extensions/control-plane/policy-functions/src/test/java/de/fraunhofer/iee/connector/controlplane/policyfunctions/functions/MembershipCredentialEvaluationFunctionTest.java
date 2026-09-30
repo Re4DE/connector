@@ -105,7 +105,6 @@ class MembershipCredentialEvaluationFunctionTest {
 
             assertThat(result).isFalse();
         }
-
     }
 
     @Nested
