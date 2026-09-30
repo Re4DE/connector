@@ -28,6 +28,14 @@ public class RegistryReregisterService {
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
+    RegistryReregisterService(Monitor monitor, ConnectorRegistryService registryService, String connectorName, String dspUrl, ScheduledExecutorService executor) {
+        this.monitor = monitor;
+        this.registryService = registryService;
+        this.connectorName = connectorName;
+        this.dspUrl = dspUrl;
+        this.executor = executor;
+    }
+
     public void start(int delay) {
         this.executor.scheduleAtFixedRate(this::reregister, delay, delay, SECONDS);
     }

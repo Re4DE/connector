@@ -14,6 +14,7 @@ restAssured = "5.5.5"
 rsApi = "4.0.0"
 shadow = "8.3.6"
 swagger = "2.2.34"
+wiremock = "3.13.1"
 
 [libraries]
 # BOM mobules
@@ -77,6 +78,7 @@ mockserver-client = { module = "org.mock-server:mockserver-client-java", version
 mockserver-netty = { module = "org.mock-server:mockserver-netty", version.ref = "httpMockServer" }
 nimbus-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus" }
 restAssured = { module = "io.rest-assured:rest-assured", version.ref = "restAssured" }
+wiremock = { module = "org.wiremock:wiremock-jetty12", version.ref = "wiremock" }
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty" }
 
 [bundles]

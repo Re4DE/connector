@@ -29,7 +29,6 @@ import java.util.function.BiFunction;
 import static org.eclipse.edc.connector.dataplane.spi.schema.DataFlowRequestSchema.*;
 
 public class DataFlowRequestSupplier implements BiFunction<ContainerRequestContextApi, DataAddress, DataFlowStartMessage> {
-
     /**
      * Put all properties of the incoming request (method, request body, query params...) into a map.
      */

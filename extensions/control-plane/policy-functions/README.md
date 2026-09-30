@@ -49,7 +49,7 @@ This policy function is currently only for demonstration purpose!
 
 ## Membership Credential active membership
 
-With this policy function it can be checked whether a requesting participant has a active membership
+With this policy function it can be checked whether a requesting participant has a active membership.
 
 ### Usage
 
