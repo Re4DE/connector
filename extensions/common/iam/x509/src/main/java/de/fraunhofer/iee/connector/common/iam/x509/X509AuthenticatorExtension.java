@@ -34,7 +34,7 @@ import org.eclipse.edc.token.spi.TokenValidationService;
 import java.security.Security;
 import java.util.Optional;
 
-@Provides({ IdentityService.class })
+@Provides({IdentityService.class})
 @Extension(value = "X509 Identity Service")
 public class X509AuthenticatorExtension implements ServiceExtension {
 
@@ -71,7 +71,7 @@ public class X509AuthenticatorExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         // Add bouncy castle as security provider
-        System.setProperty("jdk.tls.namedGroups", "brainpoolP256r1, brainpoolP384r1, brainpoolP512r1, secp256r1, secp384r1");
+        System.setProperty("jdk.tls.namedGroups", "brainpoolP256r1tls13, brainpoolP384r1tls13, brainpoolP512r1tls13, brainpoolP256r1, brainpoolP384r1, brainpoolP512r1, secp256r1, secp384r1");
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
         Security.removeProvider(BouncyCastleJsseProvider.PROVIDER_NAME);
