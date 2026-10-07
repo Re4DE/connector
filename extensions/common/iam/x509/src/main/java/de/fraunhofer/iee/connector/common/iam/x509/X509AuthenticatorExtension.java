@@ -83,6 +83,11 @@ public class X509AuthenticatorExtension implements ServiceExtension {
                 .orElseThrow(() -> new EdcException("[X509] Private key not found in vault"));
 
         var providerKeyResolver = new IdentityProviderKeyResolver(context.getMonitor(), this.httpClient, this.typeManager, this.jwksUrl, 5);
+        try {
+            providerKeyResolver.start();
+        } catch (Exception e) {
+            throw new EdcException(e.getMessage());
+        }
 
         var x509AuthService = new X509OAuthService(this.typeManager, providerKeyResolver, this.tokenValidationService, this.tokenValidationRulesRegistry);
         x509AuthService.initialize(certificateRaw, keyRaw, this.tokenUrl, this.clientId);
