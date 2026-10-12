@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.edc.dcp.core)
     implementation(libs.edc.jws2020.lib)
     implementation(libs.edc.transform.lib)
-    implementation(libs.edc.spi.identity.trust)
+    implementation(libs.edc.spi.dcp)
     implementation(libs.edc.spi.catalog)
     implementation(libs.edc.spi.identity.did)
 
