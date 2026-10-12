@@ -16,13 +16,12 @@ package de.fraunhofer.iee.connector.controlplane.scopes;
 
 import de.fraunhofer.iee.connector.controlplane.scopes.core.DefaultScopeMappingFunction;
 import de.fraunhofer.iee.connector.controlplane.scopes.credentials.MarketPartnerCredentialScopeExtractor;
-import org.eclipse.edc.iam.identitytrust.spi.scope.ScopeExtractorRegistry;
-import org.eclipse.edc.iam.identitytrust.spi.verification.SignatureSuiteRegistry;
+import org.eclipse.edc.iam.decentralizedclaims.spi.scope.ScopeExtractorRegistry;
+import org.eclipse.edc.iam.decentralizedclaims.spi.verification.SignatureSuiteRegistry;
 import org.eclipse.edc.iam.verifiablecredentials.spi.VcConstants;
 import org.eclipse.edc.policy.context.request.spi.RequestCatalogPolicyContext;
 import org.eclipse.edc.policy.context.request.spi.RequestContractNegotiationPolicyContext;
 import org.eclipse.edc.policy.context.request.spi.RequestTransferProcessPolicyContext;
-import org.eclipse.edc.policy.context.request.spi.RequestVersionPolicyContext;
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -70,7 +69,6 @@ public class ScopeExtension implements ServiceExtension {
         this.policyEngine.registerPostValidator(RequestCatalogPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestContractNegotiationPolicyContext.class, contextMappingFunction::apply);
         this.policyEngine.registerPostValidator(RequestTransferProcessPolicyContext.class, contextMappingFunction::apply);
-        this.policyEngine.registerPostValidator(RequestVersionPolicyContext.class, contextMappingFunction::apply);
 
         // register market partner credential scope extractor
         this.scopeExtractorRegistry.registerScopeExtractor(new MarketPartnerCredentialScopeExtractor());

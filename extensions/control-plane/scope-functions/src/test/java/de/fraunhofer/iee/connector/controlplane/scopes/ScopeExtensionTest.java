@@ -1,13 +1,12 @@
 package de.fraunhofer.iee.connector.controlplane.scopes;
 
 import org.eclipse.edc.boot.system.injection.ObjectFactory;
-import org.eclipse.edc.iam.identitytrust.spi.scope.ScopeExtractorRegistry;
-import org.eclipse.edc.iam.identitytrust.spi.verification.SignatureSuiteRegistry;
+import org.eclipse.edc.iam.decentralizedclaims.spi.scope.ScopeExtractorRegistry;
+import org.eclipse.edc.iam.decentralizedclaims.spi.verification.SignatureSuiteRegistry;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
 import org.eclipse.edc.policy.context.request.spi.RequestCatalogPolicyContext;
 import org.eclipse.edc.policy.context.request.spi.RequestContractNegotiationPolicyContext;
 import org.eclipse.edc.policy.context.request.spi.RequestTransferProcessPolicyContext;
-import org.eclipse.edc.policy.context.request.spi.RequestVersionPolicyContext;
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -55,6 +54,5 @@ class ScopeExtensionTest {
         verify(policyEngine).registerPostValidator(eq(RequestCatalogPolicyContext.class), argThat(Objects::nonNull));
         verify(policyEngine).registerPostValidator(eq(RequestContractNegotiationPolicyContext.class), argThat(Objects::nonNull));
         verify(policyEngine).registerPostValidator(eq(RequestTransferProcessPolicyContext.class), argThat(Objects::nonNull));
-        verify(policyEngine).registerPostValidator(eq(RequestVersionPolicyContext.class), argThat(Objects::nonNull));
     }
 }
