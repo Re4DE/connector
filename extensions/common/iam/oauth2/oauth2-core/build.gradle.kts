@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.edc.spi.jwt.signer)
     implementation(libs.edc.oauth2.client)
     implementation(libs.edc.token.lib)
+    implementation(libs.edc.spi.participant.context.single)
 
     implementation(libs.nimbus.jwt)
 
