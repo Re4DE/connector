@@ -5,7 +5,10 @@ import org.eclipse.edc.crawler.spi.TargetNode;
 import org.eclipse.edc.crawler.spi.TargetNodeDirectory;
 import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
+import org.eclipse.edc.participantcontext.spi.types.ParticipantContext;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.system.configuration.ConfigFactory;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -23,9 +26,11 @@ class CatalogNodeDirectoryExtensionTest {
 
     private static final String API_KEY = "devpass";
     private static final String CONNECTOR_REGISTRY_URL = "http://localhost:8080/api/registry";
+    private static final String PARTICIPANT_ID = "did:web:localhost:test";
     private final EdcHttpClient http = mock();
     private final TypeManager typeManager = mock();
     private final Monitor monitor = mock();
+    private final SingleParticipantContextSupplier participantContextSupplier = mock();
     private CatalogNodeDirectoryExtension extension;
     private ServiceExtensionContext context;
     private ObjectFactory factory;
@@ -39,6 +44,13 @@ class CatalogNodeDirectoryExtensionTest {
 
         context.registerService(EdcHttpClient.class, http);
         context.registerService(TypeManager.class, typeManager);
+        context.registerService(SingleParticipantContextSupplier.class, participantContextSupplier);
+
+        var participantContext = ParticipantContext.Builder.newInstance()
+                .participantContextId(PARTICIPANT_ID)
+                .identity(PARTICIPANT_ID)
+                .build();
+        when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
 
         configMap = new HashMap<>(Map.of(
                 "edc.catalog.registry.enabled", "true",

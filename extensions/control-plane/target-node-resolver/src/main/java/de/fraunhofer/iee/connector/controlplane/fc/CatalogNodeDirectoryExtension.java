@@ -22,9 +22,11 @@ import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provides;
 import org.eclipse.edc.runtime.metamodel.annotation.Setting;
+import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
 
 @Provides(TargetNodeDirectory.class)
 @Extension(value = "Connector Registry Node Directory")
@@ -45,12 +47,15 @@ public class CatalogNodeDirectoryExtension implements ServiceExtension {
     @Inject
     private TypeManager typeManager;
 
+    @Inject
+    private SingleParticipantContextSupplier participantContextSupplier;
+
     @Override
     public void initialize(ServiceExtensionContext context) {
         if (this.enabled) {
             this.typeManager.registerTypes(TargetNode.class);
-
-            var registryClient = new ConnectorRegistryService(this.httpclient, context.getMonitor(), this.typeManager.getMapper(), context.getParticipantId(), this.connectorRegistryUrl, this.apiKey);
+            var participantId = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail())).getIdentity();
+            var registryClient = new ConnectorRegistryService(this.httpclient, context.getMonitor(), this.typeManager.getMapper(), participantId, this.connectorRegistryUrl, this.apiKey);
 
             var targetNodeDirectory = new CatalogNodeDirectory(context.getMonitor(), registryClient);
             context.registerService(TargetNodeDirectory.class, targetNodeDirectory);
