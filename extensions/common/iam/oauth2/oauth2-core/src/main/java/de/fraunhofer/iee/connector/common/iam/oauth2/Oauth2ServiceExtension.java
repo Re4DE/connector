@@ -25,6 +25,7 @@ import org.eclipse.edc.iam.oauth2.spi.client.Oauth2Client;
 import org.eclipse.edc.jwt.signer.spi.JwsSignerProvider;
 import org.eclipse.edc.keys.spi.CertificateResolver;
 import org.eclipse.edc.keys.spi.PrivateKeyResolver;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provides;
@@ -113,6 +114,9 @@ public class Oauth2ServiceExtension implements ServiceExtension {
     @Inject
     private JwsSignerProvider jwsSignerProvider;
 
+    @Inject
+    private SingleParticipantContextSupplier participantContextSupplier;
+
     @Override
     public String name() {
         return NAME;
@@ -168,7 +172,7 @@ public class Oauth2ServiceExtension implements ServiceExtension {
     private Oauth2ServiceImpl createOauth2Service(TokenDecoratorRegistry jwtDecoratorRegistry,
                                                   IdentityProviderKeyResolver providerKeyResolver) {
         String privateKeySupplier = privateKeyAlias;
-
+        String participantId = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail())).getIdentity();
         return new Oauth2ServiceImpl(
                 tokenUrl,
                 new JwtGenerationService(jwsSignerProvider),
@@ -178,7 +182,8 @@ public class Oauth2ServiceExtension implements ServiceExtension {
                 tokenValidationRulesRegistry,
                 tokenValidationService,
                 providerKeyResolver,
-                tokenResourceEnabled
+                tokenResourceEnabled,
+                participantId
         );
     }
 
