@@ -4,9 +4,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import org.eclipse.edc.boot.system.injection.ObjectFactory;
 import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
+import org.eclipse.edc.participantcontext.spi.types.ParticipantContext;
 import org.eclipse.edc.protocol.dsp.http.spi.api.DspBaseWebhookAddress;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.system.configuration.Config;
@@ -48,6 +51,7 @@ public class IssueMarketPartnerCredentialTest {
     private final DspBaseWebhookAddress dspBaseWebhookAddress = mock();
     private final Vault vault = mock();
     private final Monitor monitor = mock();
+    private final SingleParticipantContextSupplier participantContextSupplier = mock();
 
     private SelfRegistrationExtension extension;
     private String credentialPath;
@@ -62,11 +66,17 @@ public class IssueMarketPartnerCredentialTest {
         context.registerService(DspBaseWebhookAddress.class, dspBaseWebhookAddress);
         context.registerService(Vault.class, vault);
         context.registerService(EdcHttpClient.class, http);
+        context.registerService(SingleParticipantContextSupplier.class, participantContextSupplier);
 
         when(dspBaseWebhookAddress.get()).thenReturn(DSP);
         when(vault.resolveSecret(anyString())).thenReturn(SUPER_USER_API_KEY);
         when(context.getMonitor()).thenReturn(monitor);
-        when(context.getParticipantId()).thenReturn(PARTICIPANT_ID);
+
+        var participantContext = ParticipantContext.Builder.newInstance()
+                .participantContextId(PARTICIPANT_ID)
+                .identity(PARTICIPANT_ID)
+                .build();
+        when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
 
         Map<String, String> configMap = baseConfigMap();
         configMap.put("edc.registration.marketpartner.issuance.enabled", "true");

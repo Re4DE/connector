@@ -28,6 +28,7 @@ import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.Hostname;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
 
 import java.util.Base64;
 import java.util.List;
@@ -92,6 +93,10 @@ public class SelfRegistrationExtension implements ServiceExtension {
     @Inject
     private Hostname hostname;
 
+    @Inject
+    private SingleParticipantContextSupplier participantContextSupplier;
+
+
     private ConnectorRegistryService registryService;
     private RegistryReregisterService reregisterService;
 
@@ -102,7 +107,7 @@ public class SelfRegistrationExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         this.monitor = context.getMonitor();
-        this.participantId = context.getParticipantId();
+        this.participantId = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail())).getIdentity();
         this.participantIdB64 = Base64.getEncoder().encodeToString(this.participantId.getBytes());
 
         this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, participantId, this.registryUrl, this.apiKey);
