@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 buncycastle = "1.84"
-edc = "0.14.0"
+edc = "0.15.1"
 edc-build = "1.1.1"
 docker = "9.4.0"
 httpMockServer = "5.15.0"
@@ -37,7 +37,7 @@ edc-token-lib = { module = "org.eclipse.edc:token-lib", version.ref = "edc" }
 edc-transform-lib = { module = "org.eclipse.edc:transform-lib", version.ref = "edc" }
 edc-util-lib = { module = "org.eclipse.edc:util-lib", version.ref = "edc" }
 edc-controlplane-core = { module = "org.eclipse.edc:control-plane-core", version.ref = "edc" }
-edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
+edc-dcp-core = { module = "org.eclipse.edc:decentralized-claims-core", version.ref = "edc" }
 edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref = "edc" }
 edc-jsonld = { module = "org.eclipse.edc:json-ld", version.ref = "edc" }
 edc-policy-monitor = { module = "org.eclipse.edc:policy-monitor-core", version.ref = "edc" }
@@ -63,9 +63,10 @@ edc-spi-jwt-signer = { module = "org.eclipse.edc:jwt-signer-spi", version.ref = 
 edc-spi-protocol = { module = "org.eclipse.edc:protocol-spi", version.ref = "edc" }
 edc-spi-protocol-dsp-http = { module = "org.eclipse.edc:dsp-http-spi", version.ref = "edc" }
 edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
-edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
+edc-spi-dcp = { module = "org.eclipse.edc:decentralized-claims-spi", version.ref = "edc" }
 edc-spi-catalog = { module = "org.eclipse.edc:catalog-spi", version.ref = "edc" }
 edc-spi-web = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
+edc-spi-participant-context-single = { module = "org.eclipse.edc:participant-context-single-spi", version.ref = "edc" }
 
 # Third-part dependencies
 bouncyCastle-bcpkixJdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "buncycastle" }
