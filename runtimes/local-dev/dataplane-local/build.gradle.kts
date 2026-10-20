@@ -21,6 +21,7 @@ dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
     runtimeOnly(libs.edc.bom.dataplane.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
+    runtimeOnly(libs.edc.participant.context.config.core)
     shadow(libs.bouncyCastle.bctlsJdk18on)
     shadow(libs.bouncyCastle.bcpkixJdk18on)
     shadow(libs.bouncyCastle.bcprovJdk18on)

@@ -47,6 +47,7 @@ edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
 edc-http = { module = "org.eclipse.edc:http", version.ref = "edc" }
 edc-jersey-core = { module = "org.eclipse.edc:jersey-core", version.ref = "edc" }
 edc-jetty-core = { module = "org.eclipse.edc:jetty-core", version.ref = "edc" }
+edc-participant-context-config-core = { module = "org.eclipse.edc:participant-context-config-core", version.ref = "edc" }
 
 # Additional edc spis
 edc-spi-core = { module = "org.eclipse.edc:core-spi", version.ref = "edc" }
