@@ -11,7 +11,7 @@ public class RequestBuilder {
     private static final MediaType TYPE_JSON = MediaType.parse("application/json");
 
     private static final String ACTIVE = "active";
-    private static final String PARTICIPANT_ID = "participantId";
+    private static final String PARTICIPANT_CONTEXT_ID = "participantContextId";
     private static final String DID = "did";
     private static final String ROLES = "roles";
     private static final String SERVICE_ENDPOINTS = "serviceEndpoints";
@@ -45,7 +45,7 @@ public class RequestBuilder {
     public static Request buildCreateParticipantContextRequest(String identityUrl, String credentialUrl ,String participantId, String participantIdB64, String superUserApiKey, String dsp, String keySuffix) {
         var json = Json.createObjectBuilder()
                 .add(ACTIVE, true)
-                .add(PARTICIPANT_ID, participantId)
+                .add(PARTICIPANT_CONTEXT_ID, participantId)
                 .add(DID, participantId)
                 .add(ROLES, Json.createArrayBuilder())
                 .add(SERVICE_ENDPOINTS, Json.createArrayBuilder()
