@@ -22,6 +22,7 @@ dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
     runtimeOnly(libs.edc.bom.dataplane.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
+    runtimeOnly(libs.edc.participant.context.config.core)
 
     runtimeOnly(project(":extensions:common:http:mtls"))
     runtimeOnly(project(":extensions:data-plane:data-plane-https-oauth2-userflow"))
