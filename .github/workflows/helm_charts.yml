@@ -6,6 +6,9 @@ on:
 env:
   REPOSITORY: ghcr.io/re4de
 
+permissions:
+  packages: write
+
 jobs:
   Helm:
     name: "Build and Publish Release Helm Charts"
