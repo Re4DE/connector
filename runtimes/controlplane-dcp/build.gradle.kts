@@ -13,9 +13,9 @@
  */
 
 plugins {
+    `java-library`
     id("application")
     alias(libs.plugins.shadow)
-    alias(libs.plugins.docker)
 }
 
 dependencies {
@@ -31,8 +31,12 @@ dependencies {
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xm")
+application {
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
+}
+
+tasks.shadowJar {
+    exclude("**/pom.properties", "**/pom.xml")
 
     // Exclude target node directory sql, as this overrides our own implementation
     dependencies {
@@ -40,11 +44,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     }
 
     mergeServiceFiles()
-    archiveFileName.set("${project.name}.jar")
-}
-
-application {
-    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
+    archiveFileName.set("controlplane-dcp.jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 edcBuild {

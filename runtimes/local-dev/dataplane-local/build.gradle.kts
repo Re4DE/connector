@@ -13,6 +13,7 @@
  */
 
 plugins {
+    `java-library`
     id("application")
     alias(libs.plugins.shadow)
 }
@@ -31,8 +32,13 @@ dependencies {
     runtimeOnly(project(":extensions:common:http:mtls"))
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xm")
+
+application {
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
+}
+
+tasks.shadowJar {
+    exclude("**/pom.properties", "**/pom.xml")
 
     // Exclude bouncy castle, as it should be loaded as seperated library to not lose the signed jar
     dependencies {
@@ -42,6 +48,7 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
 
     mergeServiceFiles()
     archiveFileName.set("dataplane.jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.register<Copy>("copyShadowLibs") {
@@ -63,10 +70,6 @@ tasks.named("distTar") {
 
 tasks.named("distZip") {
     dependsOn(tasks.named("copyShadowLibs"))
-}
-
-application {
-    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 
 edcBuild {
