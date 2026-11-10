@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 buncycastle = "1.86"
-edc = "0.15.1"
+edc = "0.18.1"
 edc-build = "1.1.2"
 httpMockServer = "9.2.0"
 jersey = "3.1.11"
@@ -59,7 +59,6 @@ edc-spi-oauth2 = { module = "org.eclipse.edc:oauth2-spi", version.ref = "edc" }
 edc-spi-jwt = { module = "org.eclipse.edc:jwt-spi", version.ref = "edc" }
 edc-spi-json-ld = { module = "org.eclipse.edc:json-ld-spi", version.ref = "edc" }
 edc-spi-policy-monitor = { module = "org.eclipse.edc:policy-monitor-spi", version.ref = "edc" }
-edc-spi-jwt-signer = { module = "org.eclipse.edc:jwt-signer-spi", version.ref = "edc" }
 edc-spi-protocol = { module = "org.eclipse.edc:protocol-spi", version.ref = "edc" }
 edc-spi-protocol-dsp-http = { module = "org.eclipse.edc:dsp-http-spi", version.ref = "edc" }
 edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
