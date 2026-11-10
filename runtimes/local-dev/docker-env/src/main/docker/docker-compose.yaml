@@ -72,6 +72,7 @@ services:
         LMX46/ju1kfqgcugSGqo1P7k6uu1H/j2GhiR41r7CvyniP6rEmcYSoMZZvqvW1XT
         4QIDAQAB
         -----END PUBLIC KEY-----
+      AES_KEY: Ioc7rahxOhGh4quiEir7eil4
     cap_add:
       - IPC_LOCK
     volumes:
