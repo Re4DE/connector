@@ -22,7 +22,7 @@ import de.fraunhofer.iee.connector.common.iam.oauth2.jwt.X509CertificateDecorato
 import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.iam.oauth2.spi.Oauth2AssertionDecorator;
 import org.eclipse.edc.iam.oauth2.spi.client.Oauth2Client;
-import org.eclipse.edc.jwt.signer.spi.JwsSignerProvider;
+import org.eclipse.edc.jwt.spi.signer.JwsSignerProvider;
 import org.eclipse.edc.keys.spi.CertificateResolver;
 import org.eclipse.edc.keys.spi.PrivateKeyResolver;
 import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
@@ -91,7 +91,6 @@ public class Oauth2ServiceExtension implements ServiceExtension {
 
     @Inject
     private PrivateKeyResolver privateKeyResolver;
-
     @Inject
     private CertificateResolver certificateResolver;
 
@@ -127,7 +126,7 @@ public class Oauth2ServiceExtension implements ServiceExtension {
 
         withDefaults(context);
         warnIfNoLeeway(context.getMonitor());
-
+        
         var certificate = ofNullable(certificateResolver.resolveCertificate(publicCertificateAlias))
                 .orElseThrow(() -> new EdcException("Public certificate not found: " + publicCertificateAlias));
         jwtDecoratorRegistry.register(OAUTH2_TOKEN_CONTEXT, Oauth2AssertionDecorator.Builder.newInstance()
