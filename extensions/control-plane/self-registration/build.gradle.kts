@@ -25,6 +25,7 @@ dependencies {
 
     implementation(libs.edc.spi.core)
     implementation(libs.edc.jsonld)
+    implementation(libs.edc.spi.participant.context.single)
 
     implementation(project(":extensions:control-plane:lib:connector-registry-lib"))
 

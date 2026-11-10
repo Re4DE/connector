@@ -2,19 +2,18 @@
 format.version = "1.1"
 
 [versions]
-buncycastle = "1.84"
-edc = "0.14.0"
-edc-build = "1.1.1"
-docker = "9.4.0"
-httpMockServer = "5.15.0"
-jersey = "3.1.10"
-jetty = "12.0.23"
+buncycastle = "1.86"
+edc = "0.18.1"
+edc-build = "1.1.2"
+httpMockServer = "9.2.0"
+jersey = "3.1.11"
+jetty = "12.1.4"
 nimbus = "10.3"
-restAssured = "5.5.5"
+restAssured = "5.5.6"
 rsApi = "4.0.0"
-shadow = "8.3.6"
-swagger = "2.2.34"
-wiremock = "3.13.1"
+shadow = "9.2.2"
+swagger = "2.2.40"
+wiremock = "3.13.2"
 
 [libraries]
 # BOM mobules
@@ -37,7 +36,7 @@ edc-token-lib = { module = "org.eclipse.edc:token-lib", version.ref = "edc" }
 edc-transform-lib = { module = "org.eclipse.edc:transform-lib", version.ref = "edc" }
 edc-util-lib = { module = "org.eclipse.edc:util-lib", version.ref = "edc" }
 edc-controlplane-core = { module = "org.eclipse.edc:control-plane-core", version.ref = "edc" }
-edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
+edc-dcp-core = { module = "org.eclipse.edc:decentralized-claims-core", version.ref = "edc" }
 edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref = "edc" }
 edc-jsonld = { module = "org.eclipse.edc:json-ld", version.ref = "edc" }
 edc-policy-monitor = { module = "org.eclipse.edc:policy-monitor-core", version.ref = "edc" }
@@ -47,6 +46,7 @@ edc-junit = { module = "org.eclipse.edc:junit", version.ref = "edc" }
 edc-http = { module = "org.eclipse.edc:http", version.ref = "edc" }
 edc-jersey-core = { module = "org.eclipse.edc:jersey-core", version.ref = "edc" }
 edc-jetty-core = { module = "org.eclipse.edc:jetty-core", version.ref = "edc" }
+edc-participant-context-config-core = { module = "org.eclipse.edc:participant-context-config-core", version.ref = "edc" }
 
 # Additional edc spis
 edc-spi-core = { module = "org.eclipse.edc:core-spi", version.ref = "edc" }
@@ -59,13 +59,13 @@ edc-spi-oauth2 = { module = "org.eclipse.edc:oauth2-spi", version.ref = "edc" }
 edc-spi-jwt = { module = "org.eclipse.edc:jwt-spi", version.ref = "edc" }
 edc-spi-json-ld = { module = "org.eclipse.edc:json-ld-spi", version.ref = "edc" }
 edc-spi-policy-monitor = { module = "org.eclipse.edc:policy-monitor-spi", version.ref = "edc" }
-edc-spi-jwt-signer = { module = "org.eclipse.edc:jwt-signer-spi", version.ref = "edc" }
 edc-spi-protocol = { module = "org.eclipse.edc:protocol-spi", version.ref = "edc" }
 edc-spi-protocol-dsp-http = { module = "org.eclipse.edc:dsp-http-spi", version.ref = "edc" }
 edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
-edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
+edc-spi-dcp = { module = "org.eclipse.edc:decentralized-claims-spi", version.ref = "edc" }
 edc-spi-catalog = { module = "org.eclipse.edc:catalog-spi", version.ref = "edc" }
 edc-spi-web = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
+edc-spi-participant-context-single = { module = "org.eclipse.edc:participant-context-single-spi", version.ref = "edc" }
 
 # Third-part dependencies
 bouncyCastle-bcpkixJdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "buncycastle" }
@@ -86,7 +86,6 @@ fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
 fc-dcp = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
 
 [plugins]
-docker = { id = "com.bmuschko.docker-remote-api", version.ref = "docker" }
 edc-build = { id = "org.eclipse.edc.edc-build", version.ref = "edc-build" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 swagger = { id = "io.swagger.core.v3.swagger-gradle-plugin", version.ref = "swagger" }

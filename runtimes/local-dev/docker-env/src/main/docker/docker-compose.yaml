@@ -16,7 +16,8 @@ name: re4de-connector-local-dev
 
 volumes:
   vault_data:
-  postgres_data:
+  postgres_issuer_data:
+  postgres_connector_data:
   mongo_data:
 
 services:
@@ -71,6 +72,7 @@ services:
         LMX46/ju1kfqgcugSGqo1P7k6uu1H/j2GhiR41r7CvyniP6rEmcYSoMZZvqvW1XT
         4QIDAQAB
         -----END PUBLIC KEY-----
+      AES_KEY: Ioc7rahxOhGh4quiEir7eil4
     cap_add:
       - IPC_LOCK
     volumes:
@@ -78,7 +80,20 @@ services:
       - "../resources/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh"
       - "vault_data:/vault"
 
-  postgresql:
+  postgresql_issuer:
+    image: postgres:18.2-alpine3.23
+    ports:
+      - "6432:5432"
+    environment:
+      POSTGRES_DB: edc
+      POSTGRES_USER: edc
+      POSTGRES_PASSWORD: devpass
+    volumes:
+      - "postgres_issuer_data:/var/lib/postgresql/18/docker"
+      - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
+      - "../resources/marketpartner-attestation.sql:/docker-entrypoint-initdb.d/marketpartner-attestation.sql"
+
+  postgresql_connector:
     image: postgres:18.2-alpine3.23
     ports:
       - "5432:5432"
@@ -87,9 +102,7 @@ services:
       POSTGRES_USER: edc
       POSTGRES_PASSWORD: devpass
     volumes:
-      - "postgres_data:/var/lib/postgresql/18/docker"
-      - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
-      - "../resources/marketpartner-attestation.sql:/docker-entrypoint-initdb.d/marketpartner-attestation.sql"
+      - "postgres_connector_data:/var/lib/postgresql/18/docker"
 
   mongodb:
     image: mongo:8.2.5-noble

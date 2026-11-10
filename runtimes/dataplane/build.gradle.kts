@@ -13,15 +13,16 @@
  */
 
 plugins {
+    `java-library`
     id("application")
     alias(libs.plugins.shadow)
-    alias(libs.plugins.docker)
 }
 
 dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
     runtimeOnly(libs.edc.bom.dataplane.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
+    runtimeOnly(libs.edc.participant.context.config.core)
 
     runtimeOnly(project(":extensions:common:http:mtls"))
     runtimeOnly(project(":extensions:data-plane:data-plane-https-oauth2-userflow"))
@@ -32,8 +33,17 @@ dependencies {
     shadow(libs.bouncyCastle.bctlsJdk18on)
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xm")
+application {
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
+}
+
+tasks.shadowJar {
+    exclude("**/pom.properties", "**/pom.xml")
+
+    // Exclude target node directory sql, as this overrides our own implementation
+    dependencies {
+        exclude(dependency("org.eclipse.edc:target-node-directory-sql"))
+    }
 
     // Exclude bouncy castle, as it should be loaded as separated library to not lose the signed jar
     dependencies {
@@ -44,7 +54,8 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     }
 
     mergeServiceFiles()
-    archiveFileName.set("${project.name}.jar")
+    archiveFileName.set("dataplane.jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.register<Copy>("copyShadowLibs") {
@@ -66,10 +77,6 @@ tasks.named("distTar") {
 
 tasks.named("distZip") {
     dependsOn(tasks.named("copyShadowLibs"))
-}
-
-application {
-    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 
 edcBuild {

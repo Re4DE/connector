@@ -44,6 +44,7 @@ public class Oauth2ServiceImpl implements IdentityService {
     private final TokenValidationService tokenValidationService;
     private final PublicKeyResolver publicKeyResolver;
     private final TokenValidationRulesRegistry tokenValidationRuleRegistry;
+    private final String participantId;
     private final boolean tokenResourceEnabled;
 
     /**
@@ -55,10 +56,11 @@ public class Oauth2ServiceImpl implements IdentityService {
      * @param jwtDecoratorRegistry   Registry containing the decorator for build the JWT
      * @param tokenValidationService Service used for token validation
      * @param tokenResourceEnabled   Add support for generating access token request with resource parameter
+     * @param participantId          The ID of the participant
      */
     public Oauth2ServiceImpl(String tokenUrl, TokenGenerationService tokenGenerationService, String privateKeyIdSupplier,
                              Oauth2Client client, TokenDecoratorRegistry jwtDecoratorRegistry, TokenValidationRulesRegistry tokenValidationRuleRegistry, TokenValidationService tokenValidationService,
-                             PublicKeyResolver publicKeyResolver, boolean tokenResourceEnabled) {
+                             PublicKeyResolver publicKeyResolver, boolean tokenResourceEnabled, String participantId) {
         this.tokenUrl = tokenUrl;
         this.privateKeySupplier = privateKeyIdSupplier;
         this.client = client;
@@ -68,24 +70,25 @@ public class Oauth2ServiceImpl implements IdentityService {
         this.tokenValidationService = tokenValidationService;
         this.publicKeyResolver = publicKeyResolver;
         this.tokenResourceEnabled = tokenResourceEnabled;
+        this.participantId = participantId;
     }
 
     @Override
-    public Result<TokenRepresentation> obtainClientCredentials(TokenParameters parameters) {
+    public Result<TokenRepresentation> obtainClientCredentials(String participantContextId, TokenParameters parameters) {
         return generateClientAssertion()
                 .map(assertion -> createRequest(parameters, assertion))
                 .compose(client::requestToken);
     }
 
     @Override
-    public Result<ClaimToken> verifyJwtToken(TokenRepresentation tokenRepresentation, VerificationContext context) {
+    public Result<ClaimToken> verifyJwtToken(String participantContextId, TokenRepresentation tokenRepresentation, VerificationContext context) {
         return tokenValidationService.validate(tokenRepresentation, publicKeyResolver, tokenValidationRuleRegistry.getRules(OAUTH2_TOKEN_CONTEXT));
     }
 
     @NotNull
     private Result<String> generateClientAssertion() {
         var decorators = jwtDecoratorRegistry.getDecoratorsFor(OAUTH2_TOKEN_CONTEXT).toArray(TokenDecorator[]::new);
-        return tokenGenerationService.generate(privateKeySupplier, decorators)
+        return tokenGenerationService.generate(participantId, privateKeySupplier, decorators)
                 .map(TokenRepresentation::getToken);
     }
 
@@ -102,5 +105,4 @@ public class Oauth2ServiceImpl implements IdentityService {
         }
         return builder.build();
     }
-
 }

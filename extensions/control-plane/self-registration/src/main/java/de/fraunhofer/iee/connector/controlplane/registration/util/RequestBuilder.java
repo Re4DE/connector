@@ -11,7 +11,7 @@ public class RequestBuilder {
     private static final MediaType TYPE_JSON = MediaType.parse("application/json");
 
     private static final String ACTIVE = "active";
-    private static final String PARTICIPANT_ID = "participantId";
+    private static final String PARTICIPANT_CONTEXT_ID = "participantContextId";
     private static final String DID = "did";
     private static final String ROLES = "roles";
     private static final String SERVICE_ENDPOINTS = "serviceEndpoints";
@@ -37,7 +37,7 @@ public class RequestBuilder {
 
     public static Request buildGetParticipantContextRequest(String identityUrl, String participantIdB64, String superUserApiKey) {
         return new Request.Builder()
-                .url("%s/v1alpha/participants/%s".formatted(identityUrl, participantIdB64))
+                .url("%s/v1beta/participants/%s".formatted(identityUrl, participantIdB64))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .build();
     }
@@ -45,7 +45,7 @@ public class RequestBuilder {
     public static Request buildCreateParticipantContextRequest(String identityUrl, String credentialUrl ,String participantId, String participantIdB64, String superUserApiKey, String dsp, String keySuffix) {
         var json = Json.createObjectBuilder()
                 .add(ACTIVE, true)
-                .add(PARTICIPANT_ID, participantId)
+                .add(PARTICIPANT_CONTEXT_ID, participantIdB64)
                 .add(DID, participantId)
                 .add(ROLES, Json.createArrayBuilder())
                 .add(SERVICE_ENDPOINTS, Json.createArrayBuilder()
@@ -71,7 +71,7 @@ public class RequestBuilder {
         }
 
         return new Request.Builder()
-                .url("%s/v1alpha/participants".formatted(identityUrl))
+                .url("%s/v1beta/participants".formatted(identityUrl))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .post(RequestBody.create(json.build().toString(), TYPE_JSON))
                 .build();
@@ -79,7 +79,7 @@ public class RequestBuilder {
 
     public static Request buildGetCredentialTypeRequest(String identityUrl, String participantIdB64, String superUserApiKey, String credentialType) {
         return new Request.Builder()
-                .url("%s/v1alpha/participants/%s/credentials?type=%s".formatted(identityUrl, participantIdB64, credentialType))
+                .url("%s/v1beta/participants/%s/credentials?type=%s".formatted(identityUrl, participantIdB64, credentialType))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .build();
     }
@@ -96,7 +96,7 @@ public class RequestBuilder {
                 .build();
 
         return new Request.Builder()
-                .url("%s/v1alpha/participants/%s/credentials/request".formatted(identityUrl, participantIdB64))
+                .url("%s/v1beta/participants/%s/credentials/request".formatted(identityUrl, participantIdB64))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .post(RequestBody.create(json.toString(), TYPE_JSON))
                 .build();
@@ -114,7 +114,7 @@ public class RequestBuilder {
                 .build();
 
         return new Request.Builder()
-                .url("%s/v1alpha/participants/%s/credentials/request".formatted(identityUrl, participantIdB64))
+                .url("%s/v1beta/participants/%s/credentials/request".formatted(identityUrl, participantIdB64))
                 .addHeader(X_API_KEY, superUserApiKey)
                 .post(RequestBody.create(json.toString(), TYPE_JSON))
                 .build();

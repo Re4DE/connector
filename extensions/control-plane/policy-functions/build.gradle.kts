@@ -25,6 +25,6 @@ dependencies {
 
     implementation(libs.edc.spi.core)
     implementation(libs.edc.controlplane.core)
-    implementation(libs.edc.spi.identity.trust)
+    implementation(libs.edc.spi.dcp)
     testImplementation(libs.edc.junit)
 }

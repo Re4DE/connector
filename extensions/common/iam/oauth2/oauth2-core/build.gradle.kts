@@ -21,9 +21,10 @@ dependencies {
     api(libs.edc.spi.oauth2)
     implementation(libs.edc.spi.protocol)
     implementation(libs.edc.spi.keys)
-    implementation(libs.edc.spi.jwt.signer)
     implementation(libs.edc.oauth2.client)
     implementation(libs.edc.token.lib)
+    implementation(libs.edc.spi.participant.context.single)
+    implementation(libs.edc.spi.jwt)
 
     implementation(libs.nimbus.jwt)
 

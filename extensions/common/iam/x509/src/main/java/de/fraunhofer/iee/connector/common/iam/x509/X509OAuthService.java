@@ -84,7 +84,7 @@ public class X509OAuthService implements IdentityService {
     }
 
     @Override
-    public Result<TokenRepresentation> obtainClientCredentials(TokenParameters tokenParameters) {
+    public Result<TokenRepresentation> obtainClientCredentials(String participantContextId, TokenParameters tokenParameters) {
         try {
             var response = this.httpClient.send(this.request, HttpResponse.BodyHandlers.ofString());
             var body = this.typeManager.readValue(response.body(), Map.class);
@@ -100,7 +100,7 @@ public class X509OAuthService implements IdentityService {
     }
 
     @Override
-    public Result<ClaimToken> verifyJwtToken(TokenRepresentation tokenRepresentation, VerificationContext verificationContext) {
+    public Result<ClaimToken> verifyJwtToken(String participantContextId, TokenRepresentation tokenRepresentation, VerificationContext verificationContext) {
         return this.tokenValidationService.validate(tokenRepresentation, this.providerKeyResolver, this.tokenValidationRuleRegistry.getRules(OAUTH2_TOKEN_CONTEXT));
     }
 
