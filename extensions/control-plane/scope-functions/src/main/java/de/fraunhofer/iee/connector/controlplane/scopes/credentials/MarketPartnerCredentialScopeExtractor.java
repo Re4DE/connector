@@ -21,7 +21,7 @@ import org.eclipse.edc.policy.model.Operator;
 import java.util.Set;
 
 public class MarketPartnerCredentialScopeExtractor implements ScopeExtractor {
-    private static final String CREDENTIAL_TYPE_NAMESPACE = "org.eclipse.edc.vc.type";
+    private static final String CREDENTIAL_TYPE_NAMESPACE = "org.eclipse.dspace.dcp.vc.type";
     private static final String MARKET_PARTNER_CREDENTIAL_TYPE = "MarketPartnerCredential";
     private static final String MARKET_PARTNER_CONSTRAINT_PREFIX = "MarketPartner.";
 

@@ -38,8 +38,8 @@ import static org.eclipse.edc.spi.constants.CoreConstants.JSON_LD;
 
 @Extension(value = "Scope extension that handles data space specific scopes, like MembershipVC")
 public class ScopeExtension implements ServiceExtension {
-    private static final String MEMBERSHIP_CREDENTIAL_SCOPE = "org.eclipse.edc.vc.type:MembershipCredential:read";
-    private static final String MARKETPARTNER_CREDENTIAL_SCOPE = "org.eclipse.edc.vc.type:MarketPartnerCredential:read";
+    private static final String MEMBERSHIP_CREDENTIAL_SCOPE = "org.eclipse.dspace.dcp.vc.type:MembershipCredential:read";
+    private static final String MARKETPARTNER_CREDENTIAL_SCOPE = "org.eclipse.dspace.dcp.vc.type:MarketPartnerCredential:read";
 
     @Inject
     TypeManager typeManager;
