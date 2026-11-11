@@ -20,15 +20,12 @@ plugins {
 
 dependencies {
     runtimeOnly(libs.edc.bom.controlplane.base)
-    runtimeOnly(libs.edc.bom.controlplane.sql)
+    runtimeOnly(libs.edc.bom.controlplane.feature.sql)
+    runtimeOnly(libs.edc.bom.federatedcatalog.base)
+    runtimeOnly(libs.edc.bom.federatedcatalog.feature.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
-    runtimeOnly(libs.edc.policy.monitor)
-    runtimeOnly(libs.bundles.fc.oauth2)
 
-    // Dependencies from oauth2, now local, as removed from upstream edc
-    runtimeOnly(libs.edc.spi.jwt)
     runtimeOnly(project(":extensions:common:iam:oauth2:oauth2-service"))
-
     runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))

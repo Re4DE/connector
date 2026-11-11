@@ -20,11 +20,11 @@ plugins {
 
 dependencies {
     runtimeOnly(libs.edc.bom.controlplane.base)
-    runtimeOnly(libs.edc.bom.controlplane.sql)
+    runtimeOnly(libs.edc.bom.controlplane.feature.sql)
+    runtimeOnly(libs.edc.bom.federatedcatalog.dcp)
+    runtimeOnly(libs.edc.bom.federatedcatalog.feature.sql)
     runtimeOnly(libs.edc.oauth2.client)
     runtimeOnly(libs.edc.vault.hashicorp)
-    runtimeOnly(libs.edc.policy.monitor)
-    runtimeOnly(libs.bundles.fc.oauth2)
 
     runtimeOnly(project(":extensions:common:iam:x509"))
     runtimeOnly(project(":extensions:control-plane:self-registration"))
@@ -50,10 +50,10 @@ tasks.shadowJar {
 
     // Exclude bouncy castle, as it should be loaded as separated library to not lose the signed jar
     dependencies {
-        exclude(dependency("org.bouncycastle:bcpkix-jdk18on:1.84"))
-        exclude(dependency("org.bouncycastle:bcprov-jdk18on:1.84"))
-        exclude(dependency("org.bouncycastle:bctls-jdk18on:1.84"))
-        exclude(dependency("org.bouncycastle:bcutil-jdk18on:1.84"))
+        exclude(dependency("org.bouncycastle:bcpkix-jdk18on"))
+        exclude(dependency("org.bouncycastle:bcprov-jdk18on"))
+        exclude(dependency("org.bouncycastle:bctls-jdk18on"))
+        exclude(dependency("org.bouncycastle:bcutil-jdk18on"))
     }
 
     mergeServiceFiles()

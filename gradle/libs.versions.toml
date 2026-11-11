@@ -4,30 +4,27 @@ format.version = "1.1"
 [versions]
 buncycastle = "1.86"
 edc = "0.18.1"
-edc-build = "1.1.2"
+edc-build = "1.5.2"
 httpMockServer = "9.2.0"
-jersey = "3.1.11"
-jetty = "12.1.4"
-nimbus = "10.3"
-restAssured = "5.5.6"
+jersey = "4.0.2"
+jetty = "12.1.9"
+nimbus = "10.9.1"
+restAssured = "6.0.0"
 rsApi = "4.0.0"
-shadow = "9.2.2"
-swagger = "2.2.40"
+shadow = "9.4.1"
+swagger = "2.2.50"
 wiremock = "3.13.2"
 
 [libraries]
 # BOM mobules
 edc-bom-controlplane-base = { module = "org.eclipse.edc:controlplane-base-bom", version.ref = "edc" }
-edc-bom-controlplane-sql = { module = "org.eclipse.edc:controlplane-feature-sql-bom", version.ref = "edc" }
 edc-bom-controlplane-dcp = { module = "org.eclipse.edc:controlplane-dcp-bom", version.ref = "edc" }
+edc-bom-controlplane-feature-sql = { module = "org.eclipse.edc:controlplane-feature-sql-bom", version.ref = "edc" }
 edc-bom-dataplane = { module = "org.eclipse.edc:dataplane-base-bom", version.ref = "edc" }
-edc-bom-dataplane-sql = { module = "org.eclipse.edc:dataplane-feature-sql-bom", version.ref = "edc" }
-
-# Federated catalog
+edc-bom-dataplane-feature-sql = { module = "org.eclipse.edc:dataplane-feature-sql-bom", version.ref = "edc" }
 edc-bom-federatedcatalog-base = { module = "org.eclipse.edc:federatedcatalog-base-bom", version.ref = "edc" }
-edc-bom-federatedcatalog-sql = { module = "org.eclipse.edc:federatedcatalog-feature-sql-bom", version.ref = "edc" }
 edc-bom-federatedcatalog-dcp = { module = "org.eclipse.edc:federatedcatalog-dcp-bom", version.ref = "edc" }
-edc-fc-crawler-spi = { module = "org.eclipse.edc:crawler-spi", version.ref = "edc" }
+edc-bom-federatedcatalog-feature-sql = { module = "org.eclipse.edc:federatedcatalog-feature-sql-bom", version.ref = "edc" }
 
 # Additional edc libs
 edc-http-lib = { module = "org.eclipse.edc:http-lib", version.ref = "edc" }
@@ -66,6 +63,7 @@ edc-spi-dcp = { module = "org.eclipse.edc:decentralized-claims-spi", version.ref
 edc-spi-catalog = { module = "org.eclipse.edc:catalog-spi", version.ref = "edc" }
 edc-spi-web = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
 edc-spi-participant-context-single = { module = "org.eclipse.edc:participant-context-single-spi", version.ref = "edc" }
+edc-fc-crawler-spi = { module = "org.eclipse.edc:crawler-spi", version.ref = "edc" }
 
 # Third-part dependencies
 bouncyCastle-bcpkixJdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "buncycastle" }
@@ -82,8 +80,6 @@ wiremock = { module = "org.wiremock:wiremock-jetty12", version.ref = "wiremock" 
 jetty-server = { module = "org.eclipse.jetty:jetty-server", version.ref = "jetty" }
 
 [bundles]
-fc-oauth2 = ["edc-bom-federatedcatalog-base", "edc-bom-federatedcatalog-sql"]
-fc-dcp = ["edc-bom-federatedcatalog-dcp", "edc-bom-federatedcatalog-sql"]
 
 [plugins]
 edc-build = { id = "org.eclipse.edc.edc-build", version.ref = "edc-build" }

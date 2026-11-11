@@ -20,10 +20,10 @@ plugins {
 
 dependencies {
     runtimeOnly(libs.edc.bom.controlplane.dcp)
-    runtimeOnly(libs.edc.bom.controlplane.sql)
+    runtimeOnly(libs.edc.bom.controlplane.feature.sql)
+    runtimeOnly(libs.edc.bom.federatedcatalog.dcp)
+    runtimeOnly(libs.edc.bom.federatedcatalog.feature.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
-    runtimeOnly(libs.edc.policy.monitor)
-    runtimeOnly(libs.bundles.fc.dcp)
 
     runtimeOnly(project(":extensions:control-plane:self-registration"))
     runtimeOnly(project(":extensions:control-plane:policy-functions"))

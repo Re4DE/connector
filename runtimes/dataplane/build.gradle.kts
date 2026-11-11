@@ -20,7 +20,7 @@ plugins {
 
 dependencies {
     runtimeOnly(libs.edc.bom.dataplane)
-    runtimeOnly(libs.edc.bom.dataplane.sql)
+    runtimeOnly(libs.edc.bom.dataplane.feature.sql)
     runtimeOnly(libs.edc.vault.hashicorp)
     runtimeOnly(libs.edc.participant.context.config.core)
 
