@@ -23,7 +23,6 @@ dependencies {
     /* DCP Controlplane (default) */
     runtimeOnly(libs.edc.bom.controlplane.dcp)
     runtimeOnly(libs.edc.bom.federatedcatalog.dcp)
-    runtimeOnly(project(":extensions:control-plane:scope-functions"))
 
     /* OAuth2 Controlplane */
     //runtimeOnly(libs.edc.bom.controlplane.base)

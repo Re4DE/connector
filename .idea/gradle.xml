@@ -21,7 +21,6 @@
             <option value="$PROJECT_DIR$/extensions/control-plane/lib" />
             <option value="$PROJECT_DIR$/extensions/control-plane/lib/connector-registry-lib" />
             <option value="$PROJECT_DIR$/extensions/control-plane/policy-functions" />
-            <option value="$PROJECT_DIR$/extensions/control-plane/scope-functions" />
             <option value="$PROJECT_DIR$/extensions/control-plane/self-registration" />
             <option value="$PROJECT_DIR$/extensions/control-plane/target-node-resolver" />
             <option value="$PROJECT_DIR$/extensions/data-plane" />
