@@ -65,7 +65,7 @@ public class ConnectorRegistryServiceTest {
                     .withRequestBody(matchingJsonPath("$.name", equalTo(connectorName)))
                     .withRequestBody(matchingJsonPath("$.id", equalTo(participantId)))
                     .withRequestBody(matchingJsonPath("$.url", equalTo(dsp)))
-                    .withRequestBody(matchingJsonPath("$.supportedProtocols[0]", equalTo("dataspace-protocol-http"))));
+                    .withRequestBody(matchingJsonPath("$.supportedProtocols[0]", equalTo("dataspace-protocol-http:2025-1"))));
         }
 
         @Test
@@ -106,7 +106,7 @@ public class ConnectorRegistryServiceTest {
                             "name": "tester",
                             "id": "did:web:localhost:test",
                             "url": "http://localhost:8080/dsp",
-                            "supportedProtocols": ["dataspace-protocol-http"]
+                            "supportedProtocols": ["dataspace-protocol-http:2025-1"]
                         }
                     ]
                     """;

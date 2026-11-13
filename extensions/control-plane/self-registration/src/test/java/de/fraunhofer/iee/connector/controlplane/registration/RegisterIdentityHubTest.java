@@ -41,7 +41,8 @@ public class RegisterIdentityHubTest {
             .options(wireMockConfig().dynamicPort())
             .build();
 
-    private static final String PARTICIPANT_ID = "did:web:localhost:test";
+    private static final String PARTICIPANT_DID = "did:web:localhost:test";
+    private static final String PARTICIPANT_CONTEXT_ID = "test";
     private static final String API_KEY = "devpass";
     private static final String DSP = "http://localhost:8080/dsp";
     private static final String CONNECTOR_NAME = "tester";
@@ -64,9 +65,8 @@ public class RegisterIdentityHubTest {
         this.context = context;
         this.factory = factory;
 
-        var participantIdB64 = Base64.getUrlEncoder().encodeToString(PARTICIPANT_ID.getBytes());
-        identityHubPath = "/api/identity/v1alpha/participants/%s".formatted(participantIdB64);
-        identityHubRequestPath = "/api/identity/v1alpha/participants";
+        identityHubPath = "/api/identity/v1beta/participants/%s".formatted(PARTICIPANT_CONTEXT_ID);
+        identityHubRequestPath = "/api/identity/v1beta/participants";
 
         context.registerService(DspBaseWebhookAddress.class, dspBaseWebhookAddress);
         context.registerService(Vault.class, vault);
@@ -77,8 +77,8 @@ public class RegisterIdentityHubTest {
         when(vault.resolveSecret(anyString())).thenReturn(SUPER_USER_API_KEY);
 
         var participantContext = ParticipantContext.Builder.newInstance()
-                .participantContextId(PARTICIPANT_ID)
-                .identity(PARTICIPANT_ID)
+                .participantContextId(PARTICIPANT_CONTEXT_ID)
+                .identity(PARTICIPANT_DID)
                 .build();
         when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
 
@@ -124,18 +124,17 @@ public class RegisterIdentityHubTest {
         extension = factory.constructInstance(SelfRegistrationExtension.class);
         extension.initialize(context);
         extension.start();
-
-        var base64ParticipantId = Base64.getEncoder().encodeToString(PARTICIPANT_ID.getBytes());
         var expectedJson = """
                 {
                     "active": true,
-                    "participantId": "%1$s",
-                    "did": "%1$s",
-                    "roles": [],
+                    "participantId": "%2$s",
+                    "participantContextId": "%1$s",
+                    "did": "%2$s",
+                    "scopes": [],
                     "serviceEndpoints": [
                         {
                             "type": "CredentialService",
-                            "serviceEndpoint": "%2$s/v1/participants/%3$s",
+                            "serviceEndpoint": "%3$s/v1/participants/%1$s",
                             "id": "%1$s-credentialservice-1"
                         },
                         {
@@ -145,14 +144,15 @@ public class RegisterIdentityHubTest {
                         }
                     ],
                     "key": {
-                        "keyId": "%1$s#key-1",
-                        "privateKeyAlias": "%1$s#key-1",
+                        "keyId": "%2$s#key-1",
+                        "privateKeyAlias": "%2$s#key-1",
                         "keyGeneratorParams": {
                             "algorithm": "EC"
                         }
                     }
                 }
-                """.formatted(PARTICIPANT_ID, server.baseUrl() + "/api/credentials", base64ParticipantId, DSP);
+                """.formatted(PARTICIPANT_CONTEXT_ID, PARTICIPANT_DID, server.baseUrl() + "/api/credentials", DSP);
+
 
         server.verify(1, getRequestedFor(urlPathEqualTo(identityHubPath))
                 .withHeader("x-api-key", equalTo(SUPER_USER_API_KEY)));
@@ -177,17 +177,17 @@ public class RegisterIdentityHubTest {
         extension.initialize(context);
         extension.start();
 
-        var base64ParticipantId = Base64.getEncoder().encodeToString(PARTICIPANT_ID.getBytes());
         var expectedJson = """
                 {
                     "active": true,
-                    "participantId": "%1$s",
-                    "did": "%1$s",
-                    "roles": [],
+                    "participantId": "%2$s",
+                    "participantContextId": "%1$s",
+                    "did": "%2$s",
+                    "scopes": [],
                     "serviceEndpoints": [
                         {
                             "type": "CredentialService",
-                            "serviceEndpoint": "%2$s/v1/participants/%3$s",
+                            "serviceEndpoint": "%3$s/v1/participants/%1$s",
                             "id": "%1$s-credentialservice-1"
                         },
                         {
@@ -197,7 +197,7 @@ public class RegisterIdentityHubTest {
                         }
                     ],
                     "key": {
-                        "keyId": "%1$s#key-1",
+                        "keyId": "%2$s#key-1",
                         "privateKeyAlias": "%5$s#key-1",
                         "keyGeneratorParams": {
                             "algorithm": "EC"
@@ -207,7 +207,7 @@ public class RegisterIdentityHubTest {
                         "clientSecret": "%5$s-sts-client-secret"
                     }
                 }
-                """.formatted(PARTICIPANT_ID, server.baseUrl() + "/api/credentials", base64ParticipantId, DSP, "short-name");
+                """.formatted(PARTICIPANT_CONTEXT_ID, PARTICIPANT_DID, server.baseUrl() + "/api/credentials", DSP, "short-name");
 
         server.verify(1, getRequestedFor(urlPathEqualTo(identityHubPath))
                 .withHeader("x-api-key", equalTo(SUPER_USER_API_KEY)));
@@ -292,7 +292,7 @@ public class RegisterIdentityHubTest {
                 entry("edc.registration.ih.credentials.url", base + "/api/credentials"),
                 entry("edc.registration.issuer.did", "did:web:issuer"),
                 entry("edc.registration.connector.name", CONNECTOR_NAME),
-                entry("edc.participant.id", PARTICIPANT_ID)
+                entry("edc.participant.id", PARTICIPANT_DID)
         ));
     }
 }

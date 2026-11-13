@@ -15,8 +15,7 @@ public class RequestBuilder {
     private final static String ID = "id";
     private final static String URL = "url";
     private final static String SUPPORTED_PROTOCOLS = "supportedProtocols";
-    private final static String DATASPACE_PROTOCOL_HTTP = "dataspace-protocol-http";
-
+    private final static String DATASPACE_PROTOCOL_HTTP = "dataspace-protocol-http:2025-1";
 
     public static Request buildPostRequest(String url, String apiKey, RequestBody body) {
         return new Request.Builder()

@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +43,8 @@ public class IssueMembershipCredentialTest {
             .build();
 
     private static final String CREDENTIAL_TYPE = "MembershipCredential";
-    private static final String PARTICIPANT_ID = "did:web:localhost:test";
+    private static final String PARTICIPANT_DID = "did:web:localhost:test";
+    private static final String PARTICIPANT_CONTEXT_ID = "test";
     private static final String DSP = "http://localhost:8080/dsp";
     private static final String API_KEY = "devpass";
     private static final String CONNECTOR_NAME = "tester";
@@ -61,8 +61,7 @@ public class IssueMembershipCredentialTest {
 
     @BeforeEach
     void setUp(ServiceExtensionContext context, ObjectFactory factory) {
-        var participantIdB64 = Base64.getUrlEncoder().encodeToString(PARTICIPANT_ID.getBytes());
-        credentialPath = "/api/identity/v1alpha/participants/%s/credentials".formatted(participantIdB64);
+        credentialPath = "/api/identity/v1beta/participants/%s/credentials".formatted(PARTICIPANT_CONTEXT_ID);
         requestPath = credentialPath + "/request";
 
         context.registerService(DspBaseWebhookAddress.class, dspBaseWebhookAddress);
@@ -75,8 +74,8 @@ public class IssueMembershipCredentialTest {
         when(context.getMonitor()).thenReturn(monitor);
 
         var participantContext = ParticipantContext.Builder.newInstance()
-                .participantContextId(PARTICIPANT_ID)
-                .identity(PARTICIPANT_ID)
+                .participantContextId(PARTICIPANT_CONTEXT_ID)
+                .identity(PARTICIPANT_DID)
                 .build();
         when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
 
@@ -147,9 +146,9 @@ public class IssueMembershipCredentialTest {
         server.verify(1, postRequestedFor(urlPathEqualTo(requestPath)).withHeader("x-api-key", equalTo(SUPER_USER_API_KEY))
                 .withHeader("Content-Type", containing("application/json"))
                 .withRequestBody(matchingJsonPath("$.issuerDid", equalTo("did:web:issuer")))
-                .withRequestBody(matchingJsonPath("$.credentials[0].id", equalTo("membership-credential-def-1")))
+                .withRequestBody(matchingJsonPath("$.credentials[0].id", equalTo("membership-credential-def")))
                 .withRequestBody(matchingJsonPath("$.credentials[0].type", equalTo("MembershipCredential")))
-                .withRequestBody(matchingJsonPath("$.credentials[0].format", equalTo("VC1_0_JWT"))));
+                .withRequestBody(matchingJsonPath("$.credentials[0].format", equalTo("vc20-bssl/jwt"))));
 
         server.verify(2, getRequestedFor(urlPathEqualTo(credentialPath))
                 .withQueryParam("type", equalTo(CREDENTIAL_TYPE))
@@ -300,7 +299,7 @@ public class IssueMembershipCredentialTest {
                 entry("edc.registration.ih.credentials.url", base + "/api/credentials"),
                 entry("edc.registration.issuer.did", "did:web:issuer"),
                 entry("edc.registration.connector.name", CONNECTOR_NAME),
-                entry("edc.participant.id", PARTICIPANT_ID)
+                entry("edc.participant.id", PARTICIPANT_DID)
         ));
     }
 }
