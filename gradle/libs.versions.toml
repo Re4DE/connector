@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 buncycastle = "1.84"
-edc = "0.18.1"
+edc = "0.18.2"
 edc-build = "1.5.2"
 httpMockServer = "9.2.0"
 jersey = "4.0.2"

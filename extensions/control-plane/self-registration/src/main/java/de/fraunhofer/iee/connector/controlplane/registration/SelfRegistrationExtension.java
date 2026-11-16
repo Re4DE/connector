@@ -107,8 +107,10 @@ public class SelfRegistrationExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         this.monitor = context.getMonitor();
-        this.participantDid = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail())).getIdentity();
-        this.participantContextId = this.extractParticipantContextIDFromDID(participantDid);
+
+        var participantContext = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail()));
+        this.participantDid = participantContext.getIdentity();
+        this.participantContextId = participantContext.getParticipantContextId();
 
         this.registryService = new ConnectorRegistryService(this.httpClient, this.monitor, null, participantDid, this.registryUrl, this.apiKey);
         this.connectorName = this.connectorName == null ? this.participantDid : this.connectorName;
@@ -271,10 +273,5 @@ public class SelfRegistrationExtension implements ServiceExtension {
         } catch (Exception e) {
             throw new EdcException("Could not query credentials of type: %s".formatted(credentialType), e);
         }
-    }
-
-    private String extractParticipantContextIDFromDID(String participantDid) {
-        var split = participantDid.split(":");
-        return split[split.length - 1];
     }
 }

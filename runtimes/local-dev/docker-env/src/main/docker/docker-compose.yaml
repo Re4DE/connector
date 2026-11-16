@@ -90,6 +90,7 @@ services:
       POSTGRES_PASSWORD: devpass
     volumes:
       - "postgres_issuer_data:/var/lib/postgresql/18/docker"
+      - "../resources/holder.sql:/docker-entrypoint-initdb.d/holder.sql"
       - "../resources/membership-attestation.sql:/docker-entrypoint-initdb.d/membership-attestation.sql"
       - "../resources/marketpartner-attestation.sql:/docker-entrypoint-initdb.d/marketpartner-attestation.sql"
 
