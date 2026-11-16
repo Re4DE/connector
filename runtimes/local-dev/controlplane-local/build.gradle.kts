@@ -13,40 +13,43 @@
  */
 
 plugins {
+    `java-library`
     id("application")
     alias(libs.plugins.shadow)
 }
 
+/* Uncomment the desired flavor to test it */
 dependencies {
-    runtimeOnly(libs.edc.bom.controlplane.sql)
-    runtimeOnly(libs.edc.vault.hashicorp)
-    runtimeOnly(libs.edc.policy.monitor)
+    /* DCP Controlplane (default) */
+    runtimeOnly(libs.edc.bom.controlplane.dcp)
+    runtimeOnly(libs.edc.bom.federatedcatalog.dcp)
 
-    runtimeOnly(project(":extensions:control-plane:policy-functions"))
-
-    // Oauth2 Specific
+    /* OAuth2 Controlplane */
     //runtimeOnly(libs.edc.bom.controlplane.base)
-    //runtimeOnly(libs.bundles.fc.oauth2)
-    //runtimeOnly(libs.edc.spi.jwt)
-
+    //runtimeOnly(libs.edc.bom.federatedcatalog.base)
     //runtimeOnly(project(":extensions:common:iam:oauth2:oauth2-service"))
 
-    // X509 Specific
-    // runtimeOnly(project(":extensions:common:iam:x509"))
+    /* X.509 Controlplane */
+    //runtimeOnly(libs.edc.bom.controlplane.base)
+    //runtimeOnly(libs.edc.bom.federatedcatalog.base)
+    //runtimeOnly(libs.edc.oauth2.client)
+    //runtimeOnly(project(":extensions:common:iam:x509"))
 
-    // DCP Specific
-    runtimeOnly(libs.edc.bom.controlplane.dcp)
-
-    // The federated catalog can not be tested locally with real connectors, as the real connectors can not resolve local DIDs
-    //runtimeOnly(libs.bundles.fc.dcp)
-
+    /* Common dependency, needed for all flavors */
+    runtimeOnly(libs.edc.bom.controlplane.feature.sql)
+    runtimeOnly(libs.edc.bom.federatedcatalog.feature.sql)
+    runtimeOnly(libs.edc.vault.hashicorp)
     runtimeOnly(project(":extensions:control-plane:self-registration"))
-    runtimeOnly(project(":extensions:control-plane:scope-functions"))
+    runtimeOnly(project(":extensions:control-plane:policy-functions"))
     runtimeOnly(project(":extensions:control-plane:target-node-resolver"))
 }
 
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    exclude("**/pom.properties", "**/pom.xm")
+application {
+    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
+}
+
+tasks.shadowJar {
+    exclude("**/pom.properties", "**/pom.xml")
 
     // Exclude target node directory sql, as this overrides our own implementation
     dependencies {
@@ -55,15 +58,16 @@ tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
 
     // Exclude bouncy castle, as it should be loaded as seperated library to not lose the signed jar
     // Only needed for X509
-    dependencies {
-        // exclude(dependency("org.bouncycastle:bcpkix-jdk18on:1.81"))
-        // exclude(dependency("org.bouncycastle:bcprov-jdk18on:1.81"))
-        // exclude(dependency("org.bouncycastle:bctls-jdk18on:1.81"))
-        // exclude(dependency("org.bouncycastle:bcutil-jdk18on:1.81"))
-    }
+    /*dependencies {
+        exclude(dependency("org.bouncycastle:bcpkix-jdk18on"))
+        exclude(dependency("org.bouncycastle:bcprov-jdk18on"))
+        exclude(dependency("org.bouncycastle:bctls-jdk18on"))
+        exclude(dependency("org.bouncycastle:bcutil-jdk18on"))
+    }*/
 
     mergeServiceFiles()
     archiveFileName.set("controlplane.jar")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 tasks.register<Copy>("copyShadowLibs") {
@@ -85,10 +89,6 @@ tasks.named("distTar") {
 
 tasks.named("distZip") {
     dependsOn(tasks.named("copyShadowLibs"))
-}
-
-application {
-    mainClass.set("org.eclipse.edc.boot.system.runtime.BaseRuntime")
 }
 
 edcBuild {

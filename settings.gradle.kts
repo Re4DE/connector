@@ -21,7 +21,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
         }
     }
 }
@@ -43,7 +43,6 @@ include(":extensions:common:iam:oauth2:oauth2-service")
 include(":extensions:control-plane:self-registration")
 include(":extensions:control-plane:policy-functions")
 include(":extensions:control-plane:target-node-resolver")
-include(":extensions:control-plane:scope-functions")
 
 include(":extensions:control-plane:lib:connector-registry-lib")
 

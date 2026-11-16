@@ -4,9 +4,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import org.eclipse.edc.boot.system.injection.ObjectFactory;
 import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
+import org.eclipse.edc.participantcontext.spi.types.ParticipantContext;
 import org.eclipse.edc.protocol.dsp.http.spi.api.DspBaseWebhookAddress;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.result.ServiceResult;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.system.configuration.Config;
@@ -17,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +41,8 @@ public class IssueMarketPartnerCredentialTest {
             .build();
 
     private static final String CREDENTIAL_TYPE = "MarketPartnerCredential";
-    private static final String PARTICIPANT_ID = "did:web:localhost:test";
+    private static final String PARTICIPANT_DID = "did:web:localhost:test";
+    private static final String PARTICIPANT_CONTEXT_ID = "test";
     private static final String DSP = "http://localhost:8080/dsp";
     private static final String API_KEY = "devpass";
     private static final String CONNECTOR_NAME = "tester";
@@ -48,6 +51,7 @@ public class IssueMarketPartnerCredentialTest {
     private final DspBaseWebhookAddress dspBaseWebhookAddress = mock();
     private final Vault vault = mock();
     private final Monitor monitor = mock();
+    private final SingleParticipantContextSupplier participantContextSupplier = mock();
 
     private SelfRegistrationExtension extension;
     private String credentialPath;
@@ -55,18 +59,23 @@ public class IssueMarketPartnerCredentialTest {
 
     @BeforeEach
     void setUp(ServiceExtensionContext context, ObjectFactory factory) {
-        var participantIdB64 = Base64.getUrlEncoder().encodeToString(PARTICIPANT_ID.getBytes());
-        credentialPath = "/api/identity/v1alpha/participants/%s/credentials".formatted(participantIdB64);
+        credentialPath = "/api/identity/v1beta/participants/%s/credentials".formatted(PARTICIPANT_CONTEXT_ID);
         requestPath = credentialPath + "/request";
 
         context.registerService(DspBaseWebhookAddress.class, dspBaseWebhookAddress);
         context.registerService(Vault.class, vault);
         context.registerService(EdcHttpClient.class, http);
+        context.registerService(SingleParticipantContextSupplier.class, participantContextSupplier);
 
         when(dspBaseWebhookAddress.get()).thenReturn(DSP);
         when(vault.resolveSecret(anyString())).thenReturn(SUPER_USER_API_KEY);
         when(context.getMonitor()).thenReturn(monitor);
-        when(context.getParticipantId()).thenReturn(PARTICIPANT_ID);
+
+        var participantContext = ParticipantContext.Builder.newInstance()
+                .participantContextId(PARTICIPANT_CONTEXT_ID)
+                .identity(PARTICIPANT_DID)
+                .build();
+        when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
 
         Map<String, String> configMap = baseConfigMap();
         configMap.put("edc.registration.marketpartner.issuance.enabled", "true");
@@ -135,9 +144,9 @@ public class IssueMarketPartnerCredentialTest {
         server.verify(1, postRequestedFor(urlPathEqualTo(requestPath)).withHeader("x-api-key", equalTo(SUPER_USER_API_KEY))
                 .withHeader("Content-Type", containing("application/json"))
                 .withRequestBody(matchingJsonPath("$.issuerDid", equalTo("did:web:issuer")))
-                .withRequestBody(matchingJsonPath("$.credentials[0].id", equalTo("marketpartner-credential-def-1")))
+                .withRequestBody(matchingJsonPath("$.credentials[0].id", equalTo("marketpartner-credential-def")))
                 .withRequestBody(matchingJsonPath("$.credentials[0].type", equalTo("MarketPartnerCredential")))
-                .withRequestBody(matchingJsonPath("$.credentials[0].format", equalTo("VC1_0_JWT"))));
+                .withRequestBody(matchingJsonPath("$.credentials[0].format", equalTo("vc20-bssl/jwt"))));
 
         server.verify(2, getRequestedFor(urlPathEqualTo(credentialPath))
                 .withQueryParam("type", equalTo(CREDENTIAL_TYPE))
@@ -265,7 +274,7 @@ public class IssueMarketPartnerCredentialTest {
                 entry("edc.registration.ih.credentials.url", base + "/api/credentials"),
                 entry("edc.registration.issuer.did", "did:web:issuer"),
                 entry("edc.registration.connector.name", CONNECTOR_NAME),
-                entry("edc.participant.id", PARTICIPANT_ID)
+                entry("edc.participant.id", PARTICIPANT_DID)
         ));
     }
 }

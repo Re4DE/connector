@@ -19,19 +19,22 @@ plugins {
 
 val edcBuildId = libs.plugins.edc.build.get().pluginId
 
+val edcScmConnection: String by project
+val edcScmUrl: String by project
+
+
 allprojects {
     apply(plugin = edcBuildId)
 
     configure<org.eclipse.edc.plugins.edcbuild.extensions.BuildExtension> {
         pom {
-            scmUrl.set("https://github.com/Re4DE/connector.git")
-            scmConnection.set("scm:git@github.com:Re4DE/connector.git")
-            developerName.set("Fraunhofer IEE")
-            developerEmail.set("sebastian.copei@iee.fraunhofer.de")
-            projectName.set("Re4DE")
-            projectUrl.set("https://github.com/Re4DE")
-            description.set("Re4DE for everyone :D")
-            licenseUrl.set("https://opensource.org/licenses/MIT")
+            scmConnection.set(edcScmConnection)
+            scmUrl.set(edcScmUrl)
         }
+    }
+
+    configure<CheckstyleExtension> {
+        configFile = rootProject.file("resources/edc-checkstyle-config.xml")
+        configDirectory.set(rootProject.file("resources"))
     }
 }

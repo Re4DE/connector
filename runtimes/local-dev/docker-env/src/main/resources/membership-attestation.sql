@@ -21,3 +21,6 @@ CREATE TABLE IF NOT EXISTS membership_attestations
 
 CREATE UNIQUE INDEX IF NOT EXISTS membership_attestation_holder_id_uindex
     ON membership_attestations (holder_id);
+
+INSERT INTO membership_attestations (holder_id)
+VALUES ('did:web:localhost%3A10085:tester');

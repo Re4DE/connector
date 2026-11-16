@@ -26,3 +26,6 @@ CREATE TABLE IF NOT EXISTS marketpartner_attestations
 
 CREATE UNIQUE INDEX IF NOT EXISTS marketpartner_attestation_holder_id_uindex
     ON marketpartner_attestations (holder_id);
+
+INSERT INTO marketpartner_attestations (company_name, company_uid, market_role, holder_id)
+VALUES ('tester inc.', '123456', '{"mpId":"123456","roleAbbreviation":"ESA","roleName":"Energieserviceanbieter"}', 'did:web:localhost%3A10085:tester');

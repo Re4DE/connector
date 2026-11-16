@@ -22,6 +22,7 @@ dependencies {
 
     implementation(libs.edc.spi.core)
     implementation(libs.edc.fc.crawler.spi)
+    implementation(libs.edc.spi.participant.context.single)
 
     implementation(project(":extensions:control-plane:lib:connector-registry-lib"))
     testImplementation(libs.edc.junit)

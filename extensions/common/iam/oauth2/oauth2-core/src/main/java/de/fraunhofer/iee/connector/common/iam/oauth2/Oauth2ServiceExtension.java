@@ -19,12 +19,12 @@ package de.fraunhofer.iee.connector.common.iam.oauth2;
 import de.fraunhofer.iee.connector.common.iam.oauth2.identity.IdentityProviderKeyResolver;
 import de.fraunhofer.iee.connector.common.iam.oauth2.identity.Oauth2ServiceImpl;
 import de.fraunhofer.iee.connector.common.iam.oauth2.jwt.X509CertificateDecorator;
+import de.fraunhofer.iee.connector.common.iam.oauth2.resolver.VaultCertificateResolver;
 import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.iam.oauth2.spi.Oauth2AssertionDecorator;
 import org.eclipse.edc.iam.oauth2.spi.client.Oauth2Client;
-import org.eclipse.edc.jwt.signer.spi.JwsSignerProvider;
-import org.eclipse.edc.keys.spi.CertificateResolver;
-import org.eclipse.edc.keys.spi.PrivateKeyResolver;
+import org.eclipse.edc.jwt.spi.signer.JwsSignerProvider;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.runtime.metamodel.annotation.Provides;
@@ -32,6 +32,7 @@ import org.eclipse.edc.runtime.metamodel.annotation.Setting;
 import org.eclipse.edc.spi.EdcException;
 import org.eclipse.edc.spi.iam.IdentityService;
 import org.eclipse.edc.spi.monitor.Monitor;
+import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtension;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.eclipse.edc.spi.types.TypeManager;
@@ -89,10 +90,7 @@ public class Oauth2ServiceExtension implements ServiceExtension {
     private EdcHttpClient httpClient;
 
     @Inject
-    private PrivateKeyResolver privateKeyResolver;
-
-    @Inject
-    private CertificateResolver certificateResolver;
+    private Vault vault;
 
     @Inject
     private Clock clock;
@@ -113,6 +111,9 @@ public class Oauth2ServiceExtension implements ServiceExtension {
     @Inject
     private JwsSignerProvider jwsSignerProvider;
 
+    @Inject
+    private SingleParticipantContextSupplier participantContextSupplier;
+
     @Override
     public String name() {
         return NAME;
@@ -123,6 +124,7 @@ public class Oauth2ServiceExtension implements ServiceExtension {
 
         withDefaults(context);
         warnIfNoLeeway(context.getMonitor());
+        var certificateResolver = new VaultCertificateResolver(this.vault);
 
         var certificate = ofNullable(certificateResolver.resolveCertificate(publicCertificateAlias))
                 .orElseThrow(() -> new EdcException("Public certificate not found: " + publicCertificateAlias));
@@ -168,7 +170,7 @@ public class Oauth2ServiceExtension implements ServiceExtension {
     private Oauth2ServiceImpl createOauth2Service(TokenDecoratorRegistry jwtDecoratorRegistry,
                                                   IdentityProviderKeyResolver providerKeyResolver) {
         String privateKeySupplier = privateKeyAlias;
-
+        String participantId = participantContextSupplier.get().orElseThrow(f -> new EdcException(f.getFailureDetail())).getIdentity();
         return new Oauth2ServiceImpl(
                 tokenUrl,
                 new JwtGenerationService(jwsSignerProvider),
@@ -178,7 +180,8 @@ public class Oauth2ServiceExtension implements ServiceExtension {
                 tokenValidationRulesRegistry,
                 tokenValidationService,
                 providerKeyResolver,
-                tokenResourceEnabled
+                tokenResourceEnabled,
+                participantId
         );
     }
 

@@ -17,48 +17,46 @@ package de.fraunhofer.iee.connector.common.iam.oauth2;
 
 import org.eclipse.edc.boot.system.injection.ObjectFactory;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
-import org.eclipse.edc.keys.spi.CertificateResolver;
-import org.eclipse.edc.keys.spi.PrivateKeyResolver;
+import org.eclipse.edc.participantcontext.single.spi.SingleParticipantContextSupplier;
+import org.eclipse.edc.participantcontext.spi.types.ParticipantContext;
 import org.eclipse.edc.spi.monitor.Monitor;
-import org.eclipse.edc.spi.result.Result;
+import org.eclipse.edc.spi.result.ServiceResult;
+import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
+import org.eclipse.edc.spi.system.configuration.Config;
 import org.eclipse.edc.spi.system.configuration.ConfigFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.security.PrivateKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
+import static java.util.Map.entry;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(DependencyInjectionExtension.class)
 class Oauth2ServiceExtensionTest {
 
-    private final CertificateResolver certificateResolver = mock();
-    private final PrivateKeyResolver privateKeyResolver = mock();
+    private final SingleParticipantContextSupplier participantContextSupplier = mock();
+    private final Vault vault = mock();
 
     @BeforeEach
     void setup(ServiceExtensionContext context) {
-        context.registerService(CertificateResolver.class, certificateResolver);
-        context.registerService(PrivateKeyResolver.class, privateKeyResolver);
+        context.registerService(SingleParticipantContextSupplier.class, participantContextSupplier);
+        context.registerService(Vault.class, vault);
     }
 
     @Test
     void verifyExtensionWithCertificateAlias(ServiceExtensionContext context, ObjectFactory objectFactory) {
-        var config = spy(ConfigFactory.fromMap(Map.of(
-                "edc.oauth.client.id", "id",
-                "edc.oauth.token.url", "url",
-                "edc.oauth.certificate.alias", "alias",
-                "edc.oauth.private.key.alias", "p_alias")));
-        mockCertificate("alias");
-        mockRsaPrivateKey("p_alias");
+        var config = spy(ConfigFactory.fromMap(Map.ofEntries(
+                entry("edc.oauth.client.id", "id"),
+                entry("edc.oauth.token.url", "url"),
+                entry("edc.oauth.certificate.alias", "alias"),
+                entry("edc.oauth.private.key.alias", "p_alias"))));
+        mockOAuthSpecifica("alias");
 
-        when(context.getConfig(any())).thenReturn(config);
+        when(context.getConfig()).thenReturn(config);
         objectFactory.constructInstance(Oauth2ServiceExtension.class).initialize(context);
 
         verify(config, times(1)).getString("edc.oauth.certificate.alias");
@@ -67,13 +65,12 @@ class Oauth2ServiceExtensionTest {
 
     @Test
     void leewayWarningLoggedWhenLeewayUnconfigured(ServiceExtensionContext context, ObjectFactory objectFactory) {
-        var config = spy(ConfigFactory.fromMap(Map.of(
-                "edc.oauth.client.id", "id",
-                "edc.oauth.token.url", "url",
-                "edc.oauth.certificate.alias", "alias",
-                "edc.oauth.private.key.alias", "p_alias")));
-        mockCertificate("alias");
-        mockRsaPrivateKey("p_alias");
+        var config = ConfigFactory.fromMap(Map.ofEntries(
+                entry("edc.oauth.client.id", "id"),
+                entry("edc.oauth.token.url", "url"),
+                entry("edc.oauth.certificate.alias", "alias"),
+                entry("edc.oauth.private.key.alias", "p_alias")));
+        mockOAuthSpecifica("alias");
 
         var monitor = mock(Monitor.class);
         when(context.getMonitor()).thenReturn(monitor);
@@ -86,38 +83,37 @@ class Oauth2ServiceExtensionTest {
 
     @Test
     void leewayNoWarningWhenLeewayConfigured(ServiceExtensionContext context, ObjectFactory objectFactory) {
-        var config = spy(ConfigFactory.fromMap(Map.of(
-                "edc.oauth.client.id", "id",
-                "edc.oauth.token.url", "url",
-                "edc.oauth.certificate.alias", "alias",
-                "edc.oauth.private.key.alias", "p_alias",
-                "edc.oauth.validation.issued.at.leeway", "5")));
-        mockCertificate("alias");
-        mockRsaPrivateKey("p_alias");
+        var config = ConfigFactory.fromMap(Map.ofEntries(
+                entry("edc.oauth.client.id", "id"),
+                entry("edc.oauth.token.url", "url"),
+                entry("edc.oauth.certificate.alias", "alias"),
+                entry("edc.oauth.private.key.alias", "p_alias"),
+                entry("edc.oauth.validation.issued.at.leeway", "5")));
+        mockOAuthSpecifica("alias");
 
         var monitor = mock(Monitor.class);
         when(context.getMonitor()).thenReturn(monitor);
-        when(context.getConfig(any())).thenReturn(config);
+        when(context.getConfig()).thenReturn(config);
         objectFactory.constructInstance(Oauth2ServiceExtension.class).initialize(context);
 
         var message = "No value was configured for 'edc.oauth.validation.issued.at.leeway'.";
         verify(monitor, never()).info(contains(message));
     }
 
-    private void mockRsaPrivateKey(String alias) {
-        var privateKey = mock(PrivateKey.class);
-        when(privateKey.getAlgorithm()).thenReturn("RSA");
-        when(privateKeyResolver.resolvePrivateKey(alias)).thenReturn(Result.success(privateKey));
-    }
-
-    private void mockCertificate(String alias) {
-        try {
-            var certificate = mock(X509Certificate.class);
-            when(certificate.getEncoded()).thenReturn(new byte[]{});
-            when(certificateResolver.resolveCertificate(alias)).thenReturn(certificate);
-        } catch (CertificateEncodingException e) {
-            // Should never happen, it's a checked exception in the way of mocking
-            throw new RuntimeException(e);
-        }
+    private void mockOAuthSpecifica(String alias) {
+        when(vault.resolveSecret(alias)).thenReturn("-----BEGIN CERTIFICATE-----" +
+                "MIIBPjCB6aADAgECAhRNrRtgnamwALeFs5XxvVpCAvCYljANBgkqhkiG9w0BAQsF\n" +
+                "ADAMMQowCAYDVQQDDAF4MCAXDTI2MTExMzEzNDUxM1oYDzMwMjYxMTE0MTM0NTEz\n" +
+                "WjAMMQowCAYDVQQDDAF4MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiJcudS40ZN\n" +
+                "zfMLHkttC+kUh6rNtPdADjgaqtcg/LSE79BAyQaX/e3ipyLh9x7Mfuy8fAnIBeRY\n" +
+                "dVO91hQSMPECAwEAAaMhMB8wHQYDVR0OBBYEFCszmhrv394axzbC+1C7mhNtz5o2\n" +
+                "MA0GCSqGSIb3DQEBCwUAA0EAUP/4Npe1d39WVTeYRb6LDhbW42/PPDUczbIp4BF0\n" +
+                "VWKtWlvdynb2G5MV9Bu47H7RNqwJNIcf4dw3RMRu8BFWIQ==" +
+                "-----END CERTIFICATE-----");
+        var participantContext = ParticipantContext.Builder.newInstance()
+                .identity("id")
+                .participantContextId("id")
+                .build();
+        when(participantContextSupplier.get()).thenReturn(ServiceResult.success(participantContext));
     }
 }
